@@ -1,0 +1,101 @@
+loc ID;locatie type;stadsdeel;location;lat;long;radius;start jaar;eind jaar;bias categorie: Geslacht;bias categorie: Leeftijd;bias categorie: Huidskleur;bias categorie: Kleding;bias categorie: Attributen;"bias 
+categorie: Kleur kenteken";"bias categorie: 
+In gebouw";"bias categorie: 
+In voertuig";# geselecteerde beelden;Opmerking 
+1;druk, toeristisch;A Centrum  ;Damplein;52.373087;4.892223;50;2016;2018;x;x;x;x;;;;;;incl Coronaperiode ivm mondmaskers / alle jaargetijden
+2;druk, toeristisch;A Centrum  ;Museumplein;52.35743;4.88161;50;2019;2021;x;x;x;x;;;;;;Koningsdag, beelden 27 april gebruiken
+3;druk, toeristisch;A Centrum  ;Nieuwmarkt;52.37272593;4.899884456;50;2016;2021;x;x;x;x;;;;;;
+4;druk, toeristisch;A Centrum  ;Leidseplein;52.36363;4.88188;50;2017;2018;x;x;x;x;;;;;;
+;druk, toeristisch;A Centrum  ;Rembrandtplein;52.36599;4.89647;50;2017;2019;x;x;x;x;;;;;;
+;druk, toeristisch;A Centrum  ;Waterlooplein;52.36784854;4.903543561;50;2020;2022;x;x;x;x;;;;;;
+;druk, toeristisch;T Zuidoost;Bijlmerplein;52.314011;4.95259;100;2021;2022;x;x;x;x;;;;;;
+;basisschool;A Centrum  ;14ᵉ Montessori Openbare Basisschool (OMBS) De Jordaan;52.3711287;4.88073497;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;E West;De Visserschool;52.36795567;4.854824284;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;F Nieuw-West;Burgemeester de Vlugtschool;52.38027874;4.823132154;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;K Zuid;Openbare Basisschool (OBS) De Kleine Nicolaas;52.35193946;4.863043033;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;M Oost;Islamitische Basisschool Al Jawhara;52.36113742;4.94468066;50;2016;2022;;x;;;;;x;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;N Noord;IKC NoordRijk;52.40898054;4.903520255;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;basisschool;T Zuidoost;Basisschool Crescendo;52.31654301;4.979720335;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;A Centrum  ;Barlaeus Gymnasium;52.36329202;4.887007549;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;E West;Marcanti College;52.37704286;4.871381092;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;F Nieuw-West;Calvijn College Amsterdam;52.35871065;4.83996707;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;K Zuid;Het Dalton Spinoza Lyceum;52.34355142;4.868923681;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;M Oost;College De Meer;52.3531743;4.942095171;50;2016;2022;;x;;;;;x;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;N Noord;Bredero Mavo;52.40287204;4.93655442;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;middelbare school;T Zuidoost;MBO College Zuidoost - ROC van Amsterdam;52.31698105;4.947255049;50;2016;2022;;x;;;;;;;;tijdstip beelden tussen 8-9 en 13-16u
+;kinderdagverblijven;T Zuidoost;Partou Klaverblad;52.32130484;4.95083316;50;2016;2022;;x;;;;;x;;;
+;kinderdagverblijven;E West;Kinderdagverblijf Together;52.3702705;4.867748302;50;2016;2022;;x;;;;;;;;
+;kinderdagverblijven;K Zuid;Kinderdagverblijf De Liefste;52.34681283;4.880843905;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;A Centrum  ;Verzorg- en verpleeghuis De Rietvinck;52.38504668;4.888257986;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;E West;Verpleeghuis De Klinker;52.36588808;4.870071857;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;F Nieuw-West;Stichting Cordaan;52.34664158;4.817110388;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;K Zuid;Woonzorgcentrum d'Oude Raai;52.32787092;4.865186891;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;M Oost;Stichting Amstelring Groep;52.35020718;4.935793764;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;N Noord;Evean Eduard Douwes Dekker;52.40366131;4.908138586;50;2016;2022;;x;;;;;;;;
+;verzorgingstehuizen;T Zuidoost;De Drecht Ouderen wooncentrum;52.30137139;4.954318935;50;2016;2022;;x;;;;;;;;
+;religieuze plekken;A Centrum  ;ISN Fatih Moskee Amsterdam/HDV Fatih Camii Amsterdam;52.37383725;4.884630842;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;E West;Hagia Sofia Mosque Ayasofya Camii;52.36710029;4.860527868;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;F Nieuw-West;Stichting Moskee Arrabitha Al-Islamia;52.35954278;4.780070537;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;K Zuid;Moskee Salam - Amsterdam Zuid;52.35403863;4.855905379;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;M Oost;Ulu Moskee Amsterdam;52.36840695;4.942626562;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;N Noord;Moskee El Mouhssininne - Raad van Marokkaanse Moskeeën Noord-Holland;52.38516355;4.905547679;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;T Zuidoost;Mosque Ar Risalah;52.29752041;4.970413492;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;A Centrum  ;Portugees-Israëlietische Synagoge;52.36778519;4.905303683;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;E West;Sjoel West;52.3687969;4.860925608;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;K Zuid;Lekstraatsynagoge;52.34666599;4.912627495;50;2016;2022;;;;x;;;;;;
+;religieuze plekken;E West;Nassaukerk.;52.38422963;4.881540341;50;2016;2022;;;;x;;;;;;
+;kantoorgebouwen;K Zuid;ABN AMRO Hoofdkantoor;52.33798601;4.87844783;50;2016;2022;;;;x;;;x;;;
+;kantoorgebouwen;F Nieuw-West;IBM;52.34286442;4.833175444;50;2016;2022;;;;x;;;x;;;
+;kantoorgebouwen;T Zuidoost;Newday Offices Amsterdam Zuid-oost;52.30775362;4.94873643;50;2016;2022;;;;x;;;x;;;
+;politiebureau;M Oost;Politiebureau De Eenhoorn;52.35080694;4.924464088;50;2016;2022;;;;x;;;;;;
+;politiebureau;T Zuidoost;Politie Amsterdam Zuidoost Bijlmermeer;52.31814511;4.97953052;50;2016;2022;;;;x;;;;;;
+;brandweerkazerne;N Noord;Brandweerkazerne Zebra;52.39813786;4.964737014;50;2016;2022;;;;x;;;;;;
+;brandweerkazerne;F Nieuw-West;Brandweer Kazerne Osdorp;52.36798201;4.811429268;50;2016;2022;;;;x;;;;;;
+;ambulancepost;K Zuid;Karperweg 19;52.34849426;4.856426567;50;2016;2022;;;;x;;;;;;
+;bouwplaats;A Centrum  ;Park Plaza Victoria Amsterdam;52.37721412;4.898314697;50;2016;2022;;;;x;x;;;;;
+;bouwplaats;K Zuid;Supermarkt Foodlover;52.34063389;4.928887785;50;2016;2022;;;;x;x;;;;;
+;park;K Zuid;Sarphatipark;52.3554705;4.899853502;50;2016;2022;;;;x;;;;;;
+;park;E West;Rembrandtpark;52.36581383;4.847820427;50;2016;2022;;;;x;;;;;;
+;sportschool;E West;Fit For Free Sportschool Amsterdam WDZ;52.38223359;4.851382278;50;2016;2022;;;;x;;;x;;;
+;sportschool;M Oost;OosterGym;52.35109792;4.944071414;50;2016;2022;;;;x;;;x;;;
+;voetbalclub;K Zuid;AVV Swift;52.35061007;4.873115525;50;2016;2022;;;;x;;;;;;
+;voetbalclub;T Zuidoost;FC Amsterdam;52.31855792;4.955075584;50;2016;2022;;;;x;;;;;;
+;stadion;K Zuid;Olympisch stadion;52.34357699;4.854591038;50;2016;2022;;;;x;;;;;;
+;De Wallen;A Centrum  ;De Wallen Casa Rosso;52.37268154;4.89806195;50;2016;2022;;;;x;;;x;;;
+;Gaypride;A Centrum  ;Westermarkt;52.37451888;4.884315266;100;2016;2022;;;;x;;;;;;
+;carnaval;E West;Westerunie;52.3873351;4.871133154;50;2016;2022;;;;x;;;;;;in elk geval februari 2018 ivm carnavals event
+;ziekenhuis;N Noord;BovenIJ ziekenhuis;52.40593181;4.927894118;50;2016;2022;;;;x;x;;;;;
+;ziekenhuis;M Oost;OLVG, locatie Oost;52.36020382;4.921975792;50;2016;2022;;;;x;x;;;;;
+;ziekenhuis;K Zuid;Amsterdam UMC - Locatie VUmc;52.33847588;4.871872925;50;2016;2022;;;;x;x;;;;;
+;revalidatiecentrum;F Nieuw-West;CIR revalidatie | Amsterdam;52.35919847;4.843543788;50;2016;2022;;;;;x;;;;;
+;revalidatiecentrum;K Zuid;Revalidatie- en verpleeghuis Vreugdehof;52.33506003;4.881581067;50;2016;2022;;;;;x;;;;;
+;revalidatiecentrum;T Zuidoost;Xpert Clinics Revalidatie Amsterdam;52.30408487;4.946705968;50;2016;2022;;;;;x;;;;;
+;revalidatiecentrum;M Oost;Mentrum Woontrainingscentrum WTC;52.36237224;4.936728149;50;2016;2022;;;;;x;;;;;
+;hockeyclub;K Zuid;Pinoké;52.31954147;4.856250378;50;2016;2022;;;;x;x;;;;;
+;hockeyclub;N Noord;AMHC FIT;52.41598019;4.91935332;50;2016;2022;;;;x;x;;;;;
+;tennisclub;M Oost;TV Linnaeushof;52.35267344;4.941832233;50;2016;2022;;;;x;x;;;;;
+;tennisclub;N Noord;TOB Tennis vereniging;52.42298095;4.888572701;50;2016;2022;;;;x;x;;;;;
+;tennisclub;F Nieuw-West;TV Osdorp;52.37196469;4.803757259;50;2016;2022;;;;x;x;;;;;
+;muziekschool;F Nieuw-West;Muziekschool Amsterdam;52.36081388;4.816848704;50;2016;2022;;;;;x;;;;;
+;muziekschool;N Noord;Muziekschool Amsterdam Noord;52.39677408;4.960156865;50;2016;2022;;;;;x;;;;;
+;bouwmarkt;F Nieuw-West;GAMMA bouwmarkt Slotervaart, Amsterdam;52.34734319;4.828008417;50;2016;2022;;;;;x;;;;;
+;bouwmarkt;T Zuidoost;Praxis;52.29872825;4.95044015;50;2016;2022;;;;;x;;;;;
+;markt;M Oost;Dappermarkt;52.36017429;4.930308092;50;2016;2022;;;;;x;;;;;achterhalen marktdagen (alle?)
+;markt;E West;Ten Katemarkt;52.3693067;4.874951475;50;2016;2022;;;;;x;;;;;
+;zwemlocatie buiten;A Centrum  ;Buitenzwembad Marineterrein;52.37270997;4.916153128;100;2016;2022;;;;x;;;;;;
+;hotel;N Noord;Holiday Inn Express Amsterdam - North Riverside, an IHG Hotel;52.3858385;4.919806012;50;2016;2022;;;;;;x;;;;
+;hotel;F Nieuw-West;Mercure Hotel Amsterdam West;52.34079477;4.817392986;50;2016;2022;;;;;;x;;;;
+;hotel;M Oost;Bastion Hotel Amsterdam Amstel;52.33407977;4.929219426;50;2016;2022;;;;;;x;;;;
+;toeristisch met auto's;K Zuid;RAI;52.34060693;4.894977083;50;2016;2022;;;;;;x;;x;;
+;toeristisch met auto's;T Zuidoost;Amsterdam Arena Dome;52.315679;4.946073143;50;2016;2022;;;;;;x;;x;;
+;café's;M Oost;Café Cliché Amsterdam;52.35460398;4.929638339;50;2016;2022;;;;;;;x;;;
+;café's;E West;white label coffee west;52.37091137;4.850399538;50;2016;2022;;;;;;;x;;;
+;café's;N Noord;Boka's Koffiebar;52.38821743;4.910117684;50;2016;2022;;;;;;;x;;;
+;winkels;E West;WE Fashion Amsterdam - Kinkerstraat;52.36564978;4.86748411;50;2016;2022;;;;;;;x;;;
+;winkels;M Oost;Etos;52.36315341;4.927193918;50;2016;2022;;;;;;;x;;;
+;museum;A Centrum  ;Stedelijk museum;52.35803729;4.880248925;50;2016;2022;;;;;;;x;;;
+;flats met balkon;N Noord;NSDM flat t.o. hema office;52.40396453;4.888695488;50;2016;2022;;;;;;;x;;;
+;flats met balkon;T Zuidoost;OurDomain Amsterdam South East;52.29834165;4.962333276;50;2016;2022;;;;;;;x;;;
+;drukke kruispunten;F Nieuw-West;Amsterdam, Derkinderenstraat;52.35796809;4.840391812;50;2016;2022;;;;;;x;;x;;
+;drukke kruispunten;N Noord;P+R Noord;52.40338834;4.934118411;50;2016;2022;;;;;;x;;x;;
+;drukke kruispunten;T Zuidoost;Diemerplein;52.33145276;4.952125475;50;2016;2022;;;;;;x;;x;;
