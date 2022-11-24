@@ -51,5 +51,5 @@ def remove_images(annotations_file):
 
 
 if __name__ == "__main__":
-    annotations_file = Path("data/annotations.json")
+    annotations_file = Path("data/prep-laurens/annotations.json")
     remove_images(annotations_file)
