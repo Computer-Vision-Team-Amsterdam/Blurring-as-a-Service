@@ -1,4 +1,7 @@
 # PyCharm files
 **/*.DS_Store
+
+
 .idea/*
 data/prep-diana/yolo-format/*
+data/prep-diana/__pycache__/*
