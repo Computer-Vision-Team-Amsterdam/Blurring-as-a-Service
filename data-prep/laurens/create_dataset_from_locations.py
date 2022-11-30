@@ -149,7 +149,7 @@ def upload_to_storage():
     dataset.update()
 
 
-def create_dataset_from_locations(file_to_locations="data/locations.csv", sample_frequency=5, dataset_folder="Retrieved_images"):
+def create_dataset_from_locations(file_to_locations="data-prep/locations.csv", sample_frequency=5, dataset_folder="Retrieved_images"):
     locations = read_locations_file(file_to_locations)
     filtered_pano_ids = []
     for location in locations:

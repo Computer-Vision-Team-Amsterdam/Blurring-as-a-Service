@@ -26,4 +26,4 @@ The *.txt file specifications are:
 ---
 
 ### Data processing 
-More information about the exploratory data analysis can be found in the [eda.md](data/eda.md) file.
+More information about the exploratory data analysis can be found in the [eda.md](data-prep/eda.md) file.

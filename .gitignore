@@ -3,5 +3,8 @@
 
 
 .idea/*
-data/prep-diana/yolo-format/*
-data/prep-diana/__pycache__/*
+data-prep/diana/out:yolo-format/*
+data-prep/diana/__pycache__/*
+
+# Azure ML config file
+config.json

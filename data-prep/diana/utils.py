@@ -34,6 +34,6 @@ class CocoToYoloConverter:
             # update category
             annotations = [_update_category(annotation) for annotation in annotations]
 
-            # write annotations to txt file. image_name is Location/images/TMXblabla.jpg
-            self._write_to_txt(image_name=image["file_name"].split("/")[-3],
+            # write annotations to txt file. image_name is TMXblabla.jpg
+            self._write_to_txt(image_name=image["file_name"].split("/")[-1].split(".")[0],
                                per_image_annotations=annotations)
