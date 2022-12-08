@@ -1,4 +1,3 @@
-
 import os
 import json
 import time
@@ -6,11 +5,11 @@ from pathlib import Path
 from tqdm import tqdm
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
-
 from panorama.client import PanoramaClient
 
 from visualizations.model import PointOfInterest
-from visualizations.unique_instance_prediction import geo_clustering, generate_map, color_generator, append_geohash,get_points
+from visualizations.unique_instance_prediction import geo_clustering, generate_map, color_generator, append_geohash, \
+    get_points
 from dataclass_wizard import Container
 
 
@@ -75,36 +74,37 @@ def get_filenames_metadata(filenames: List[str], ids: List[str], locations: List
     """
     filenames_loc = Container[PointOfInterest]()
 
-    for filename, img_id, loc in tqdm(zip(filenames, ids, locations), total=len(filenames), desc="Getting metadata from API"):
-        pano_object = PanoramaClient.get_panorama(filename)
-        lat = pano_object.geometry.coordinates[1]
-        lon = pano_object.geometry.coordinates[0]
+    for filename, img_id, loc in tqdm(zip(filenames, ids, locations), total=len(filenames),
+                                      desc="Getting metadata from API"):
+        try:
+            pano_object = PanoramaClient.get_panorama(filename)
+            lat = pano_object.geometry.coordinates[1]
+            lon = pano_object.geometry.coordinates[0]
 
-        filenames_loc.append(
-            PointOfInterest(
-                pano_id=filename,
-                coords=(lat, lon),
-                image_id=img_id,
-                location=loc
+            filenames_loc.append(
+                PointOfInterest(
+                    pano_id=filename,
+                    coords=(lat, lon),
+                    image_id=img_id,
+                    location=loc
+                )
             )
-        )
-        # panorama API allows 6 requests per 10 seconds = 1 request per 0.6 seconds
-        time.sleep(0.6)
+            # panorama API allows 6 requests per 10 seconds = 1 request per 0.6 seconds
+            time.sleep(0.6)
+        except ValueError:
+            print(f"{filename} failed.")
     return filenames_loc
 
 
 def split_pano_ids(points, nr_clusters, train_ratio=0.8):
     """
     Split panorama filenames in train.txt, val.txt and test.txt based on given split ratio
-    Panos that start with pano* are firstly moved based on where they already are.
-    Example: if pano0001 is initially in annotations-train.json, then we put
-    pano0001 in train.txt.
     """
 
     total = len(points) + 370  # add the pano files
 
     print(f"total: {total}")
-    train_count = int(train_ratio*total)
+    train_count = int(train_ratio * total)
     val_count = total - train_count
 
     train_points = []
@@ -132,6 +132,3 @@ def split_pano_ids(points, nr_clusters, train_ratio=0.8):
     print(f"After filename splitting, train count is {len(train_points)}, val count is {len(val_points)}.")
 
     return train_points, val_points
-
-
-
