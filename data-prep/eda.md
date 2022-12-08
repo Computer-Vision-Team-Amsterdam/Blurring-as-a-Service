@@ -223,7 +223,8 @@ Previously, we generated the new annotations txt files.
 
 ---
 Now we create the `ORBS-base` dataset at the following location in the storage account:
-link
+ [AS storage account](https://portal.azure.com/#view/Microsoft_Azure_Storage/ContainerMenuBlade/~/overview/storageAccountId/%2Fsubscriptions%2Fb5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14%2FresourceGroups%2Fcvo-aml-p-rg%2Fproviders%2FMicrosoft.Storage%2FstorageAccounts%2Fcvodataweupgwapeg4pyiw5e/path/annotations-blob-container/etag/%220x8DAD3B5819D0865%22/defaultEncryptionScope/%24account-encryption-key/denyEncryptionScopeOverride~/false/defaultId//publicAccessVal/None),   
+at `annotations-projects/07-25-2022_120550_UTC/ORBS-base`
 
 Here we have 2 folders: 
 
