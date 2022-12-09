@@ -1,7 +1,8 @@
 import os
 import json
 import time
-from pathlib import Path
+import random
+import numpy as np
 from tqdm import tqdm
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
@@ -96,19 +97,21 @@ def get_filenames_metadata(filenames: List[str], ids: List[str], locations: List
     return filenames_loc
 
 
-def split_pano_ids(points, nr_clusters, train_ratio=0.8):
+def split_pano_ids(points, nr_clusters, train_ratio=0.7, val_ratio=0.15):
     """
     Split panorama filenames in train.txt, val.txt and test.txt based on given split ratio
     """
 
-    total = len(points) + 370  # add the pano files
+    total = len(points)   # add the pano files
 
     print(f"total: {total}")
     train_count = int(train_ratio * total)
-    val_count = total - train_count
+
+    val_count = int(val_ratio * total)
 
     train_points = []
     val_points = []
+    test_points = []
 
     print(f"Number of panorama files: {len(points)}")
     print(f"Train count is {train_count}, val count is {val_count}.")
@@ -118,9 +121,14 @@ def split_pano_ids(points, nr_clusters, train_ratio=0.8):
             return True
         return False
 
-    for cluster_id in range(nr_clusters):
+    # shuffle the cluster indices. If we don't we get a lot of test points in Nieuw West
+    cluster_indices = list(np.arange(nr_clusters))
+    random.seed(4)
+    random.shuffle(cluster_indices)
+
+    for cluster_id in cluster_indices:
         points_subset = get_points(points, cluster_id=cluster_id)
-        if _not_full(train_points, threshold=train_count - 370):  # we already start with 355 pano* filenames.
+        if _not_full(train_points, threshold=train_count):
             for i, point in enumerate(points_subset):
                 points_subset[i].subset = "train"
             train_points.extend(points_subset)
@@ -128,7 +136,13 @@ def split_pano_ids(points, nr_clusters, train_ratio=0.8):
             for i, point in enumerate(points_subset):
                 points_subset[i].subset = "val"
             val_points.extend(points_subset)
+        else:
+            for i, point in enumerate(points_subset):
+                points_subset[i].subset = "test"
+            test_points.extend(points_subset)
 
-    print(f"After filename splitting, train count is {len(train_points)}, val count is {len(val_points)}.")
+    print(f"After filename splitting, train count is {len(train_points)}, val count is {len(val_points)}, "
+          f"test count is {len(test_points)}.")
 
-    return train_points, val_points
+    return train_points, val_points, test_points
+

@@ -140,7 +140,7 @@ def generate_map(
             )
 
             popup = folium.Popup(folium.Html(html, script=True), max_width=500)
-            if detections[i].subset == "":  #train
+            if detections[i].subset == "train":
                 folium.Marker(
                     location=[detections[i].coords[0], detections[i].coords[1]],
                     popup=popup,
@@ -162,6 +162,22 @@ def generate_map(
                     popup=popup,
                     icon=folium.Icon(
                         color="blue",
+                        icon_color=color(detections[i].cluster, colors)
+                        if colors
+                        else "darkgreen",
+                        icon="square",
+                        angle=0,
+                        prefix="fa",
+                    ),
+                    radius=15,
+                    # ).add_to(marker_cluster)
+                ).add_to(Map)
+            if detections[i].subset == "test":
+                folium.Marker(
+                    location=[detections[i].coords[0], detections[i].coords[1]],
+                    popup=popup,
+                    icon=folium.Icon(
+                        color="red",
                         icon_color=color(detections[i].cluster, colors)
                         if colors
                         else "darkgreen",

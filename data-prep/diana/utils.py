@@ -20,8 +20,16 @@ class CocoToYoloConverter:
 
     def _write_to_txt(self, image_name, per_image_annotations):
         # line = [category, x, ,y, width, height]
-        lines = [f'{annotation["category_id"]} {" ".join(map(str, annotation["bbox"]))}'
-                 for annotation in per_image_annotations]
+        lines = []
+        for annotation in per_image_annotations:
+            x, y, width, height = annotation["bbox"]
+            xc = x + width/2
+            yc = y + height/2
+            line = f'{annotation["category_id"]} {xc} {yc} {width} {height}'
+            lines.append(line)
+
+        # lines = [f'{annotation["category_id"]} {" ".join(map(str, annotation["bbox"]))}'
+        #         for annotation in per_image_annotations]
         with open(f'{self._output_dir}/{image_name}.txt', 'w') as f:
             f.write('\n'.join(lines))
 

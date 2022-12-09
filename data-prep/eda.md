@@ -233,7 +233,7 @@ Here we have 2 folders:
 
 !! *This is the dataset used from now onwards to train the first version of the blurring model.*
   
-### Visualizations  
+### Creating the metadata  
   
 Let's look at the distribution of our images thoughout the city  
   
@@ -262,20 +262,80 @@ points_geohash = append_geohash(points)
 # a `Container` object is just a wrapper around a Python `list`  
 Container[PointOfInterest](points_geohash).to_json_file("in:coco-format/blur_v0.1/metadata_for_map.json", indent=4)  
 ```  
-We can then generate a simple map   
+
+### Split into train, test and validation 
+
+We have roughly 5200 images. 
+With a 70%-15%-15% split, we have roughly 3640-780-780 images in each subset.
+Process is as follows:
+- Split ids
+- Move corresponding image files based on ids.
+
+```python
+from visualizations.model import PointOfInterest
+from dataclass_wizard import Container
+from visualizations.unique_instance_prediction import geo_clustering
+from annotations_utils import split_pano_ids
+
+points_geohash = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/metadata_for_map.json')
+
+# add cluster_id to Points of Interest
+clustered_points, clusters = geo_clustering(container_locations=points_geohash,
+                                            prefix_length=6)
+
+
+print(f"Number of clusters: {len(clusters)}.")
+# split Points of Interest into 3 subsets: train, val and test
+train_points, val_points, test_points = split_pano_ids(clustered_points, nr_clusters=len(clusters))
+
+Container[PointOfInterest](train_points).to_json_file("in:coco-format/blur_v0.1/map_train.json", indent=4)
+Container[PointOfInterest](val_points).to_json_file("in:coco-format/blur_v0.1/map_val.json", indent=4)
+Container[PointOfInterest](test_points).to_json_file("in:coco-format/blur_v0.1/map_test.json", indent=4)
+```
+
+Output is:
+
+```text
+Number of clusters: 321.
+Number of panorama files: 5188
+Train count is 3631, val count is 778.
+After filename splitting, train count is 3698, val count is 798, test count is 692.
+
+```
+
+### Visualizations 
+
+Let's  create a map with train, validation and test sets to see how close the clusters are to each other.
+
+```python
+from visualizations.model import PointOfInterest
+from visualizations.unique_instance_prediction import color_generator, generate_map
+
+train_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_train.json')
+val_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_val.json')
+test_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_test.json')
+
+train_validation_points = train_points + val_points + test_points
+# array with N different colors for N different clusters
+# len(clusters) = 321
+# colors = color_generator(nr_colors=len(clusters))
+colors = color_generator(nr_colors=321)
+
+# create HTML map for each subset
+generate_map(vulnerable_bridges=[],
+             permit_locations=[],
+             detections=train_validation_points,
+             name="in:coco-format/blur_v0.1/Train_Validation_Test",
+             colors=colors)
+
+```
+Next, we will move these ids in the corresponding folders in Azure. 
+
   
-```python  
-from visualizations.unique_instance_prediction import generate_map  
-from visualizations.model import PointOfInterest  
-  
-  
-points_geohash = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/metadata_for_map.json')  
-  
-generate_map(vulnerable_bridges=[],  
-  permit_locations=[],  
-  detections=points_geohash,  
-  name="in:coco-format/blur_v0.1/all_locations")  
-```  
+
+
+
+
 
 BELOW IS OBSOLETE 
 As stated above, let's see if the panoramas ids overlap. If they do, then we have   
