@@ -331,7 +331,59 @@ generate_map(vulnerable_bridges=[],
 ```
 Next, we will move these ids in the corresponding folders in Azure. 
 
-  
+Let's download the train, validation and test data in separate folders:
+
+```python
+from visualizations.model import PointOfInterest
+from azure.identity import DefaultAzureCredential
+from azure.storage.blob import ContainerClient
+from tqdm import tqdm
+
+STORAGE_ACCOUNT = 'https://cvodataweupgwapeg4pyiw5e.blob.core.windows.net/'
+CONTAINER_NAME = 'annotations-blob-container'
+
+train_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_train.json')
+train_ids = [point.pano_id for point in train_points]
+
+val_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_val.json')
+val_ids = [point.pano_id for point in val_points]
+
+test_points = PointOfInterest.from_json_file('in:coco-format/blur_v0.1/map_test.json')
+test_ids = [point.pano_id for point in test_points]
+
+print(f"{len(train_ids)} train points, {len(val_ids)} val points and {len(test_ids)} test points.")
+
+
+def download_data_from_datastore(pano_ids, data_format="jpg", subset=None):
+    default_credential = DefaultAzureCredential()
+    # Create the BlobServiceClient object  
+    blob_service_client = ContainerClient(STORAGE_ACCOUNT, container_name=CONTAINER_NAME, credential=default_credential)
+    root = None
+    destination = None
+    if data_format == "jpg":
+        root = "annotations-projects/07-25-2022_120550_UTC/ORBS-base/images"
+        destination = "in:coco-format/dataset/images"
+    if data_format == "txt":
+        root = "annotations-projects/07-25-2022_120550_UTC/ORBS-base/labels"
+        destination = "in:coco-format/dataset/labels"
+     
+    for pano_id in tqdm(pano_ids):
+        blob_name = f"{root}/{pano_id}.{data_format}"
+        try:
+            with open(file=f"{destination}/{subset}/{pano_id}.{data_format}", mode="wb") as download_file:
+                download_file.write(blob_service_client.download_blob(blob_name).readall())
+        except ValueError:
+            print(f"{pano_id} failed.")               
+
+
+download_data_from_datastore(train_ids, data_format="jpg", subset="train")
+download_data_from_datastore(train_ids, data_format="txt", subset="train")
+download_data_from_datastore(val_ids, data_format="jpg", subset="val")
+download_data_from_datastore(val_ids, data_format="txt", subset="val")
+download_data_from_datastore(test_ids, data_format="jpg", subset="test")
+download_data_from_datastore(test_ids, data_format="txt", subset="test")
+```
+
 
 
 
