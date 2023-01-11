@@ -92,6 +92,11 @@ converter.convert()
 We generated 1445 txt files with annotations in out:yolo-format/blur_v0.1  
 One is a duplicate!  
   
+### COCO to YOLO format checker
+
+For sanity checks of the converted annotations, we draw bounding boxes on original images based on 
+yolo format annotation. Instructions on how to do this can be found [here](../draw-YOLO-box/README.md).
+
   
 ### Inspecting the old dataset  
   
