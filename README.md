@@ -13,7 +13,24 @@ the panorama images used for training the model based on this document.
 ---
 
 ## Development
-### Setup the AzureML connection
+
+#### 1. Clone the code
+
+```bash
+git clone git@github.com:Computer-Vision-Team-Amsterdam/Blurring-as-a-Service.git
+```
+
+#### 2. Install Poetry
+If you don't have it yet, follow the instructions [here](https://python-poetry.org/docs/#installation) to install the package manager Poetry.
+
+
+#### 3. Init submodules
+You need to initialize the content of the submodules so git clones the latest version.
+```bash
+git submodule update --init --recursive
+```
+
+#### 4. Setup the AzureML connection
 To allow your code to connect to Azure ML and train the model is necessary to retrieve a connection config.
 This can be done clicking on the change workspace button located on the top right in the [AzureML website](https://ml.azure.com), and then in "Download config file".
 The downloaded "config.json" file must be added in the top folder of the project.
@@ -30,6 +47,15 @@ The *.txt file specifications are:
 - Box coordinates must be in normalized xywh format (from 0 - 1). If your boxes are in pixels, divide x_center and width by image width, and y_center and height by image height.
 - Class numbers are zero-indexed (start from 0).
 ---
+
+### Update yolov5
+In case the yolov5 package gets updated it's necessary to update the poetry packages adding the new ones of yolov5,
+in case there are new ones.
+
+This can be easily done using the following command:
+```bash
+cat yolov5/requirements.txt | grep -o '^[^# ]*' | xargs poetry add
+```
 
 ### Data processing 
 More information about the exploratory data analysis can be found in the [eda.md](data-prep/eda.md) file.
