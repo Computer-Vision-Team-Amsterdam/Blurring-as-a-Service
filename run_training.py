@@ -13,7 +13,6 @@ ws = Workspace.from_config()
 packages_and_versions_local_env = dict(
     tuple(str(ws).split()) for ws in pkg_resources.working_set
 )
-packages_and_versions_local_env.pop("panorama")
 packages = [
     f"{package}=={version}"
     for package, version in packages_and_versions_local_env.items()
@@ -27,15 +26,22 @@ cd = CondaDependencies.create(
 )
 
 env.python.conda_dependencies = cd
+env.register(workspace=ws)
 dataset = Dataset.get_by_name(ws, "ORBS-base-first-split")
 
 mounted_dataset = dataset.as_mount(path_on_compute="first-split")
 compute_target = ComputeTarget(ws, "stronger-gpu")
 experiment = Experiment(workspace=ws, name="Train-with-first-split")
 
+
+script_args = [
+    "--data", "data/pano.yaml",
+    "--img", "4000",
+]
 script_config = ScriptRunConfig(
-    source_directory=".",
+    source_directory="./yolov5",
     script="train.py",
+    arguments=script_args,
     environment=env,
     compute_target=compute_target,
 )
