@@ -35,6 +35,20 @@ To allow your code to connect to Azure ML and train the model is necessary to re
 This can be done clicking on the change workspace button located on the top right in the [AzureML website](https://ml.azure.com), and then in "Download config file".
 The downloaded "config.json" file must be added in the top folder of the project.
 
+#### 6. Install dependencies
+In the terminal, navigate to the project root (the folder containing `pyproject.toml`), then use Poetry to create a new virtual environment and install the dependencies.
+
+```bash
+poetry install
+```
+    
+#### 7. Install pre-commit hooks
+The pre-commit hooks help to ensure that all committed code is valid and consistently formatted.
+
+```bash
+poetry run pre-commit install
+```
+
 ### Train custom dataset with yolov5
 Source can be found [here](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data). 
 
