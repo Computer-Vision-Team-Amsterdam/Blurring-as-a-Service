@@ -9,6 +9,7 @@ RUN apt-get -y update \
     && rm -rf /var/lib/apt/lists/*
 
 RUN apt-get update
-RUN apt-get install ffmpeg libsm6 libxext6  -y
+RUN apt-get install ffmpeg libsm6 libxext6 -y
 
 RUN pip install git+https://git@github.com/Computer-Vision-Team-Amsterdam/panorama.git@98a92686a9ef92b3748f345b137123ea5915c8b1
+
