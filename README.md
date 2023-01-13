@@ -10,7 +10,7 @@ the panorama images used for training the model based on this document.
 2. [Panorama viewer](https://data.amsterdam.nl/data/geozoek/?modus=kaart&term=Panoramabeelden&lagen=pano-pano2022bi%7Cpano-pano2021bi%7Cpano-pano2020bi%7Cpano-pano2019bi%7Cpano-pano2018bi%7Cpano-pano2017bi%7Cpano-pano2016bi%7Cpano-pano2021woz%7Cpano-pano2020woz%7Cpano-pano2019woz%7Cpano-pano2018woz%7Cpano-pano2017woz&legenda=true)
 3. [Excel sheet with inclusivity biases (risico's en maatregelen.xlsx)](https://hoofdstad.sharepoint.com/sites/DigitaliseringenCTO/Shared%20Documents/Forms/AllItems.aspx?RootFolder=%2Fsites%2FDigitaliseringenCTO%2FShared%20Documents%2FInnovatie%20en%20RenD%2FComputer%20Vision%20Team%2FProjecten%2FInnovatiebudget%20%28hieronder%20valt%20Blur%20use%20case%29%2FInclusiviteit&FolderCTID=0x0120002EC45AFB501BC64FB525D14106AF3E05)
 4. [Annotation project in Azure ML](https://ml.azure.com/labeling/project/93e9b2be-62de-6a8c-9c22-5b20cc5b90af/details?wsid=/subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourceGroups/cvo-aml-p-rg/providers/Microsoft.MachineLearningServices/workspaces/cvo-weu-aml-p-xnjyjutinwfyu&tid=72fca1b1-2c2e-4376-a445-294d80196804)
-5. [Miro board with pipelines architecture] TODO
+5. [Miro board with pipelines architecture](https://miro.com/app/board/uXjVPbDfQ9s=/?share_link_id=940866715023)
 ---
 
 ## Development
