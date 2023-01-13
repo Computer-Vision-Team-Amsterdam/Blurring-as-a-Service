@@ -42,7 +42,7 @@ experiment = Experiment(workspace=ws, name="Train-with-first-split")
 script_args = [
     "--mount_point", mounted_dataset,
     "--data", "yolov5/data/pano.yaml",
-    "--cfg", "yolov5/models/yolov5s.yaml"
+    "--cfg", "yolov5/models/yolov5s.yaml",
     "--img", "2048",
     "--batch-size", "8",
     "--save-period", "40",

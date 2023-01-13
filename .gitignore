@@ -8,3 +8,6 @@ data-prep/diana/__pycache__/*
 
 # Azure ML config file
 config.json
+
+# Fond for Yolo
+Arial.ttf
