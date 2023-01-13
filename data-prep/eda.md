@@ -1,5 +1,5 @@
   
-### Azure COCO format   
+### Azure COCO format vs YOLO format  
 We download the annotations from AzureML.  
 The used annotation file can be found [here](diana/in:coco-format/blur_v0.1/blur-annotations.json).  
   
@@ -38,7 +38,17 @@ An example of one txt file:
 49 0.646836 0.132552 0.118047 0.0969375  
   
 [class name] [x] [y] [width] [height]  
+
+The *.txt file specifications are:
+
+- One row per object
+- Each row is class x_center y_center width height format.
+- Box coordinates must be in normalized xywh format (from 0 - 1). If your boxes are in pixels, divide x_center and width by image width, and y_center and height by image height.
+- Class numbers are zero-indexed (start from 0).
 ```  
+Source for training YOLO with custom dataset can be found [here](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data). 
+
+Based on this info, we know what we need to consider the following when converting the annotations:
 - The bbox will remain the same format  
 - Categories will change from 1=person and 2=license plate to 0=person and 1=licence plate  
 - if we split train-val in for example 1000-446 we have `train/images` with 1000 jpg files  and `train/labels` with 1000 txt files  
