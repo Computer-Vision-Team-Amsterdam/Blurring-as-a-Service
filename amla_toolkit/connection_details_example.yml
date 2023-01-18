@@ -1,0 +1,37 @@
+# EXAMPLE
+#connections:
+#  your_connection_name:
+#    acc:
+#      subscription_id: your_subscription_id
+#      resource_group: your_resource_group
+#      tenant_id: your_tenant_id
+#      some_other_attribute: your_attribute
+#    prd:
+#      subscription_id: your_subscription_id
+#      resource_group: your_resource_group
+#      tenant_id: your_tenant_id
+#      some_other_attribute: your_attribute
+
+connections:
+  datateam_sociaal:
+    subscription_id: 12a222ce-185d-4419-9911-f59258f0a83a
+    resource_group: wpi
+  analyse_services:
+    ont:
+      subscription_id: b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14
+      resource_group: aao-aml-p-rg
+      storage_account_name: daodataweuom4vosf3mpux7y
+      aml_workspace_name: aao-weu-aml-p-xnjyjutinwfyu
+      tenant_id: 72fca1b1-2c2e-4376-a445-294d80196804
+      vnet_resourcegroup_name: infr-weu-networking-rg
+      vnet_name: infr-weu-vnet-as-ont-01
+      user_assigned_identity_id: aml-compute-dao-o
+    prd:
+      subscription_id: b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14
+      resource_group: aap-aml-p-rg
+      storage_account_name: daodataweupkebdy6mkwkv7u
+      aml_workspace_name: aap-weu-aml-p-xnjyjutinwfyu
+      tenant_id: 72fca1b1-2c2e-4376-a445-294d80196804
+      vnet_resourcegroup_name: infr-weu-networking-rg
+      vnet_name: infr-weu-vnet-as-prd-01
+      user_assigned_identity_id: aml-compute-dao-p
