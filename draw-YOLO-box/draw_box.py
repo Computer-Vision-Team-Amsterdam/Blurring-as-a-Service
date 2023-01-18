@@ -11,7 +11,7 @@ raw_images_folder = './raw_images/'  #检查图片存放文件夹raw_images路�
 
 save_images_folder = './save_image/'  #保存图片文件夹save_image路径
 
-name_list_path = './name_list.txt'  #里面有检测图片名称txt文件路径
+name_list_path = '../yolov5/name_list.txt'  #里面有检测图片名称txt文件路径
 
 classes_path = './classes.txt'
 
@@ -66,8 +66,8 @@ def draw_box_on_image(image_name, classes, colors, label_folder, raw_images_fold
         #     draw_car_tangle = cv2.rectangle(image,(x1,y1),(x2,y2),(0,255,0),2)     # 画框操作  绿框  宽度为1
         #     cv2.imwrite(save_file_path,draw_car_tangle)  #画框 并保存
 
-        plot_one_box([x1,y1,x2,y2], image, color=colors[class_idx], label=classes[class_idx], line_thickness=None)
-
+        #plot_one_box([x1,y1,x2,y2], image, color=colors[class_idx], label=classes[class_idx], line_thickness=None)
+        plot_one_box([x1, y1, x2, y2], image, color=colors[class_idx], line_thickness=1)
         cv2.imwrite(save_file_path,image) 
 
         box_number += 1

@@ -8,7 +8,7 @@ raw_images_folder = './raw_images/'  #检查图片存放文件夹raw_images路�
 
 save_images_folder = './save_image/'  #保存图片文件夹save_image路径
 
-name_list_path = './name_list.txt'  #里面有检测图片名称得txt文件路径
+name_list_path = '../yolov5/name_list.txt'  #里面有检测图片名称得txt文件路径
 
 wrong_folder = './wrong/'  #错判图片文件夹wrong路径
 
