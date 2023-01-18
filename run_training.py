@@ -37,17 +37,21 @@ dataset = Dataset.get_by_name(ws, "ORBS-base-first-split")
 mounted_dataset = dataset.as_mount(path_on_compute="data/first-split")
 compute_target = ComputeTarget(ws, "stronger-gpu")
 
-
 experiment = Experiment(workspace=ws, name="Train-with-first-split")
 script_args = [
-    "--mount_point", mounted_dataset,
+    "--mount-point", mounted_dataset,  # this is needed otherwise the mounted folder cannot be found
     "--data", "yolov5/data/pano.yaml",
     "--cfg", "yolov5/models/yolov5s.yaml",
     "--img", "2048",
     "--batch-size", "8",
+    "--epochs", "100",
     "--save-period", "40",
-    "--cache"
+    "--project", "outputs/runs/train",
+    "--cache",
+    "--resume",
+    "--weights", "yolov5/models/last-willing_plum_1t32npvv.pt"
 ]
+
 script_config = ScriptRunConfig(
     source_directory=".",
     script="yolov5/train.py",
@@ -55,5 +59,7 @@ script_config = ScriptRunConfig(
     environment=env,
     compute_target=compute_target,
 )
+
+
 run = experiment.submit(config=script_config)
 run.wait_for_completion(show_output=True)
