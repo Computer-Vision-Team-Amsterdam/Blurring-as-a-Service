@@ -8,3 +8,14 @@ data-prep/diana/__pycache__/*
 
 # Azure ML config file
 config.json
+
+
+# model weights
+weights/*
+
+# output images
+draw-YOLO-box/save_image/*
+
+# caches
+**/__pycache__
+**/*.cache

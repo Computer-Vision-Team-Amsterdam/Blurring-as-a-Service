@@ -5,7 +5,7 @@ description = ""
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.8.14"
+python = ">=3.8.14,<3.10"
 pandas = ">=1.1.4"
 GitPython = "^3.1.30"
 ipython = "^8.8.0"
@@ -18,12 +18,16 @@ PyYAML = ">=5.3.1"
 requests = ">=2.23.0"
 scipy = ">=1.4.1"
 thop = ">=0.1.1"
-torch = ">=1.7.0"
-torchvision = ">=0.8.1"
+torch = "1.8.0"
+torchvision = "0.9.0"
 tqdm = ">=4.64.0"
 tensorboard = ">=2.4.1"
 seaborn = ">=0.11.0"
 azureml-core = "^1.48.0"
+azureml-dataset-runtime = "^1.48.0"
+azure-ai-ml = "^1.2.0"
+azureml-pipeline = "^1.48.0"
+yolov5 = {path = "yolov5", develop = true}
 
 [tool.poetry.dev-dependencies]
 
