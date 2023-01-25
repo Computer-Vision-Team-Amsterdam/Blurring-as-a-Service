@@ -41,11 +41,11 @@ compute_target = ComputeTarget(ws, "yolo-cluster")
 experiment = Experiment(workspace=ws, name="Validate-first-split")
 script_args = [
     "--mount-point", mounted_dataset,
-    "--data", "yolov5/data/pano.yaml",
-    "--weights", "yolov5/models/last-purple_boot_3l6p24vb.pt",
-    "--batch-size", "8",
+    "--data", "data-config/pano.yaml",
+    "--weights", "weights/last-purple_boot_3l6p24vb.pt",
+    "--batch-size", "1",
     "--max-det", "200",
-    "--img", "2048",
+    "--img", "8000",
     "--project", "outputs/runs/val",
     "--task", "val",
     "--save-txt"

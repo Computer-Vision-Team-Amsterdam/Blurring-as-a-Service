@@ -39,8 +39,8 @@ compute_target = ComputeTarget(ws, "stronger-gpu")
 
 experiment = Experiment(workspace=ws, name="Train-sample")
 script_args = [
-    "--data", "yolov5/data/pano-sample.yaml",
-    "--cfg", "yolov5/models/yolov5s.yaml",
+    "--data", "data-config/pano-sample.yaml",
+    "--cfg", "weights/yolov5s.yaml",
     "--img", "2048",
     "--batch-size", "8",
     "--epochs", "2",

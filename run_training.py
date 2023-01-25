@@ -40,7 +40,7 @@ compute_target = ComputeTarget(ws, "stronger-gpu")
 experiment = Experiment(workspace=ws, name="Train-with-first-split")
 script_args = [
     "--mount-point", mounted_dataset,  # this is needed otherwise the mounted folder cannot be found
-    "--data", "yolov5/data/pano.yaml",
+    "--data", "data-config/pano.yaml",
     "--cfg", "yolov5/models/yolov5s.yaml",
     "--img", "2048",
     "--batch-size", "8",
@@ -49,7 +49,7 @@ script_args = [
     "--project", "outputs/runs/train",
     "--cache",
     "--resume",
-    "--weights", "yolov5/models/last-willing_plum_1t32npvv.pt"
+    "--weights", "weights/last-willing_plum_1t32npvv.pt"
 ]
 
 script_config = ScriptRunConfig(
