@@ -31,6 +31,27 @@ You need to initialize the content of the submodules so git clones the latest ve
 git submodule update --init --recursive
 ```
 
+#### 4. Setup the AzureML connection
+To allow your code to connect to Azure ML and train the model is necessary to retrieve a connection config.
+This can be done clicking on the change workspace button located on the top right in the [AzureML website](https://ml.azure.com), and then in "Download config file".
+The downloaded "config.json" file must be added in the top folder of the project.
+
+#### 5. Install dependencies
+In the terminal, navigate to the project root (the folder containing `pyproject.toml`), then use Poetry to create a new virtual environment and install the dependencies.
+
+```bash
+poetry install
+```
+    
+#### 6. Install pre-commit hooks
+The pre-commit hooks help to ensure that all committed code is valid and consistently formatted.
+
+```bash
+poetry run pre-commit install
+```
+
+### Update yolov5
+
 **Note**: In case the yolov5 package gets updated it's necessary to update the poetry packages adding the new ones of yolov5,
 in case there are new ones.
 
@@ -38,12 +59,6 @@ This can be easily done using the following command:
 ```bash
 cat yolov5/requirements.txt | grep -o '^[^# ]*' | xargs poetry add
 ```
-
-#### 4. Setup the AzureML connection
-To allow your code to connect to Azure ML and train the model is necessary to retrieve a connection config.
-This can be done clicking on the change workspace button located on the top right in the [AzureML website](https://ml.azure.com), and then in "Download config file".
-The downloaded "config.json" file must be added in the top folder of the project.
-
 ---
 
 ### Data processing 
