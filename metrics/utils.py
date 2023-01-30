@@ -1,7 +1,8 @@
 from typing import Tuple, List
 
+import cv2
 import numpy as np
-from PIL import Image
+from PIL import Image, ImageOps
 
 import matplotlib.pyplot as plt
 
@@ -34,7 +35,7 @@ def generate_mask_binary(*args, **kwargs):
     return mask_binary
 
 
-def generate_mask(bounding_boxes: List[Tuple[float, float, float, float]], image:Image) -> Image:
+def generate_mask(bounding_boxes: List[Tuple[float, float, float, float]], image: Image) -> Image:
     """
        Generates a mask for an image given a list of bounding boxes.
 

@@ -3,7 +3,8 @@ import numpy as np
 from PIL import Image
 from unittest import TestCase
 
-from metrics.utils import generate_mask, visualize_mask, parse_labels, generate_mask_binary
+from metrics.utils import generate_mask, visualize_mask, parse_labels, generate_mask_binary, \
+    visualize_mask_with_prediction
 
 
 class Test(TestCase):
@@ -47,7 +48,7 @@ class Test(TestCase):
                                                                        f"bounding box {bounding_box} "
 
     def test_generate_mask_binary(self):
-        image = Image.open("../test-images/val/TMX7316010203-000992_pano_0001_000323.jpg")
+        image = Image.open("../test-images/val/TMX7316010203-000992_pano_0001_000323-small.jpg")
         bounding_boxes = [(0.1, 0.1, 0.1, 0.1), (0.2, 0.2, 0.2, 0.2)]
         mask_binary = generate_mask_binary(bounding_boxes, image)
         assert isinstance(mask_binary, np.ndarray), f"Expected numpy array but got {type(mask_binary)}"
@@ -55,7 +56,7 @@ class Test(TestCase):
 
     def test_visualize_mask(self):
         # Test image
-        image = Image.open("../test-images/val/TMX7316010203-000992_pano_0001_000323.jpg")
+        image = Image.open("../test-images/val/TMX7316010203-000992_pano_0001_000323-small.jpg")
         # Test bounding box
         classes, bounding_boxes = parse_labels("../test-labels/val/TMX7316010203-000992_pano_0001_000323.txt")
         # Get mask
@@ -65,3 +66,4 @@ class Test(TestCase):
             visualize_mask(mask, image)
         except Exception as e:
             assert False, f"visualize_mask() raised an exception: {e}"
+
