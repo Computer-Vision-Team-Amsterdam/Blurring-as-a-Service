@@ -1,0 +1,6 @@
+[mypy]
+pretty = True
+show_absolute_path = True
+show_column_numbers = True
+show_error_codes = True
+exclude = tests

@@ -1,13 +1,14 @@
-from typing import Tuple, List
-
-import cv2
-import numpy as np
-from PIL import Image, ImageOps
+from typing import List, Tuple
 
 import matplotlib.pyplot as plt
+import numpy as np
+from PIL import Image
+from PIL.Image import Image as ImageType
 
 
-def parse_labels(file_path: str) -> Tuple[List[int], List[Tuple[float, float, float, float]]]:
+def parse_labels(
+    file_path: str,
+) -> Tuple[List[int], List[Tuple[float, float, float, float]]]:
     """
      Parses a labels file with the following normalized format: [x_center, y_center, width, height]
 
@@ -23,7 +24,14 @@ def parse_labels(file_path: str) -> Tuple[List[int], List[Tuple[float, float, fl
     for line in lines:
         elements = line.strip().split()
         classes.append(int(elements[0]))
-        bounding_boxes.append((float(elements[1]), float(elements[2]), float(elements[3]), float(elements[4])))
+        bounding_boxes.append(
+            (
+                float(elements[1]),
+                float(elements[2]),
+                float(elements[3]),
+                float(elements[4]),
+            )
+        )
     return classes, bounding_boxes
 
 
@@ -35,18 +43,20 @@ def generate_mask_binary(*args, **kwargs):
     return mask_binary
 
 
-def generate_mask(bounding_boxes: List[Tuple[float, float, float, float]], image: Image) -> Image:
+def generate_mask(
+    bounding_boxes: List[Tuple[float, float, float, float]], image: ImageType
+) -> ImageType:
     """
-       Generates a mask for an image given a list of bounding boxes.
+    Generates a mask for an image given a list of bounding boxes.
 
-       Parameters:
-        :param bounding_boxes: (List[Tuple[float, float, float, float]]): List of bounding boxes with normalised
-                                                                     (x_center, y_center, width, height)
-        :param image: (PIL.Image): An image to generate the mask for.
+    Parameters:
+     :param bounding_boxes: (List[Tuple[float, float, float, float]]): List of bounding boxes with normalised
+                                                                  (x_center, y_center, width, height)
+     :param image: (PIL.Image): An image to generate the mask for.
 
 
-        :return: PIL.Image: The generated mask image.
-       """
+     :return: PIL.Image: The generated mask image.
+    """
     mask = np.zeros_like(np.array(image))
     for bounding_box in bounding_boxes:
         x_center, y_center, width, height = bounding_box
