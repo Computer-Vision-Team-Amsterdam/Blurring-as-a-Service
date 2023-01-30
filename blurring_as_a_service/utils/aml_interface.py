@@ -43,7 +43,11 @@ class AMLInterface:
         return credential
 
     def create_aml_environment(
-        self, env_name: str, submodules: List[str] = []
+        self,
+        env_name: str,
+        project_name: str,
+        submodules: List[str] = [],
+        custom_packages: Dict[str, str] = {},
     ) -> Environment:
         """Creates an AML environment based on the mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04 image.
         Installs the pip packages present in the env where the code is run.
@@ -59,7 +63,7 @@ class AMLInterface:
         -------
             None
         """
-        self.create_environment_yml(submodules)
+        self.create_environment_yml(project_name, submodules, custom_packages)
         env = Environment(
             name=env_name,
             image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
@@ -70,16 +74,26 @@ class AMLInterface:
         return env
 
     @staticmethod
-    def create_environment_yml(submodules: List[str] = []):
+    def create_environment_yml(
+        project_name: str,
+        submodules: List[str] = [],
+        custom_packages: Dict[str, str] = {},
+    ):
         packages_and_versions_local_env: Dict[str, str] = dict(
             tuple(str(ws).split()) for ws in pkg_resources.working_set  # type: ignore
         )
+        packages_and_versions_local_env.pop(project_name)
+        for custom_package in custom_packages.keys():
+            packages_and_versions_local_env.pop(custom_package)
         packages = [
             f"    - {package}=={version}"
             if package not in submodules
             else f"    - {package}"
             for package, version in packages_and_versions_local_env.items()
         ]
+
+        for custom_package in custom_packages.values():
+            packages.append(f"    - {custom_package}")
         with open("environment.yml", "w") as env_file:
             env_file.write("dependencies:\n")
             env_file.write("  - python=3.9.*\n")

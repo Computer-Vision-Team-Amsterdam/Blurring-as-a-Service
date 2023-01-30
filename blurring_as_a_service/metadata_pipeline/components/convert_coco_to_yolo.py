@@ -11,7 +11,7 @@ from blurring_as_a_service.metadata_pipeline.utils.coco_to_yolo_converter import
 @command_component(
     name="convert_coco_to_yolo",
     display_name="Convert coco to yolo",
-    environment="azureml:test-sebastian-env:41",
+    environment="azureml:test-sebastian-env:87",
     code="../../../",
 )
 def convert_coco_to_yolo(
