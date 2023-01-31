@@ -1,4 +1,6 @@
-from metadata_pipeline.utils.coco_to_yolo_converter import CocoToYoloConverter
+from blurring_as_a_service.metadata_pipeline.source.coco_to_yolo_converter import (
+    CocoToYoloConverter,
+)
 
 
 def expected_output():

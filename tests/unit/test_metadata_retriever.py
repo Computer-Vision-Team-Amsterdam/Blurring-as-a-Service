@@ -1,4 +1,4 @@
-from blurring_as_a_service.metadata_pipeline.utils.metadata_retriever import (
+from blurring_as_a_service.metadata_pipeline.source.metadata_retriever import (
     Metadata,
     MetadataRetriever,
 )

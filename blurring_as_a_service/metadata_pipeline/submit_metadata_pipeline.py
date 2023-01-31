@@ -36,6 +36,7 @@ def metadata_pipeline(coco_annotations, labels_path, images_path, metadata_path)
 def main(inputs: Dict[str, str], outputs: Dict[str, str]):
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
+
     if settings["metadata_pipeline"]["flags"] & PipelineFlag.CREATE_ENVIRONMENT:
         custom_packages = {
             "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",

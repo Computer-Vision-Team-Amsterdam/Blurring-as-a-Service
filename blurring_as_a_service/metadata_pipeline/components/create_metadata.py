@@ -4,7 +4,7 @@ import sys
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-from blurring_as_a_service.metadata_pipeline.utils.metadata_retriever import (  # noqa: E402
+from blurring_as_a_service.metadata_pipeline.source.metadata_retriever import (  # noqa: E402
     MetadataRetriever,
 )
 from blurring_as_a_service.settings.settings import (  # noqa: E402

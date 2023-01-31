@@ -99,17 +99,15 @@ class AMLInterface:
             Custom packages to remove from the local dependencies list and install on the AzureML environment.
             Example: {"panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2"}
         """
-        packages_and_versions_local_env: Dict[str, str] = dict(
-            tuple(str(ws).split()) for ws in pkg_resources.working_set  # type: ignore
-        )
+        packages_and_versions_local_env = {
+            ws.key: ws.version for ws in pkg_resources.working_set
+        }
         packages_and_versions_local_env.pop(project_name)
         for custom_package in custom_packages.keys():
             packages_and_versions_local_env.pop(custom_package)
         packages = [
-            f"    - {package}=={version}"
-            if package not in submodules
-            else f"    - {package}"
-            for package, version in packages_and_versions_local_env.items()
+            f"    - {key}=={value}" if key not in submodules else f"    - {key}"
+            for key, value in packages_and_versions_local_env.items()
         ]
 
         for custom_package in custom_packages.values():
