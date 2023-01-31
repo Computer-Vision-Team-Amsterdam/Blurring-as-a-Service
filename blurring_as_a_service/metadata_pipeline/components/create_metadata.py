@@ -2,11 +2,12 @@ import sys
 
 from mldesigner import Input, Output, command_component
 
-from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-
 sys.path.append("../../..")
 from blurring_as_a_service.metadata_pipeline.utils.metadata_retriever import (  # noqa: E402
     MetadataRetriever,
+)
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
 )
 
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml("config.yml")[
