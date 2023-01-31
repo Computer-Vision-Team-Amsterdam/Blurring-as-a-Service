@@ -1,6 +1,5 @@
 from typing import Dict
 
-import yaml
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -35,21 +34,14 @@ def metadata_pipeline(coco_annotations, labels_path, images_path, metadata_path)
 
 
 def main(inputs: Dict[str, str], outputs: Dict[str, str]):
-    with open("aml-config.yml", "r") as fs:
-        aml_config = yaml.safe_load(fs)
-        experiment_details = aml_config["experiment_details"]
-
     aml_interface = AMLInterface()
-
-    if (
-        BlurringAsAServiceSettings.get_settings()["metadata_pipeline"]["flags"]
-        & PipelineFlag.CREATE_ENVIRONMENT
-    ):
+    settings = BlurringAsAServiceSettings.get_settings()
+    if settings["metadata_pipeline"]["flags"] & PipelineFlag.CREATE_ENVIRONMENT:
         custom_packages = {
             "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
         }
         aml_interface.create_aml_environment(
-            experiment_details["env_name"],
+            settings["aml_experiment_details"]["env_name"],
             project_name="blurring-as-a-service",
             custom_packages=custom_packages,
         )
@@ -64,7 +56,9 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         metadata_path=outputs["metadata_path"],
     )
 
-    metadata_pipeline_job.settings.default_compute = experiment_details["compute_name"]
+    metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
+        "compute_name"
+    ]
 
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=metadata_pipeline_job, experiment_name="metadata_pipeline"

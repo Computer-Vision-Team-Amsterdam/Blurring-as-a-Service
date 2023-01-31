@@ -8,6 +8,13 @@ class SettingsSpecModel(BaseModel):
         extra = "forbid"
 
 
+class AMLExperimentDetailsSpec(SettingsSpecModel):
+    compute_name: str = None
+    env_name: str = None
+    env_version: int = None
+    src_dir: str = None
+
+
 class MetadataPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
@@ -32,5 +39,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     class Config:
         extra = "forbid"
 
+    aml_experiment_details: AMLExperimentDetailsSpec = None
     metadata_pipeline: MetadataPipelineSpec = None
     logging: LoggingSpec = LoggingSpec()

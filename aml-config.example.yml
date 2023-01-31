@@ -1,4 +1,0 @@
-experiment_details:
-  compute_name: cvt-compute
-  env_name: cvt_environment
-  src_dir: "."

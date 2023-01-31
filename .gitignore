@@ -155,4 +155,5 @@ tags
 
 local_test_data/out:yolo-format/*
 config.json
+config.yml
 /aml-config.yml

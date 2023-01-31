@@ -1,3 +1,9 @@
+aml_experiment_details:
+  compute_name: cvt-compute
+  env_name: cvt_environment
+  env_version: 1
+  src_dir: "."
+
 metadata_pipeline:
   inputs:
     coco_annotations: "azureml:NAMED_ASSET_URI_CONTAINING_COCO_ANNOTATIONS"
