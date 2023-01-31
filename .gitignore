@@ -1,10 +1,13 @@
 # PyCharm files
 **/*.DS_Store
-
-
 .idea/*
+
+
 data-prep/diana/out:yolo-format/*
-data-prep/diana/__pycache__/*
+
 
 # Azure ML config file
 config.json
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__
