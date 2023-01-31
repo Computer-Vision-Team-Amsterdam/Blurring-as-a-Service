@@ -2,7 +2,6 @@ import numpy as np
 
 
 class TotalBlurredArea:
-
     def __init__(self):
         self.tp = 0
         self.fp = 0
@@ -25,5 +24,11 @@ class TotalBlurredArea:
         self.fn += fn
 
     def summary(self):
-        print(f"TP: {self.tp}\nFP: {self.fp}\nTN: {self.tn}\nFN: {self.fn}\n")
+        precision = self.tp / (self.tp + self.fp)
+        recall = self.tp / (self.tp + self.fn)
 
+        f1 = 2 * precision * recall / (precision + recall)
+        print(f"TP: {self.tp}\nFP: {self.fp}\nTN: {self.tn}\nFN: {self.fn}\n")
+        print(f"Precision: {precision}.")
+        print(f"Recall: {recall}.")
+        print(f"F1 score: {f1}.")
