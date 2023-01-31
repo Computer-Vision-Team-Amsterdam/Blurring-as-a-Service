@@ -1,6 +1,3 @@
-# input:
-# val folder with images/ and labels/
-# predictions in labels/
 import glob
 
 from PIL import Image
