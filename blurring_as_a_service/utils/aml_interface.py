@@ -56,29 +56,49 @@ class AMLInterface:
         ----------
         env_name : str
             Name to give to the new environment.
+        project_name: str
+            Name of the project to be removed from the dependencies in case locally you are using Poetry.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
+        custom_packages: Dict[str, str]
+            Custom packages to remove from the local dependencies list and install on the AzureML environment.
+            Example: {"panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2"}
 
         Returns
         -------
-            None
+        : Environment
+            Created environment.
         """
-        self.create_environment_yml(project_name, submodules, custom_packages)
+        self._create_environment_yml(project_name, submodules, custom_packages)
         env = Environment(
             name=env_name,
             image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
             conda_file="environment.yml",
         )
         self.workspace.environments.create_or_update(env)
-        self.delete_environment_yml()
+        self._delete_environment_yml()
         return env
 
     @staticmethod
-    def create_environment_yml(
+    def _create_environment_yml(
         project_name: str,
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ):
+        """
+        Retrieves all packages currently installed in the local venv used to execute the code,
+        and creates a conda environment yaml file to be used to install the packages on AzureML env.
+
+        Parameters
+        ----------
+        project_name: str
+            Name of the project to be removed from the dependencies in case locally you are using Poetry.
+        submodules : List[str]
+            Packages that are actually submodules and not pip installed.
+        custom_packages: Dict[str, str]
+            Custom packages to remove from the local dependencies list and install on the AzureML environment.
+            Example: {"panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2"}
+        """
         packages_and_versions_local_env: Dict[str, str] = dict(
             tuple(str(ws).split()) for ws in pkg_resources.working_set  # type: ignore
         )
@@ -101,7 +121,7 @@ class AMLInterface:
             env_file.write("\n".join(packages))
 
     @staticmethod
-    def delete_environment_yml():
+    def _delete_environment_yml():
         os.remove("environment.yml")
 
     def submit_command_job(self, job):
@@ -133,9 +153,11 @@ class AMLInterface:
         Parameters
         ----------
         job
+            The job to be created or updated.
 
         Returns
         -------
+            The created or updated resource.
 
         """
         return self.workspace.create_or_update(job)

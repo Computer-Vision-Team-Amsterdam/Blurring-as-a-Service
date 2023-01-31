@@ -49,6 +49,11 @@ The pre-commit hooks help to ensure that all committed code is valid and consist
 poetry run pre-commit install
 ```
 
+#### 7. Setup running configuration
+Copy the config.example.yml file and rename it to config.yml.
+Adapt the config file to your execution configuration, 
+setting azure paths of where the data can be located and the flags to enable or disable pipeline steps.
+
 ### Train custom dataset with yolov5
 Source can be found [here](https://github.com/ultralytics/yolov5/wiki/Train-Custom-Data). 
 

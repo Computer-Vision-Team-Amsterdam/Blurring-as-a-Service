@@ -11,19 +11,26 @@ from blurring_as_a_service.metadata_pipeline.components.convert_coco_to_yolo imp
 from blurring_as_a_service.metadata_pipeline.components.create_metadata import (
     create_metadata,
 )
+from blurring_as_a_service.settings.flags import PipelineFlag
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
 def metadata_pipeline(coco_annotations, labels_path, images_path, metadata_path):
-    convert_coco_to_yolo_step = convert_coco_to_yolo(input_data=coco_annotations)
-    convert_coco_to_yolo_step.outputs.output_folder = Output(
-        type=AssetTypes.URI_FOLDER, path=labels_path.result(), mode="rw_mount"
-    )
-    metadata_retriever_step = create_metadata(input_directory=images_path)
-    metadata_retriever_step.outputs.output_file = Output(
-        type=AssetTypes.URI_FILE, path=metadata_path.result(), mode="rw_mount"
-    )
+    metadata_flags = BlurringAsAServiceSettings.get_settings()["metadata_pipeline"][
+        "flags"
+    ]
+    if metadata_flags & PipelineFlag.CONVERT_COCO_TO_YOLO:
+        convert_coco_to_yolo_step = convert_coco_to_yolo(input_data=coco_annotations)
+        convert_coco_to_yolo_step.outputs.output_folder = Output(
+            type=AssetTypes.URI_FOLDER, path=labels_path.result(), mode="rw_mount"
+        )
+    if metadata_flags & PipelineFlag.CREATE_METADATA:
+        metadata_retriever_step = create_metadata(input_directory=images_path)
+        metadata_retriever_step.outputs.output_file = Output(
+            type=AssetTypes.URI_FILE, path=metadata_path.result(), mode="rw_mount"
+        )
     return {}
 
 
@@ -34,14 +41,18 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
 
     aml_interface = AMLInterface()
 
-    custom_packages = {
-        "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
-    }
-    aml_interface.create_aml_environment(
-        experiment_details["env_name"],
-        project_name="blurring-as-a-service",
-        custom_packages=custom_packages,
-    )
+    if (
+        BlurringAsAServiceSettings.get_settings()["metadata_pipeline"]["flags"]
+        & PipelineFlag.CREATE_ENVIRONMENT
+    ):
+        custom_packages = {
+            "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
+        }
+        aml_interface.create_aml_environment(
+            experiment_details["env_name"],
+            project_name="blurring-as-a-service",
+            custom_packages=custom_packages,
+        )
 
     coco_annotations = Input(type=AssetTypes.URI_FILE, path=inputs["coco_annotations"])
     images_path = Input(type=AssetTypes.URI_FOLDER, path=inputs["images_path"])
@@ -63,25 +74,8 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
 
 
 if __name__ == "__main__":
-    inputs = {
-        "coco_annotations": "azureml:coco_annotations_to_convert_to_yolo:1",
-        "images_path": (
-            "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/"
-            "cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/"
-            "paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/images"
-        ),
-    }
-    outputs = {
-        "labels_path": (
-            "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/"
-            "cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/"
-            "paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/labels"
-        ),
-        "metadata_path": (
-            "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/"
-            "cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/"
-            "paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/metadata/metadata.json"
-        ),
-    }
-
-    main(inputs, outputs)
+    settings = BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    main(
+        settings["metadata_pipeline"]["inputs"],
+        settings["metadata_pipeline"]["outputs"],
+    )

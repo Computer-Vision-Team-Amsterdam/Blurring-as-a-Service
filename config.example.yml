@@ -1,0 +1,21 @@
+metadata_pipeline:
+  inputs:
+    coco_annotations: "azureml:NAMED_ASSET_URI_CONTAINING_COCO_ANNOTATIONS"
+    images_path: "azureml://FOLDER_PATH_CONTAINING_THE_IMAGES"
+  outputs:
+    labels_path: "azureml://FOLDER_PATH_WHERE_STORE_YOLO_LABELS"
+    metadata_path: "azureml://FOLDER_PATH_WHERE_STORE_METADATA"
+  flags:
+    # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, CONVERT_COCO_TO_YOLO, CREATE_METADATA
+    - CREATE_ENVIRONMENT
+    - CONVERT_COCO_TO_YOLO
+    - CREATE_METADATA
+
+logging:
+  loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
+  own_packages: ["__main__", "blurring_as_a_service"]
+  basic_config:
+    # log config as arguments to `logging.basicConfig`
+    level: WARNING
+    format: "%(asctime)s|%(levelname)-8s|%(name)s|%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"

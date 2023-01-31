@@ -1,0 +1,21 @@
+metadata_pipeline:
+  inputs:
+    coco_annotations: "azureml:coco_annotations_to_convert_to_yolo:1"
+    images_path: "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/images"
+  outputs:
+    labels_path: "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/labels"
+    metadata_path: "azureml://subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourcegroups/cvo-aml-p-rg/workspaces/cvo-weu-aml-p-xnjyjutinwfyu/datastores/annotations_datastore/paths/annotations-projects/07-25-2022_120550_UTC/test_sebastian/sample/metadata/metadata.json"
+  flags:
+    # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, CONVERT_COCO_TO_YOLO, CREATE_METADATA
+    - CREATE_ENVIRONMENT
+    - CONVERT_COCO_TO_YOLO
+    - CREATE_METADATA
+
+logging:
+  loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
+  own_packages: ["__main__", "blurring_as_a_service"]
+  basic_config:
+    # log config as arguments to `logging.basicConfig`
+    level: WARNING
+    format: "%(asctime)s|%(levelname)-8s|%(name)s|%(message)s"
+    datefmt: "%Y-%m-%d %H:%M:%S"
