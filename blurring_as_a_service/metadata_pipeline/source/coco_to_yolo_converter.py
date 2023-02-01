@@ -4,7 +4,7 @@ import json
 class CocoToYoloConverter:
     """
     Converts a COCO annotation dataset to a YOLOv5 format.
-    - The bbox will remain the same format;
+    - The bbox changes from x_min, y_min, width, height to x_center, y_center, width, height;
     - Categories will change from 1=person and 2=license plate to 0=person and 1=licence plate;
     - It generates one file per image.
     """
