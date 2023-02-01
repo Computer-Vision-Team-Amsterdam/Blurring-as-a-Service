@@ -1,6 +1,5 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-*/__pycache__/
 *.py[cod]
 *$py.class
 
@@ -125,11 +124,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+
 # PyCharm
 .idea
-
-# VSCode
-.vscode
 
 ## Vim Stuff
 # Swap
@@ -152,8 +149,33 @@ tags
 # Persistent undo
 [._]*.un~
 
+## Other files
+config.py
+aml-config.yml
+core
+data/*
 
-local_test_data/out:yolo-format/*
-config.json
-config.yml
-/aml-config.yml
+## Data files
+*.h5
+*.pkl
+*.pickle
+*.csv
+*.gz
+*.bz2
+*.db
+
+notebooks_prive
+.~*
+poetry.lock
+.dscache
+
+!data/stats*
+/analysis
+/info
+/scripts
+/*.md
+/pyproject.toml
+/poetry.lock
+/.*
+/data-prep
+/local_test_data

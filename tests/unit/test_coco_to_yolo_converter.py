@@ -1,0 +1,34 @@
+from blurring_as_a_service.metadata_pipeline.source.coco_to_yolo_converter import (
+    CocoToYoloConverter,
+)
+
+
+def expected_output():
+    """
+    Returns expected YOLO conversion of file: TMX7315080123-000286_pano_0000_001145.txt.
+
+    Returns
+    -------
+    list
+        Expected YOLO conversion.
+    """
+    return [
+        "1 0.19793212624913425 0.5886019590382903 0.010190956762639758 0.0061343623231423505\n",
+        "1 0.23388245770258237 0.5307806325829252 0.002404274265360662 0.0017809439002671734\n",
+        "1 0.2757346393588602 0.5394182104992209 0.0043633125556545305 0.00267141585040076\n",
+        "1 0.36588007586403604 0.6623033396176536 0.015227070347284044 0.018343722172751598\n",
+        "1 0.22175719073491762 0.527753027952471 0.0012466607301870047 0.0021371326803205637\n",
+        "0 0.3024339494170192 0.5173345061359083 0.003027604630454095 0.016562778272484424\n",
+        "1 0.776105654844724 0.5440486646399154 0.005342831700801409 0.0033837934105076517\n",
+        "1 0.733585619225846 0.5241020929569234 0.002938557435440803 0.0016028495102404783\n",
+        "1 0.9804986642920748 0.734965850748553 0.004808548530721324 0.039358860195903844",
+    ]
+
+
+def test_coco_to_yolo_converter():
+    source = "../../local_test_data/in:coco-format/blur_v0.1/blur-annotations.json"
+    output_dir = "../../local_test_data/out:yolo-format/blur_v0.1"
+    converter = CocoToYoloConverter(source, output_dir)
+    converter.convert()
+    with open(f"{output_dir}/TMX7315080123-000286_pano_0000_001145.txt", "r") as f:
+        assert f.readlines() == expected_output()
