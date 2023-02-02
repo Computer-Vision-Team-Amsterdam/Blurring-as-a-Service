@@ -11,7 +11,7 @@ config.json
 
 
 # model weights
-weights/*
+#weights/*
 
 # output images
 draw-YOLO-box/save_image/*
@@ -19,3 +19,7 @@ draw-YOLO-box/save_image/*
 # caches
 **/__pycache__
 **/*.cache
+
+
+# sample dataset
+data/sample-local/*

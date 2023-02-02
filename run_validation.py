@@ -13,12 +13,15 @@ ws = Workspace.from_config()
 
 # Get or create environment
 try:
-    env = Environment.get(ws, 'blurring-env')
+    env = Environment.get(ws, "blurring-env")
 except Exception:
-    print("Environment not found. Building environment from blur-environment.Dockerfile")
-    packages_and_versions_local_env = dict(
-        tuple(str(ws).split()) for ws in pkg_resources.working_set
+    print(
+        "Environment not found. Building environment from blur-environment.Dockerfile"
     )
+
+    packages_and_versions_local_env = {
+        ws.key: ws.version for ws in pkg_resources.working_set
+    }
     packages = [
         f"{package}=={version}"
         for package, version in packages_and_versions_local_env.items()
@@ -26,30 +29,37 @@ except Exception:
     env = Environment("blurring-env")
     env.docker.base_image = None
     env.docker.base_dockerfile = "blur-environment.Dockerfile"
-    cd = CondaDependencies.create(
-        python_version="3.8.14", pip_packages=packages
-    )
+    cd = CondaDependencies.create(python_version="3.8.14", pip_packages=packages)
     env.python.conda_dependencies = cd
     env.register(workspace=ws)
 
-dataset = Dataset.get_by_name(ws, "ORBS-base-first-split")
-mounted_dataset = dataset.as_mount(path_on_compute="data/first-split")
+# dataset = Dataset.get_by_name(ws, "ORBS-base-first-split")
+# mounted_dataset = dataset.as_mount(path_on_compute="data/first-split")
+dataset = Dataset.get_by_name(ws, "validation-to-tag")
+mounted_dataset = dataset.as_mount(path_on_compute="data/validation-to-tag")
 
 
 compute_target = ComputeTarget(ws, "yolo-cluster")
 
-experiment = Experiment(workspace=ws, name="Validate-first-split")
+experiment = Experiment(workspace=ws, name="Validate-with-tagged-dataset")
 script_args = [
-    "--mount-point", mounted_dataset,
-    "--data", "data-config/pano.yaml",
-    "--weights", "weights/last-purple_boot_3l6p24vb.pt",
-    "--batch-size", "1",
-    "--max-det", "200",
-    "--img", "8000",
-    "--project", "outputs/runs/val",
-    "--task", "val",
-    "--save-txt"
-
+    "--mount-point",
+    mounted_dataset,
+    "--data",
+    "data-config/pano.yaml",
+    "--weights",
+    "weights/last-purple_boot_3l6p24vb.pt",
+    "--batch-size",
+    "1",
+    "--max-det",
+    "200",
+    "--img",
+    "8000",
+    "--project",
+    "outputs/runs/val",
+    "--task",
+    "val",
+    "--save-txt",
 ]
 
 script_config = ScriptRunConfig(
