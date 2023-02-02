@@ -14,6 +14,7 @@ train: ../data/first-split/images/train/
 val: ../data/first-split/images/val/
 test: ../data/first-split/images/test/
 
+
 # number of classes
 nc: 2
 
