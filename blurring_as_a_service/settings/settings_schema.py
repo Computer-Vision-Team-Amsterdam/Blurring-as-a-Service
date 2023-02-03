@@ -21,6 +21,12 @@ class MetadataPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
+    flags: List[str] = []
+
+
 class LoggingSpec(SettingsSpecModel):
     loglevel_own: str = "INFO"
     own_packages: List[str] = [
