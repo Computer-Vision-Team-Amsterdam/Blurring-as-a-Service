@@ -1,7 +1,7 @@
 import os
 import sys
 
-from mldesigner import Input, command_component
+from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 from blurring_as_a_service.performace_evaluation_pipeline.source.get_data import (  # noqa: E402
@@ -25,5 +25,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
 )
-def get_data(input_data: Input(type="uri_folder")):  # type: ignore # noqa: F821
-    get_and_store_info(input_data)
+def get_data(
+    input_folder: Input(type="uri_folder"), output_file: Output(type="uri_file")  # type: ignore # noqa: F821
+):
+    get_and_store_info(input_folder, output_file)
