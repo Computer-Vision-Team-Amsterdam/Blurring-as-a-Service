@@ -16,12 +16,15 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 def performance_evaluation_pipeline(
     validation_images_path, txt_validation_images_names_path
 ):
-    metadata_flags = BlurringAsAServiceSettings.get_settings()["metadata_pipeline"][
-        "flags"
-    ]
-    if metadata_flags & PipelineFlag.GET_DATA:
-        get_data_step = get_data(input_data=validation_images_path)
-        get_data_step.outputs.output_folder = Output(
+    peformance_evaluation_flags = BlurringAsAServiceSettings.get_settings()[
+        "performance_evaluation_pipeline"
+    ]["flags"]
+    if peformance_evaluation_flags & PipelineFlag.GET_DATA:
+        get_data_step = get_data(
+            input_data=validation_images_path,
+            output_file=txt_validation_images_names_path,
+        )
+        get_data_step.outputs.output_file = Output(
             type=AssetTypes.URI_FILE,
             path=txt_validation_images_names_path.result(),
             mode="rw_mount",

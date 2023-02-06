@@ -47,4 +47,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
 
     aml_experiment_details: AMLExperimentDetailsSpec = None
     metadata_pipeline: MetadataPipelineSpec = None
+    performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     logging: LoggingSpec = LoggingSpec()
