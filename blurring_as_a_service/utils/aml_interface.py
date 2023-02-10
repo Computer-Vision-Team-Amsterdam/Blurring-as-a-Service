@@ -102,7 +102,7 @@ class AMLInterface:
         packages_and_versions_local_env = {
             ws.key: ws.version for ws in pkg_resources.working_set
         }
-        packages_and_versions_local_env.pop(project_name)
+        packages_and_versions_local_env.pop(project_name, None)
         for custom_package in custom_packages.keys():
             packages_and_versions_local_env.pop(custom_package)
         packages = [
