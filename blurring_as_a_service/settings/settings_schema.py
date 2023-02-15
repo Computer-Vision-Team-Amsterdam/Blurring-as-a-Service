@@ -23,6 +23,11 @@ class MetadataPipelineSpec(SettingsSpecModel):
 
 class TrainingPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
+    flags: List[str] = []
+
+
+class InferencePipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
 
@@ -48,4 +53,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     aml_experiment_details: AMLExperimentDetailsSpec = None
     metadata_pipeline: MetadataPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
+    inference_pipeline: InferencePipelineSpec = None
     logging: LoggingSpec = LoggingSpec()
