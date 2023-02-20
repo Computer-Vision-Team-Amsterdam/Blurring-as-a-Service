@@ -36,13 +36,13 @@ def main():
         type=AssetTypes.URI_FOLDER,
         path=settings["training_pipeline"]["inputs"]["training_data"],
     )
-    metadata_pipeline_job = training_pipeline(training_data=training_data)
-    metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
+    training_pipeline_job = training_pipeline(training_data=training_data)
+    training_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
         "compute_name"
     ]
 
     pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=metadata_pipeline_job, experiment_name="metadata_pipeline"
+        pipeline_job=training_pipeline_job, experiment_name="metadata_pipeline"
     )
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
