@@ -29,6 +29,18 @@ def detect_sensitive_data(
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
+    """
+    Pipeline step to detect the areas to blur.
+
+    Parameters
+    ----------
+    data_to_blur:
+        Images to be blurred
+    model:
+        Pre-trained model to be used to blur.
+    results_path:
+        Where to store the results.
+    """
     detect.run(
         weights=f"{model}/best.pt",
         source=data_to_blur,
@@ -37,6 +49,6 @@ def detect_sensitive_data(
         exist_ok=True,
         name="detection_result",
         imgsz=(2000, 4000),
-        # half=True,
+        # half=True, # Half can be enabled only if run on GPU.
         hide_labels=True,
     )
