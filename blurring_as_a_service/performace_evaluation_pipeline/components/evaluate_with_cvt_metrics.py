@@ -38,8 +38,7 @@ def evaluate_with_cvt_metrics(
 ):
     true_labels = [file for file in glob.glob(f"{mounted_dataset}/labels/val/*.txt")]
     pred_labels = [file for file in glob.glob(f"{yolo_output_folder}/exp/labels/*.txt")]
-    print(true_labels)
-    print(pred_labels)
+
     inputs = [
         {"true": true_label, "predicted": pred_label}
         for true_label, pred_label in zip(true_labels, pred_labels)
@@ -50,7 +49,7 @@ def evaluate_with_cvt_metrics(
 
     for i, input in enumerate(inputs):
         tba_true, tba_pred, uba_true, uba_pred = process_image_labels(input)
-        print(i)
+        print(f"{i}/{len(inputs)} images done.")
         tba.add_mask(tba_true, tba_pred)
         uba.add_mask(uba_true, uba_pred)
 
