@@ -18,8 +18,8 @@ PyYAML = {version = ">=5.3.1", source = "PyPI"}
 requests = {version = ">=2.23.0", source = "PyPI"}
 scipy = {version = ">=1.4.1", source = "PyPI"}
 thop = {version = ">=0.1.1", source = "PyPI"}
-torch = {version = ">=1.7.0", source = "PyPI"}
-torchvision = {version = ">=0.8.1", source = "PyPI"}
+torch = {version = "1.8.0", source = "PyPI"}
+torchvision = {version = "0.9.0", source = "PyPI"}
 tqdm = {version = ">=4.64.0", source = "PyPI"}
 tensorboard = {version = ">=2.4.1", source = "PyPI"}
 seaborn = {version = ">=0.11.0", source = "PyPI"}
@@ -31,6 +31,8 @@ dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
 python-geohash = {version = "^0.8.5", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", rev = "v0.2.2"}
+pycocotools = {version = "^2.0.6", source="PyPI"}
+cryptography = "<39.0.0"
 
 [tool.poetry.dev-dependencies]
 

@@ -1,4 +1,7 @@
-from metrics.metrics_utils import generate_binary_mask, parse_labels
+from blurring_as_a_service.metrics.metrics_utils import (
+    generate_binary_mask,
+    parse_labels,
+)
 
 
 def process_image_labels(labels):
