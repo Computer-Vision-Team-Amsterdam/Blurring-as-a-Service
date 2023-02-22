@@ -1,5 +1,6 @@
 import json
-from typing import List
+
+from blurring_as_a_service.utils.bias_category_mapper import BiasCategoryMapper
 
 
 class CocoToYoloConverter:
@@ -24,51 +25,7 @@ class CocoToYoloConverter:
         with open(coco_file) as f:
             self._input = json.load(f)
 
-        self._grouped_categories = self._group_categories(self._input["categories"])
-
-    @staticmethod
-    def _group_categories(categories: List[dict]) -> List[dict]:
-        """
-        Group categories into person or licence plates based on the original category name.
-
-        Parameters
-        ----------
-        categories
-            Original category name, example:
-                [{"id": 1, "name": "man"}, {"id": 2, "name": "man/child"}, {"id": 3, "name": "man/child/light"}]
-
-        Returns
-        -------
-            Grouped category, example: [
-                {"id": 1, "name": "man", 'grouped_category': 0},
-                {"id": 2, "name": "man/child", 'grouped_category': 0},
-                {"id": 3, "name": "man/child/light", 'grouped_category': 0}
-            ]
-        """
-        for category in categories:
-            if category["name"].startswith("licence_plate"):
-                category["grouped_category"] = 1
-            else:
-                category["grouped_category"] = 0
-        return categories
-
-    def _get_grouped_category(self, category_id) -> int:
-        """
-        Returns the correct grouped category for a specific annotation.
-
-        Parameters
-        ----------
-        category_id:
-            Original category.
-
-        Returns
-        -------
-        Grouped category.
-
-        """
-        return list(
-            filter(lambda cat: cat["id"] == category_id, self._grouped_categories)
-        )[0]["grouped_category"]
+        self._bias_category_mapper = BiasCategoryMapper(self._input["categories"])
 
     def _write_to_txt(self, image_name, per_image_annotations):
         """
@@ -89,7 +46,9 @@ class CocoToYoloConverter:
             x, y, width, height = annotation["bbox"]
             xc = x + width / 2
             yc = y + height / 2
-            grouped_category = self._get_grouped_category(annotation["category_id"])
+            grouped_category = self._bias_category_mapper.get_grouped_category(
+                annotation["category_id"]
+            )
             line = f'{grouped_category} {xc} {yc} {width} {height} {annotation["category_id"]}'
             lines.append(line)
 

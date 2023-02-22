@@ -1,6 +1,4 @@
-from blurring_as_a_service.metadata_pipeline.source.coco_to_yolo_converter import (
-    CocoToYoloConverter,
-)
+from blurring_as_a_service.utils.coco_to_yolo_converter import CocoToYoloConverter
 
 
 def expected_output():
@@ -50,7 +48,9 @@ def expected_output():
 def test_coco_to_yolo_converter():
     source = "../../local_test_data/in:coco-format/blur_v0.1/validation-tagged.json"
     output_dir = "../../local_test_data/out:yolo-format/blur_v0.1"
+
     converter = CocoToYoloConverter(source, output_dir)
     converter.convert()
+
     with open(f"{output_dir}/TMX7316010203-001900_pano_0005_000728.txt", "r") as f:
         assert f.readlines() == expected_output()
