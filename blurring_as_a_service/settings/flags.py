@@ -9,6 +9,8 @@ class PipelineFlag(IntFlag):
     CONVERT_COCO_TO_YOLO = auto()
     CREATE_METADATA = auto()
     GET_DATA = auto()
+    VALIDATE_MODEL = auto()
+    COCO_EVALUATION = auto()
 
     @classmethod
     def all(cls):

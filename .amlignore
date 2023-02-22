@@ -179,3 +179,6 @@ poetry.lock
 /.*
 /data-prep
 /local_test_data
+data/validation-tagged/*
+weights/best-heroic_basil_mj32yn3n.pt
+weights/yolov5m.pt
