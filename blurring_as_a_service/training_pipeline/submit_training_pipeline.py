@@ -8,10 +8,15 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def training_pipeline(training_data):
-    train_model_step = train_model(mounted_dataset=training_data)
+def training_pipeline(training_data, model_weights, trained_model):
+    train_model_step = train_model(
+        mounted_dataset=training_data, model_weights=model_weights
+    )
     train_model_step.outputs.yolo_yaml_path = Output(
         type="uri_folder", mode="rw_mount", path=training_data.path
+    )
+    train_model_step.outputs.trained_model = Output(
+        type="uri_folder", mode="rw_mount", path=trained_model.result()
     )
     return {}
 
@@ -36,13 +41,21 @@ def main():
         type=AssetTypes.URI_FOLDER,
         path=settings["training_pipeline"]["inputs"]["training_data"],
     )
-    metadata_pipeline_job = training_pipeline(training_data=training_data)
-    metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
+    model_weights = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=settings["training_pipeline"]["inputs"]["model_weights"],
+    )
+    training_pipeline_job = training_pipeline(
+        training_data=training_data,
+        model_weights=model_weights,
+        trained_model=settings["training_pipeline"]["outputs"]["trained_model"],
+    )
+    training_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
         "compute_name"
     ]
 
     pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=metadata_pipeline_job, experiment_name="metadata_pipeline"
+        pipeline_job=training_pipeline_job, experiment_name="metadata_pipeline"
     )
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
