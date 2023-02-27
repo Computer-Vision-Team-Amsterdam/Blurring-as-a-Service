@@ -2,6 +2,7 @@ import os
 import sys
 
 import yaml
+from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
@@ -24,8 +25,21 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
     code="../../../",
 )
 def train_model(
-    mounted_dataset: Input(type="uri_folder"), model_weights: Input(type="uri_folder"), yolo_yaml_path: Output(type="uri_folder"), trained_model: Output(type="uri_folder")  # type: ignore # noqa: F821
+    mounted_dataset: Input(type=AssetTypes.URI_FOLDER), model_weights: Input(type=AssetTypes.URI_FOLDER), yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER), trained_model: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
 ):
+    """
+    Pipeline step to train the model.
+
+    Parameters
+    ----------
+    mounted_dataset:
+        Dataset to use for training, it should contain the following folder structure:
+            - /images/train/
+            - /images/val/
+            - /images/test/
+    yolo_yaml_path:
+        Location where to store the yaml file for yolo training.
+    """
     data = dict(
         train=f"{mounted_dataset}/images/train/",
         val=f"{mounted_dataset}/images/val/",
@@ -33,7 +47,7 @@ def train_model(
         nc=2,
         names=["person", "license_plate"],
     )
-    with open(f"{yolo_yaml_path}/pano-sample.yaml", "w") as outfile:
+    with open(f"{yolo_yaml_path}/yolo_configuration.yaml", "w") as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     os.system("cp Arial.ttf /root/.config/Ultralytics/Arial.ttf")  # nosec
     if settings["training_pipeline"]["flags"] & PipelineFlag.STORE_MODEL:
@@ -41,7 +55,7 @@ def train_model(
     else:
         model_output = "../../../outputs/runs/train"
     train.run(
-        data=f"{yolo_yaml_path}/pano-sample.yaml",
+        data=f"{yolo_yaml_path}/yolo_configuration.yaml",
         weights=f"{model_weights}/yolov5m.pt",
         cfg="../../../yolov5/models/yolov5s.yaml",
         img=2048,

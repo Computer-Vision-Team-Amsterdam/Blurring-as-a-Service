@@ -15,15 +15,15 @@ class AMLInterface:
 
     Attributes
     ----------
-    workspace :
+    ml_client :
         Instance of :class:`azureml.core.Workspace`
     """
 
     def __init__(self):
         """Initiate AMLInterface based on the Azure config.json file."""
-        self.workspace = MLClient.from_config(self._connect())
+        self.ml_client = MLClient.from_config(self._connect())
         logger.info(
-            f"Retrieved the following workspace: {self.workspace.workspace_name}"
+            f"Retrieved the following workspace: {self.ml_client.workspace_name}"
         )
 
     @staticmethod
@@ -75,7 +75,7 @@ class AMLInterface:
             image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
             conda_file="environment.yml",
         )
-        self.workspace.environments.create_or_update(env)
+        self.ml_client.environments.create_or_update(env)
         self._delete_environment_yml()
         return env
 
@@ -158,7 +158,7 @@ class AMLInterface:
             The created or updated resource.
 
         """
-        return self.workspace.create_or_update(job)
+        return self.ml_client.create_or_update(job)
 
     def submit_pipeline_job(self, pipeline_job, experiment_name):
         """
@@ -193,9 +193,9 @@ class AMLInterface:
         -------
 
         """
-        return self.workspace.jobs.create_or_update(
+        return self.ml_client.jobs.create_or_update(
             pipeline_job, experiment_name=experiment_name
         )
 
     def wait_until_job_completes(self, job_name):
-        self.workspace.jobs.stream(job_name)
+        self.ml_client.jobs.stream(job_name)
