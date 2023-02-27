@@ -17,6 +17,16 @@ metadata_pipeline:
     - CONVERT_COCO_TO_YOLO
     - CREATE_METADATA
 
+training_pipeline:
+  inputs:
+    training_data: "azureml://FOLDER_PATH_TO_TRAINING_DATA"
+    model_weights: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
+  outputs:
+    trained_model: "azureml://FOLDER_PATH_WHERE_STORE_TRAINED_MODEL"
+  flags:
+    # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, STORE_MODEL
+    - NONE
+
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
   own_packages: ["__main__", "blurring_as_a_service"]

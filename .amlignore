@@ -176,6 +176,6 @@ poetry.lock
 /*.md
 /pyproject.toml
 /poetry.lock
-/.*
+#/.*
 /data-prep
 /local_test_data

@@ -21,6 +21,12 @@ class MetadataPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class TrainingPipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
+    flags: List[str] = []
+
+
 class LoggingSpec(SettingsSpecModel):
     loglevel_own: str = "INFO"
     own_packages: List[str] = [
@@ -41,4 +47,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
 
     aml_experiment_details: AMLExperimentDetailsSpec = None
     metadata_pipeline: MetadataPipelineSpec = None
+    training_pipeline: TrainingPipelineSpec = None
     logging: LoggingSpec = LoggingSpec()
