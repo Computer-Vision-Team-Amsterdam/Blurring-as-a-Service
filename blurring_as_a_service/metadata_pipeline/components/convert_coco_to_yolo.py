@@ -1,6 +1,7 @@
 import os
 import sys
 
+from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
@@ -26,6 +27,6 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     code="../../../",
 )
 def convert_coco_to_yolo(
-    input_data: Input(type="uri_file"), output_folder: Output(type="uri_folder")  # type: ignore # noqa: F821
+    input_data: Input(type=AssetTypes.URI_FILE), output_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
 ):
     CocoToYoloConverter(input_data, output_folder).convert()

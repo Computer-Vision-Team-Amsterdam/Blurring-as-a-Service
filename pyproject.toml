@@ -6,13 +6,13 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-pandas = {version = ">=1.1.4", source = "PyPI"}
+pandas = ">=1.1.4"
 GitPython = {version = "^3.1.30", source = "PyPI"}
 ipython = {version = "^8.8.0", source = "PyPI"}
-matplotlib = {version = ">=3.2.2", source = "PyPI"}
-numpy = {version = ">=1.18.5", source = "PyPI"}
-opencv-python = {version = ">=4.1.1", source = "PyPI"}
-Pillow = {version = ">=7.1.2", source = "PyPI"}
+matplotlib = ">=3.2.2"
+numpy = ">=1.18.5"
+opencv-python = ">=4.1.1"
+Pillow = ">=7.1.2"
 psutil = {version = "^5.9.4", source = "PyPI"}
 PyYAML = {version = ">=5.3.1", source = "PyPI"}
 requests = {version = ">=2.23.0", source = "PyPI"}

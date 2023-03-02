@@ -27,6 +27,17 @@ class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class TrainingPipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
+    flags: List[str] = []
+
+
+class InferencePipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
+    flags: List[str] = []
+
+
 class LoggingSpec(SettingsSpecModel):
     loglevel_own: str = "INFO"
     own_packages: List[str] = [
@@ -48,4 +59,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     aml_experiment_details: AMLExperimentDetailsSpec = None
     metadata_pipeline: MetadataPipelineSpec = None
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
+    training_pipeline: TrainingPipelineSpec = None
+    inference_pipeline: InferencePipelineSpec = None
     logging: LoggingSpec = LoggingSpec()

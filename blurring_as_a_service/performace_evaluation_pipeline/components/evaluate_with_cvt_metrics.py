@@ -1,20 +1,14 @@
-import glob
 import os
 import sys
 
 from mldesigner import Input, command_component
 
+from blurring_as_a_service.metrics.custom_metrics_calculator import (
+    collect_and_store_tba_results_per_class_and_size,
+)
+
 sys.path.append("../../..")
 
-from blurring_as_a_service.metrics.metrics_utils import (  # noqa: E402
-    process_image_labels,
-)
-from blurring_as_a_service.metrics.total_blurred_area import (  # noqa: E402
-    TotalBlurredArea,
-)
-from blurring_as_a_service.metrics.upper_blurred_area import (  # noqa: E402
-    UpperBlurredArea,
-)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -36,22 +30,9 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 def evaluate_with_cvt_metrics(
     mounted_dataset: Input(type="uri_folder"), yolo_output_folder: Input(type="uri_folder")  # type: ignore # noqa: F821
 ):
-    true_labels = [file for file in glob.glob(f"{mounted_dataset}/labels/val/*.txt")]
-    pred_labels = [file for file in glob.glob(f"{yolo_output_folder}/exp/labels/*.txt")]
+    true_path = f"{mounted_dataset}/labels/val"
+    pred_path = f"{yolo_output_folder}/exp/labels"
 
-    inputs = [
-        {"true": true_label, "predicted": pred_label}
-        for true_label, pred_label in zip(true_labels, pred_labels)
-    ]
-
-    tba = TotalBlurredArea()
-    uba = UpperBlurredArea()
-
-    for i, input in enumerate(inputs):
-        tba_true, tba_pred, uba_true, uba_pred = process_image_labels(input)
-        print(f"{i}/{len(inputs)} images done.")
-        tba.add_mask(tba_true, tba_pred)
-        uba.add_mask(uba_true, uba_pred)
-
-    tba.summary("Statistics for Total Blurred Area:")
-    uba.summary("Statistics for Upper Blurred Area:")
+    collect_and_store_tba_results_per_class_and_size(
+        true_path, pred_path, markdown_output_path="tba_results.md"
+    )

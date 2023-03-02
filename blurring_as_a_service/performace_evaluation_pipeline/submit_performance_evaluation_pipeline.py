@@ -10,9 +10,6 @@ from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_wi
 from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_cvt_metrics import (
     evaluate_with_cvt_metrics,
 )
-from blurring_as_a_service.performace_evaluation_pipeline.components.get_data import (
-    get_data,
-)
 from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (
     validate_model,
 )
@@ -29,14 +26,6 @@ def performance_evaluation_pipeline(
         "performance_evaluation_pipeline"
     ]["flags"]
 
-    if performance_evaluation_flags & PipelineFlag.GET_DATA:
-        get_data_step = get_data(input_folder=validation_data)
-
-        get_data_step.outputs.output_file = Output(
-            type=AssetTypes.URI_FILE,
-            path=yolo_validation_output.result(),
-            mode="rw_mount",
-        )
     if performance_evaluation_flags & PipelineFlag.VALIDATE_MODEL:
         validate_model_step = validate_model(mounted_dataset=validation_data)
         validate_model_step.outputs.yolo_validation_output = Output(
