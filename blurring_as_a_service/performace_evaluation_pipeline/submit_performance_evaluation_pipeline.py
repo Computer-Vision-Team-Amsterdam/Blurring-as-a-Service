@@ -28,6 +28,7 @@ def performance_evaluation_pipeline(
     performance_evaluation_flags = BlurringAsAServiceSettings.get_settings()[
         "performance_evaluation_pipeline"
     ]["flags"]
+
     if performance_evaluation_flags & PipelineFlag.GET_DATA:
         get_data_step = get_data(input_folder=validation_data)
 
