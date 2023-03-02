@@ -157,3 +157,5 @@ local_test_data/out:yolo-format/*
 config.json
 config.yml
 /aml-config.yml
+tests/test-images/*
+tests/test-labels/*
