@@ -33,6 +33,7 @@ azure-identity = {version = "^1.12.0", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", rev = "v0.2.2"}
 pycocotools = {version = "^2.0.6", source="PyPI"}
 cryptography = "<39.0.0"
+markdown-it-py = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 
