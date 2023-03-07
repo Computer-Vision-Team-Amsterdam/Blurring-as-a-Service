@@ -22,12 +22,29 @@ class YoloLabelsDataset(Dataset):
         return self._labels[image_id]
 
     def get_labels(self):
+        """
+        Get dict with information about images and their corresponding labels.
+
+        Returns
+        -------
+
+        """
         return self._labels
 
     def get_filtered_labels(self):
         return self._filtered_labels
 
     def _prepare_labels(self):
+        """
+        Loop through the yolo labels and store them in a dict.
+
+        Each key in the dict is an image, each value is a ndarray (n_detections, 5)
+        The 6 columns are in the yolo format, i.e. (target_class, x_c, y_c, width, height)
+
+        Returns
+        -------
+
+        """
         self._labels = {}
         for file in self.label_files:
             with open(f"{self.folder_path}/{file}", "r") as f:

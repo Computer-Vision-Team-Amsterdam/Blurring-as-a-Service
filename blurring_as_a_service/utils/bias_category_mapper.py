@@ -1,4 +1,21 @@
+from dataclasses import dataclass
 from typing import List
+
+
+@dataclass
+class SensitiveCategories:
+    values: List[str] = None
+
+    def __post_init__(self):
+        if self.values is None:
+            self.values = [
+                "grouped_category",
+                "sex",
+                "age",
+                "skin_color",
+                "licence_plate_origin",
+                "licence_plate_color",
+            ]
 
 
 class BiasCategoryMapper:

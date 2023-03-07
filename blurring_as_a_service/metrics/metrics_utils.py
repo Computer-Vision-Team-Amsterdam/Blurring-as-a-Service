@@ -6,44 +6,22 @@ from PIL import Image
 from PIL.Image import Image as ImageType
 
 
-def process_image_labels(labels):
-
-    true_classes, true_bboxes = parse_labels(labels["true"])
-    pred_classes, pred_bboxes = parse_labels(labels["predicted"])
-
-    tba_true_mask = generate_binary_mask(true_bboxes)
-    tba_pred_mask = generate_binary_mask(pred_bboxes)
-
-    # discard true and pred classes which are licence_plates
-    person_true_bboxes_filtered = [
-        true_bboxes[i] for i in range(len(true_bboxes)) if true_classes[i] == 0
-    ]
-    person_pred_bboxes_filtered = [
-        pred_bboxes[i] for i in range(len(pred_bboxes)) if pred_classes[i] == 0
-    ]
-
-    uba_true_mask = generate_binary_mask(
-        person_true_bboxes_filtered, consider_upper_half=True
-    )
-    uba_pred_mask = generate_binary_mask(
-        person_pred_bboxes_filtered, consider_upper_half=True
-    )
-
-    return tba_true_mask, tba_pred_mask, uba_true_mask, uba_pred_mask
-
-
 def parse_labels(
     file_path: str,
 ) -> Tuple[List[int], List[Tuple[float, float, float, float]]]:
     """
-     Parses a labels file with the following normalized format: [x_center, y_center, width, height]
+     Parses a txt file with the following normalized format: [class x_center, y_center, width, height]
 
-    :param file_path: The path to the labels file to be parsed.
-    :return: A tuple with two lists: classes and bounding_boxes
+    Parameters
+    ----------
+    file_path The path to the labels file to be parsed.
+
+    Returns (classes and bounding_boxes)
+    -------
+
     """
     with open(file_path, "r") as f:
         lines = f.readlines()
-    f.close()
 
     classes = [int(line.strip().split()[0]) for line in lines]
     bounding_boxes = [
@@ -62,12 +40,18 @@ def generate_binary_mask(
     bounding_boxes, image_width=8000, image_height=4000, consider_upper_half=False
 ):
     """
+    Creates binary mask where all points inside the bounding boxes are 1, 0 otherwise.
 
-    :param consider_upper_half:
-    :param image_height:
-    :param image_width:
-    :param bounding_boxes:
-    :return:
+    Parameters
+    ----------
+    bounding_boxes: list of bounding box coordinates
+    image_width
+    image_height
+    consider_upper_half: only look at the upper half of the bounding boxes
+
+    Returns
+    -------
+
     """
 
     mask = np.zeros((image_height, image_width))
@@ -99,15 +83,18 @@ def generate_mask(
     bounding_boxes, image: ImageType, consider_upper_half=False
 ) -> ImageType:
     """
-    Generates a mask for an image given a list of bounding boxes.
+    Generates an RGB mask for an image given a list of bounding boxes.
+    Similar to generate_binary_mask, but this is used for visualizations, mainly as sanity checks
 
-    Parameters:
-     :param bounding_boxes: (List[Tuple[float, float, float, float]]): List of bounding boxes with normalised
-                                                                  (x_center, y_center, width, height)
-     :param image: (PIL.Image): An image to generate the mask for.
+    Parameters
+    ----------
+    bounding_boxes List of bounding boxes with normalised (x_center, y_center, width, height)
+    image  An image to generate the mask for.
+    consider_upper_half only look at the upper half of the bounding boxes
 
+    Returns
+    -------
 
-     :return: PIL.Image: The generated mask image.
     """
     mask = np.zeros_like(np.array(image))
 
