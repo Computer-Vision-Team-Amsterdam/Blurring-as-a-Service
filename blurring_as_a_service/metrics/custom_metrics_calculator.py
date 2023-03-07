@@ -10,11 +10,11 @@ from tqdm import tqdm
 
 from blurring_as_a_service.metrics.metrics_utils import generate_binary_mask
 from blurring_as_a_service.metrics.total_blurred_area import TotalBlurredArea
-from blurring_as_a_service.metrics.yolo_labels_dataset import YoloLabelsDataset
 from blurring_as_a_service.utils.bias_category_mapper import (
     BiasCategoryMapper,
     SensitiveCategories,
 )
+from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
 
 
 class ImageSize(Enum):
