@@ -37,6 +37,22 @@ class TargetClass(Enum):
         return self.value
 
 
+class Metrics:
+    def __init__(self):
+        self.true_positives = 0
+        self.false_negatives = 0
+        self.true_positives_small = 0
+        self.true_positives_medium = 0
+        self.true_positives_large = 0
+        self.false_negatives_small = 0
+        self.false_negatives_medium = 0
+        self.false_negatives_large = 0
+        self.false_negative_rate = None
+        self.false_negatives_rate_small = None
+        self.false_negatives_rate_medium = None
+        self.false_negatives_rate_large = None
+
+
 class CustomMetricsCalculator:
     """
     Given a folder containing tagged_validation results for multiple images, it loads all the results,
@@ -134,11 +150,12 @@ class CustomMetricsCalculator:
         -------
         A list where each element is a category value and its metrics, included the false negative rate.
         """
-        available_categories = list(
+        sensitive_category_options = list(
             {v[category_name] for k, v in self._statistics_per_category.items()}
         )
-        all_categories = {
-            available_category: {
+
+        metrics_for_all_sensitive_category_options = {
+            metrics_for_sensitive_category_option: {
                 "true_positives": 0,
                 "true_positives_small": 0,
                 "true_positives_medium": 0,
@@ -148,21 +165,37 @@ class CustomMetricsCalculator:
                 "false_negatives_medium": 0,
                 "false_negatives_large": 0,
             }
-            for available_category in available_categories
+            for metrics_for_sensitive_category_option in sensitive_category_options
         }
         for value in self._statistics_per_category.values():
-            category = all_categories[value[category_name]]
-            category["true_positives"] += value["true_positives"]
-            category["false_negatives"] += value["false_negatives"]
-            category["true_positives_small"] += value["true_positives_small"]
-            category["true_positives_medium"] += value["true_positives_medium"]
-            category["true_positives_large"] += value["true_positives_large"]
-            category["false_negatives_small"] += value["false_negatives_small"]
-            category["false_negatives_medium"] += value["false_negatives_medium"]
-            category["false_negatives_large"] += value["false_negatives_large"]
+            metrics_for_sensitive_category = metrics_for_all_sensitive_category_options[
+                value[category_name]
+            ]
+            metrics_for_sensitive_category["true_positives"] += value["true_positives"]
+            metrics_for_sensitive_category["false_negatives"] += value[
+                "false_negatives"
+            ]
+            metrics_for_sensitive_category["true_positives_small"] += value[
+                "true_positives_small"
+            ]
+            metrics_for_sensitive_category["true_positives_medium"] += value[
+                "true_positives_medium"
+            ]
+            metrics_for_sensitive_category["true_positives_large"] += value[
+                "true_positives_large"
+            ]
+            metrics_for_sensitive_category["false_negatives_small"] += value[
+                "false_negatives_small"
+            ]
+            metrics_for_sensitive_category["false_negatives_medium"] += value[
+                "false_negatives_medium"
+            ]
+            metrics_for_sensitive_category["false_negatives_large"] += value[
+                "false_negatives_large"
+            ]
 
         result = []
-        for name, values in all_categories.items():
+        for name, values in metrics_for_all_sensitive_category_options.items():
             true_positives = values["true_positives"]
             false_negatives = values["false_negatives"]
             true_positives_small = values["true_positives_small"]
