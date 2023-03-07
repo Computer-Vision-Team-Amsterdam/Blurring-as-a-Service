@@ -27,6 +27,14 @@ training_pipeline:
     # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, STORE_MODEL
     - NONE
 
+inference_pipeline:
+  input:
+    data_to_blur: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
+  outputs:
+    results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
+
+
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
   own_packages: ["__main__", "blurring_as_a_service"]
