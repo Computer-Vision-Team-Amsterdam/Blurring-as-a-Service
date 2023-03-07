@@ -20,29 +20,24 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def performance_evaluation_pipeline(
-    validation_data, annotations_json, yolo_yaml_path, yolo_validation_output
+    validation_data, annotations_json, yolo_yaml_path, yolo_validation_output, model
 ):
-    performance_evaluation_flags = BlurringAsAServiceSettings.get_settings()[
-        "performance_evaluation_pipeline"
-    ]["flags"]
+    validate_model_step = validate_model(mounted_dataset=validation_data, model=model)
+    validate_model_step.outputs.yolo_validation_output = Output(
+        type="uri_folder", mode="rw_mount", path=yolo_validation_output.result()
+    )
+    validate_model_step.outputs.yolo_yaml_path = Output(
+        type="uri_folder", mode="rw_mount", path=yolo_yaml_path.result()
+    )
+    coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
+        annotations_json=annotations_json,
+        yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
+    )
 
-    if performance_evaluation_flags & PipelineFlag.VALIDATE_MODEL:
-        validate_model_step = validate_model(mounted_dataset=validation_data)
-        validate_model_step.outputs.yolo_validation_output = Output(
-            type="uri_folder", mode="rw_mount", path=yolo_validation_output.result()
-        )
-        validate_model_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=yolo_yaml_path.result()
-        )
-        coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
-            annotations_json=annotations_json,
-            yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
-        )
-
-        custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
-            mounted_dataset=validation_data,
-            yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
-        )
+    custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
+        mounted_dataset=validation_data,
+        yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
+    )
 
     return {}
 

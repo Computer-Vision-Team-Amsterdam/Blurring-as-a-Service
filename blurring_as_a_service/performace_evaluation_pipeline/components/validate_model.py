@@ -26,6 +26,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 )
 def validate_model(
     mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
+    model: Input(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
 ):
@@ -41,10 +42,9 @@ def validate_model(
     os.system("cp Arial.ttf /root/.config/Ultralytics/Arial.ttf")  # nosec
     val.run(
         data=f"{yolo_yaml_path}/pano.yaml",
-        weights="weights/last-purple_boot_3l6p24vb.pt",
+        weights=f"{model}/last-purple_boot_3l6p24vb.pt",
         imgsz=2048,
         batch_size=8,
-        # project="../../../outputs/runs/val",
         project=f"{yolo_validation_output}",
         task="val",
         save_txt=True,
