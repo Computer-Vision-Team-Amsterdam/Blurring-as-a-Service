@@ -177,5 +177,15 @@ poetry.lock
 /pyproject.toml
 /poetry.lock
 #/.*
-/data-prep
+
+
 /local_test_data
+/weights
+/yolov5/runs
+/draw-YOLO-box
+*.jpg
+*.DS_Store
+*.md
+/tests
+/experiments
+/datasets

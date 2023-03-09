@@ -1,15 +1,14 @@
 import os
 import sys
 
-from azure.ai.ml.constants import AssetTypes
-from mldesigner import Input, Output, command_component
+from mldesigner import Input, command_component
 
 sys.path.append("../../..")
+from blurring_as_a_service.performace_evaluation_pipeline.source.evaluate_with_coco import (  # noqa: E402
+    coco_evaluation,
+)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
-)
-from blurring_as_a_service.utils.coco_to_yolo_converter import (  # noqa: E402
-    CocoToYoloConverter,
 )
 
 config_path = os.path.abspath(
@@ -21,12 +20,12 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 
 
 @command_component(
-    name="convert_coco_to_yolo",
-    display_name="Convert coco to yolo",
+    name="evaluate_with_coco",
+    display_name="COCO evaluation",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
 )
-def convert_coco_to_yolo(
-    input_data: Input(type=AssetTypes.URI_FILE), output_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
+def evaluate_with_coco(
+    annotations_json: Input(type="uri_file"), yolo_output_folder: Input(type="uri_folder")  # type: ignore # noqa: F821
 ):
-    CocoToYoloConverter(input_data, output_folder).convert()
+    coco_evaluation(annotations_json, yolo_output_folder)

@@ -14,15 +14,15 @@ numpy = ">=1.18.5"
 opencv-python = ">=4.1.1"
 Pillow = ">=7.1.2"
 psutil = {version = "^5.9.4", source = "PyPI"}
-PyYAML = ">=5.3.1"
-requests = ">=2.23.0"
-scipy = ">=1.4.1"
-thop = ">=0.1.1"
-torch = ">=1.7.0"
-torchvision = ">=0.8.1"
-tqdm = ">=4.64.0"
-tensorboard = ">=2.4.1"
-seaborn = ">=0.11.0"
+PyYAML = {version = ">=5.3.1", source = "PyPI"}
+requests = {version = ">=2.23.0", source = "PyPI"}
+scipy = {version = ">=1.4.1", source = "PyPI"}
+thop = {version = ">=0.1.1", source = "PyPI"}
+torch = {version = "1.8.0", source = "PyPI"}
+torchvision = {version = "0.9.0", source = "PyPI"}
+tqdm = {version = ">=4.64.0", source = "PyPI"}
+tensorboard = {version = ">=2.4.1", source = "PyPI"}
+seaborn = {version = ">=0.11.0", source = "PyPI"}
 pre-commit = {version = "^2.21.0", source = "PyPI"}
 pytest = {version = "^7.2.1", source = "PyPI"}
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
@@ -31,6 +31,9 @@ dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
 python-geohash = {version = "^0.8.5", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", rev = "v0.2.2"}
+pycocotools = {version = "^2.0.6", source="PyPI"}
+cryptography = "<39.0.0"
+markdown-it-py = "^2.2.0"
 
 [tool.poetry.dev-dependencies]
 

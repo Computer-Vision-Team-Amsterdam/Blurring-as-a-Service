@@ -8,6 +8,8 @@ class PipelineFlag(IntFlag):
     CREATE_ENVIRONMENT = auto()
     CONVERT_COCO_TO_YOLO = auto()
     CREATE_METADATA = auto()
+    VALIDATE_MODEL = auto()
+    COCO_EVALUATION = auto()
     STORE_MODEL = auto()
 
     @classmethod
