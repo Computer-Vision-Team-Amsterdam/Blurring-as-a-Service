@@ -29,6 +29,7 @@ def performance_evaluation_pipeline(
     validate_model_step.outputs.yolo_yaml_path = Output(
         type="uri_folder", mode="rw_mount", path=yolo_yaml_path.result()
     )
+
     coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
         annotations_json=annotations_json,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
@@ -65,9 +66,16 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
 
     annotations_json = Input(type=AssetTypes.URI_FILE, path=inputs["annotations_json"])
 
+    model = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=settings["performance_evaluation_pipeline"]["inputs"]["model"],
+        description="Model to use for the blurring",
+    )
+
     performance_evaluation_pipeline_job = performance_evaluation_pipeline(
         validation_data=validation_images_path,
         annotations_json=annotations_json,
+        model=model,
         yolo_validation_output=outputs["yolo_validation_output"],
     )
 

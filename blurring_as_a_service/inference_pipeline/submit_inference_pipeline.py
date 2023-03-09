@@ -46,13 +46,13 @@ def main():
         path=settings["inference_pipeline"]["inputs"]["model"],
         description="Model to use for the blurring",
     )
-    metadata_pipeline_job = inference_pipeline(data_to_blur=data_to_blur, model=model)
+    inference_pipeline_job = inference_pipeline(data_to_blur=data_to_blur, model=model)
 
-    metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
-        "compute_name"
-    ]
+    inference_pipeline_job.settings.default_compute = settings[
+        "aml_experiment_details"
+    ]["compute_name"]
     pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=metadata_pipeline_job, experiment_name="inference_pipeline"
+        pipeline_job=inference_pipeline_job, experiment_name="inference_pipeline"
     )
     aml_interface.wait_until_job_completes(pipeline_job.name)
 

@@ -2,7 +2,7 @@ import json
 
 from pycocotools.coco import COCO
 
-from metrics.customCocoEval import CustomCOCOeval
+from blurring_as_a_service.metrics.custom_coco_evaluator import CustomCOCOeval
 
 
 def coco_evaluation(annotations_json, yolo_output_folder):
