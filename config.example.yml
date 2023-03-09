@@ -28,12 +28,21 @@ training_pipeline:
     - NONE
 
 inference_pipeline:
-  input:
+  inputs:
     data_to_blur: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
   outputs:
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
 
+
+performance_evaluation_pipeline:
+  inputs:
+    validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    annotations_json: "azureml://FOLDER_PATH_TO_TAGGED_ANNOTATION"
+    model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
+  outputs:
+    yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
+    yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
