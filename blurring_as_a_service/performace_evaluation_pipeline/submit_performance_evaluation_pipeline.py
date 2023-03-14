@@ -21,11 +21,11 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def performance_evaluation_pipeline(
     validation_data,
-    annotations_json,
+    annotations_for_coco_metrics,
     yolo_yaml_path,
     yolo_validation_output,
     model,
-    coco_file_with_categories,
+    annotations_for_custom_metrics,
 ):
     validate_model_step = validate_model(mounted_dataset=validation_data, model=model)
     validate_model_step.outputs.yolo_validation_output = Output(
@@ -36,14 +36,14 @@ def performance_evaluation_pipeline(
     )
 
     coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
-        annotations_json=annotations_json,
+        annotations_for_coco_metrics=annotations_for_coco_metrics,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
     )
 
     custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
         mounted_dataset=validation_data,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
-        coco_file_with_categories=coco_file_with_categories,
+        annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
     return {}
 
@@ -69,7 +69,9 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         type=AssetTypes.URI_FOLDER, path=inputs["validation_images_path"]
     )
 
-    annotations_json = Input(type=AssetTypes.URI_FILE, path=inputs["annotations_json"])
+    annotations_for_coco_metrics = Input(
+        type=AssetTypes.URI_FILE, path=inputs["annotations_for_coco_metrics"]
+    )
 
     model = Input(
         type=AssetTypes.URI_FOLDER,
@@ -77,16 +79,16 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         description="Model to use for the blurring",
     )
 
-    coco_file_with_categories = Input(
-        type=AssetTypes.URI_FILE, path=inputs["coco_file_with_categories"]
+    annotations_for_custom_metrics = Input(
+        type=AssetTypes.URI_FILE, path=inputs["annotations_for_custom_metrics"]
     )
 
     performance_evaluation_pipeline_job = performance_evaluation_pipeline(
         validation_data=validation_images_path,
-        annotations_json=annotations_json,
+        annotations_for_coco_metrics=annotations_for_coco_metrics,
         model=model,
         yolo_validation_output=outputs["yolo_validation_output"],
-        coco_file_with_categories=coco_file_with_categories,
+        annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
 
     performance_evaluation_pipeline_job.settings.default_compute = settings[

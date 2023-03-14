@@ -32,7 +32,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 def evaluate_with_cvt_metrics(
     mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_output_folder: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    coco_file_with_categories: Input(type="uri_file"),  # type: ignore # noqa: F821
+    annotations_for_custom_metrics: Input(type="uri_file"),  # type: ignore # noqa: F821
 ):
     true_path = f"{mounted_dataset}/labels/val"
     pred_path = f"{yolo_output_folder}/exp/labels"
@@ -43,7 +43,9 @@ def evaluate_with_cvt_metrics(
     )
 
     # ======== False Negative Rate metric ========= #
-    metrics_calculator = CustomMetricsCalculator(true_path, coco_file_with_categories)
+    metrics_calculator = CustomMetricsCalculator(
+        true_path, annotations_for_custom_metrics
+    )
     metrics_calculator.calculate_and_store_metrics(
         markdown_output_path="fnr_results.md"
     )

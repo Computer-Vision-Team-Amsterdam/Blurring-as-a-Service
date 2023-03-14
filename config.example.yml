@@ -38,8 +38,9 @@ inference_pipeline:
 performance_evaluation_pipeline:
   inputs:
     validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    annotations_json: "azureml://FOLDER_PATH_TO_TAGGED_ANNOTATION"
+    annotations_for_coco_metrics: "azureml://FILE_PATH_TO_COCO_format_annotations_for_COCO_evaluation"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
+    annotations_for_custom_metrics: "azureml://FILE_PATH_TO_Azure_COCO_format_tagged_annotations_for_custom_evaluation"
   outputs:
     yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
