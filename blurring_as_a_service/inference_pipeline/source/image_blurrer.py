@@ -52,6 +52,9 @@ class ImageBlurrer:
 
         """
         image = self.blur(labels_path=labels_path)
+        folder_path = os.path.dirname(store_path)
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
         if not cv2.imwrite(
             store_path,
             image,

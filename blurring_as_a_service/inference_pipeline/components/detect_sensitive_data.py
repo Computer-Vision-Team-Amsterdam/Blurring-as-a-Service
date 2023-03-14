@@ -25,7 +25,8 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     code="../../../",
 )
 def detect_sensitive_data(
-    data_to_blur: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
@@ -41,9 +42,15 @@ def detect_sensitive_data(
     results_path:
         Where to store the results.
     """
+    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"
+    with open(files_to_blur, "r") as src:
+        with open(files_to_blur_full_path, "w") as dest:
+            for line in src:
+                dest.write(f"{folder}/{line}")
+
     detect.run(
         weights=f"{model}/best.pt",
-        source=data_to_blur,
+        source=files_to_blur_full_path,
         project=results_path,
         save_txt=True,
         exist_ok=True,

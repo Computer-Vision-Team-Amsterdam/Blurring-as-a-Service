@@ -24,18 +24,17 @@ class MetadataPipelineSpec(SettingsSpecModel):
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
-    flags: List[str] = []
 
 
 class TrainingPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
     flags: List[str] = []
 
 
 class InferencePipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
-    flags: List[str] = []
 
 
 class LoggingSpec(SettingsSpecModel):

@@ -1,5 +1,3 @@
-from typing import Dict
-
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -33,21 +31,12 @@ def metadata_pipeline(coco_annotations, labels_path, images_path, metadata_path)
     return {}
 
 
-def main(inputs: Dict[str, str], outputs: Dict[str, str]):
+def main():
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
 
-    # TODO: Remore all the environment creation and put it only in one place after the SDKv2 problem is solved.
-    if settings["metadata_pipeline"]["flags"] & PipelineFlag.CREATE_ENVIRONMENT:
-        custom_packages = {
-            "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
-        }
-        aml_interface.create_aml_environment(
-            settings["aml_experiment_details"]["env_name"],
-            project_name="blurring-as-a-service",
-            custom_packages=custom_packages,
-        )
-
+    inputs = settings["metadata_pipeline"]["inputs"]
+    outputs = settings["metadata_pipeline"]["outputs"]
     coco_annotations = Input(type=AssetTypes.URI_FILE, path=inputs["coco_annotations"])
     images_path = Input(type=AssetTypes.URI_FOLDER, path=inputs["images_path"])
 
@@ -57,7 +46,6 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         images_path=images_path,
         metadata_path=outputs["metadata_path"],
     )
-
     metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
         "compute_name"
     ]
@@ -65,13 +53,9 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=metadata_pipeline_job, experiment_name="metadata_pipeline"
     )
-
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
 
 if __name__ == "__main__":
-    settings = BlurringAsAServiceSettings.set_from_yaml("config.yml")
-    main(
-        settings["metadata_pipeline"]["inputs"],
-        settings["metadata_pipeline"]["outputs"],
-    )
+    BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    main()

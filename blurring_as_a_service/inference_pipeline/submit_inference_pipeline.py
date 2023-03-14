@@ -11,18 +11,19 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def inference_pipeline(data_to_blur, model):
+def inference_pipeline(folder, files_to_blur, model):
     outputs = BlurringAsAServiceSettings.get_settings()["inference_pipeline"]["outputs"]
 
     detect_sensitive_data_step = detect_sensitive_data(
-        data_to_blur=data_to_blur, model=model
+        folder=folder, files_to_blur=files_to_blur, model=model
     )
     detect_sensitive_data_step.outputs.results_path = Output(
         type="uri_folder", mode="rw_mount", path=outputs["results_path"]
     )
 
     blur_images_step = blur_images(
-        data_to_blur=data_to_blur,
+        folder=folder,
+        files_to_blur=files_to_blur,
         results_detection=detect_sensitive_data_step.outputs.results_path,
     )
     blur_images_step.outputs.results_path = Output(
@@ -36,9 +37,14 @@ def main():
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
 
-    data_to_blur = Input(
+    folder = Input(
         type=AssetTypes.URI_FOLDER,
-        path=settings["inference_pipeline"]["inputs"]["data_to_blur"],
+        path=settings["inference_pipeline"]["inputs"]["folder"],
+        description="Data to be blurred",
+    )
+    files_to_blur = Input(
+        type=AssetTypes.URI_FILE,
+        path=settings["inference_pipeline"]["inputs"]["files_to_blur"],
         description="Data to be blurred",
     )
     model = Input(
@@ -46,7 +52,9 @@ def main():
         path=settings["inference_pipeline"]["inputs"]["model"],
         description="Model to use for the blurring",
     )
-    inference_pipeline_job = inference_pipeline(data_to_blur=data_to_blur, model=model)
+    inference_pipeline_job = inference_pipeline(
+        folder=folder, files_to_blur=files_to_blur, model=model
+    )
 
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"

@@ -3,7 +3,7 @@ import sys
 
 from mldesigner import Input, command_component
 
-from blurring_as_a_service.metrics.custom_metrics_calculator import (
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.custom_metrics_calculator import (
     collect_and_store_tba_results_per_class_and_size,
 )
 

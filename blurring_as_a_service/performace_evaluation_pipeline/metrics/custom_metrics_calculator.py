@@ -8,8 +8,12 @@ from typing import Dict, List
 import numpy.typing as npt
 from tqdm import tqdm
 
-from blurring_as_a_service.metrics.metrics_utils import generate_binary_mask
-from blurring_as_a_service.metrics.total_blurred_area import TotalBlurredArea
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (
+    generate_binary_mask,
+)
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.total_blurred_area import (
+    TotalBlurredArea,
+)
 from blurring_as_a_service.utils.bias_category_mapper import (
     BiasCategoryMapper,
     SensitiveCategories,

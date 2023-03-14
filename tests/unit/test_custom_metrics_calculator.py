@@ -1,4 +1,4 @@
-from blurring_as_a_service.metrics.custom_metrics_calculator import (
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.custom_metrics_calculator import (
     CustomMetricsCalculator,
 )
 

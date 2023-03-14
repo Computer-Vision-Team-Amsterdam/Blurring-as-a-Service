@@ -25,18 +25,6 @@ def main():
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
 
-    # TODO: Impossible to create an env for the training with the SDKv2 at the moment.
-    # This needs to be uncommented and fixed when it becomes possible:
-    # if settings["training_pipeline"]["flags"] & PipelineFlag.CREATE_ENVIRONMENT:
-    #     custom_packages = {
-    #         "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
-    #     }
-    #     aml_interface.create_aml_environment(
-    #         settings["aml_experiment_details"]["env_name"],
-    #         project_name="blurring-as-a-service",
-    #         custom_packages=custom_packages,
-    #     )
-
     training_data = Input(
         type=AssetTypes.URI_FOLDER,
         path=settings["training_pipeline"]["inputs"]["training_data"],

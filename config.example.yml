@@ -12,8 +12,7 @@ metadata_pipeline:
     labels_path: "azureml://FOLDER_PATH_WHERE_STORE_YOLO_LABELS"
     metadata_path: "azureml://FOLDER_PATH_WHERE_STORE_METADATA"
   flags:
-    # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, CONVERT_COCO_TO_YOLO, CREATE_METADATA
-    - CREATE_ENVIRONMENT
+    # Possible values: NONE (in case no flag is needed), CONVERT_COCO_TO_YOLO, CREATE_METADATA
     - CONVERT_COCO_TO_YOLO
     - CREATE_METADATA
 
@@ -24,12 +23,13 @@ training_pipeline:
   outputs:
     trained_model: "azureml://FOLDER_PATH_WHERE_STORE_TRAINED_MODEL"
   flags:
-    # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, STORE_MODEL
+    # Possible values: NONE (in case no flag is needed), STORE_MODEL
     - NONE
 
 inference_pipeline:
   inputs:
     data_to_blur: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    files_to_blur: "azureml://FILE_WITH_RELATIVE_PATHS_OF_BLUR_IMAGES"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
   outputs:
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"

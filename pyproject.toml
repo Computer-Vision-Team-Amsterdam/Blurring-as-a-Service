@@ -34,6 +34,9 @@ panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.gi
 pycocotools = {version = "^2.0.6", source="PyPI"}
 cryptography = "<39.0.0"
 markdown-it-py = "^2.2.0"
+joblib = "^1.2.0"
+azureml-core = "^1.49.0"
+setuptools = "^67.6.0"
 
 [tool.poetry.dev-dependencies]
 
