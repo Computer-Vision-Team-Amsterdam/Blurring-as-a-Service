@@ -31,9 +31,9 @@ def validate_model(
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
 ):
     data = dict(
-        train=f"{mounted_dataset}/images/train/",
-        val=f"{mounted_dataset}/images/val/",
-        test=f"{mounted_dataset}/images/test/",
+        train=f"{mounted_dataset}/",
+        val=f"{mounted_dataset}/",
+        test=f"{mounted_dataset}/",
         nc=2,
         names=["person", "license_plate"],
     )
@@ -49,4 +49,5 @@ def validate_model(
         task="val",
         save_txt=True,
         save_json=True,
+        half=True,
     )

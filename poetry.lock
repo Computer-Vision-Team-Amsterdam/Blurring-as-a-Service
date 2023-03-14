@@ -803,6 +803,14 @@ requests-oauthlib = ">=0.5.0"
 async = ["aiodns", "aiohttp (>=3.0)"]
 
 [[package]]
+name = "mss"
+version = "7.0.1"
+description = "An ultra fast cross-platform multiple screenshots module in pure python using ctypes."
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "nodeenv"
 version = "1.7.0"
 description = "Node.js virtual environment builder"
@@ -1590,7 +1598,7 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "5d5b6e79b3d238d7d2a3040f12af8a834237c20efcf6ccc0771a9a9a867ef24d"
+content-hash = "58ec07c790a5710faec43605ceed82ecc4d2882af35917aa6172745197c0339c"
 
 [metadata.files]
 absl-py = [
@@ -2235,6 +2243,10 @@ msal-extensions = [
 msrest = [
     {file = "msrest-0.7.1-py3-none-any.whl", hash = "sha256:21120a810e1233e5e6cc7fe40b474eeb4ec6f757a15d7cf86702c369f9567c32"},
     {file = "msrest-0.7.1.zip", hash = "sha256:6e7661f46f3afd88b75667b7187a92829924446c7ea1d169be8c4bb7eeb788b9"},
+]
+mss = [
+    {file = "mss-7.0.1-py3-none-any.whl", hash = "sha256:c8d69b5c1aefc19fb4d37802bfee9ebae5bb86fc42f1ab04cb93b32b0eaae451"},
+    {file = "mss-7.0.1.tar.gz", hash = "sha256:f14cee528903c3b01d3b8f1209cd498422f71e3d0d2d92c5b933edd3b9772022"},
 ]
 nodeenv = [
     {file = "nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},
