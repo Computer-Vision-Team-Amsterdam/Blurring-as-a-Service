@@ -23,6 +23,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     display_name="Uses a training model to detect sensitive data that needs to be blurred.",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
+    is_deterministic=False,
 )
 def detect_sensitive_data(
     data_to_blur: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
@@ -49,6 +50,5 @@ def detect_sensitive_data(
         exist_ok=True,
         name="detection_result",
         imgsz=(2000, 4000),
-        # half=True, # Half can be enabled only if run on GPU.
         hide_labels=True,
     )

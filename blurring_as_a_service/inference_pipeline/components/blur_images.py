@@ -26,6 +26,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     display_name="Blur images.",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
+    is_deterministic=False,
 )
 def blur_images(
     data_to_blur: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
