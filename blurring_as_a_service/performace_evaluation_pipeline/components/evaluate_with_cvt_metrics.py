@@ -27,6 +27,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     display_name="Evaluation with CVT metrics",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
+    is_deterministic=False,
 )
 def evaluate_with_cvt_metrics(
     mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
