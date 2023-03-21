@@ -25,6 +25,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     display_name="Convert Azure coco format to yolo",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
+    is_deterministic=False,
 )
 def convert_azure_coco_to_yolo(
     input_data: Input(type=AssetTypes.URI_FILE), output_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821

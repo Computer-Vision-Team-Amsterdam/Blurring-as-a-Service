@@ -23,6 +23,7 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
     display_name="Train model",
     environment=f"azureml:{settings['aml_experiment_details']['env_name']}:{settings['aml_experiment_details']['env_version']}",
     code="../../../",
+    is_deterministic=False,
 )
 def train_model(
     mounted_dataset: Input(type=AssetTypes.URI_FOLDER), model_weights: Input(type=AssetTypes.URI_FOLDER), yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER), trained_model: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821

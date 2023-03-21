@@ -30,6 +30,7 @@ class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
 
 class TrainingPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
     flags: List[str] = []
 
 
