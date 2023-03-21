@@ -27,6 +27,8 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     is_deterministic=False,
 )
 def evaluate_with_coco(
-    annotations_for_coco_metrics: Input(type="uri_file"), yolo_output_folder: Input(type="uri_folder")  # type: ignore # noqa: F821
+    annotations_for_coco_metrics: Input(type="uri_file"),  # type: ignore # noqa: F821
+    yolo_output_folder: Input(type="uri_folder"),  # type: ignore # noqa: F821
+    experiment_name: str,
 ):
-    coco_evaluation(annotations_for_coco_metrics, yolo_output_folder)
+    coco_evaluation(annotations_for_coco_metrics, yolo_output_folder, experiment_name)

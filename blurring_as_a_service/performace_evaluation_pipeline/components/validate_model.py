@@ -30,11 +30,12 @@ def validate_model(
     model: Input(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
+    experiment_name: str,
 ):
     data = dict(
-        train=f"{mounted_dataset}/",
-        val=f"{mounted_dataset}/",
-        test=f"{mounted_dataset}/",
+        train=f"{mounted_dataset}/images/train",
+        val=f"{mounted_dataset}/images/val",
+        test=f"{mounted_dataset}/images/test",
         nc=2,
         names=["person", "license_plate"],
     )
@@ -45,10 +46,12 @@ def validate_model(
         data=f"{yolo_yaml_path}/pano.yaml",
         weights=f"{model}/last-purple_boot_3l6p24vb.pt",
         imgsz=2048,
-        batch_size=8,
+        batch_size=1,
         project=f"{yolo_validation_output}",
         task="val",
+        name=experiment_name,
         save_txt=True,
         save_json=True,
         half=True,
+        tagged_data=True,
     )
