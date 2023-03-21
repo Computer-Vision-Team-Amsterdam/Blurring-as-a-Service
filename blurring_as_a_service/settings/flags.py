@@ -6,7 +6,8 @@ from functools import reduce
 class PipelineFlag(IntFlag):
     NONE = 0
     CREATE_ENVIRONMENT = auto()
-    CONVERT_COCO_TO_YOLO = auto()
+    CONVERT_AZURE_COCO_TO_YOLO = auto()
+    CONVERT_AZURE_COCO_TO_COCO = auto()
     CREATE_METADATA = auto()
     VALIDATE_MODEL = auto()
     COCO_EVALUATION = auto()

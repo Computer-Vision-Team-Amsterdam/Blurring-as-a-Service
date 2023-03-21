@@ -8,8 +8,8 @@ sys.path.append("../../..")
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.coco_to_yolo_converter import (  # noqa: E402
-    CocoToYoloConverter,
+from blurring_as_a_service.utils.azure_coco_to_coco_converter import (  # noqa: E402
+    AzureCocoToCocoConverter,
 )
 
 config_path = os.path.abspath(
@@ -21,12 +21,12 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 
 
 @command_component(
-    name="convert_coco_to_yolo",
-    display_name="Convert coco to yolo",
+    name="convert_azure_coco_to_coco",
+    display_name="Convert Azure coco format to coco",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
 )
-def convert_coco_to_yolo(
-    input_data: Input(type=AssetTypes.URI_FILE), output_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
+def convert_azure_coco_to_coco(
+    input_data: Input(type=AssetTypes.URI_FILE), output_file: Output(type=AssetTypes.URI_FILE)  # type: ignore # noqa: F821
 ):
-    CocoToYoloConverter(input_data, output_folder).convert()
+    AzureCocoToCocoConverter(input_data, output_file).convert()

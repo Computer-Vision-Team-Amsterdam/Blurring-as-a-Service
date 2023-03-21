@@ -449,7 +449,7 @@ class CustomMetricsCalculator:
 
 
 def get_total_blurred_area_statistics(
-    true_labels: Dict[str, npt.NDArray], predicted_lables: Dict[str, npt.NDArray]
+    true_labels: Dict[str, npt.NDArray], predicted_labels: Dict[str, npt.NDArray]
 ):
     """
     Calculates per pixel statistics (tp, tn, fp, fn, precision, recall, f1 score)
@@ -460,7 +460,7 @@ def get_total_blurred_area_statistics(
     Parameters
     ----------
     true_labels
-    predicted_lables
+    predicted_labels
 
     Returns
     -------
@@ -470,7 +470,7 @@ def get_total_blurred_area_statistics(
 
     for image_id in tqdm(true_labels.keys(), total=len(true_labels)):
         tba_true_mask = generate_binary_mask(true_labels[image_id][:, 1:5])
-        tba_pred_mask = generate_binary_mask(predicted_lables[image_id][:, 1:5])
+        tba_pred_mask = generate_binary_mask(predicted_labels[image_id][:, 1:5])
 
         total_blurred_area.update_statistics_based_on_masks(
             true_mask=tba_true_mask, predicted_mask=tba_pred_mask
