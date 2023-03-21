@@ -35,6 +35,8 @@ pycocotools = {version = "^2.0.6", source="PyPI"}
 cryptography = "<39.0.0"
 markdown-it-py = "^2.2.0"
 mss = "^7.0.1"
+setuptools = {version="^67.6.0", source = "PyPI"}
+
 
 [tool.poetry.dev-dependencies]
 
