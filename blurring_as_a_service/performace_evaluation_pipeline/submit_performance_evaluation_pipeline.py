@@ -25,9 +25,12 @@ def performance_evaluation_pipeline(
     yolo_yaml_path,
     yolo_validation_output,
     model,
+    experiment_name,
     annotations_for_custom_metrics,
 ):
-    validate_model_step = validate_model(mounted_dataset=validation_data, model=model)
+    validate_model_step = validate_model(
+        mounted_dataset=validation_data, model=model, experiment_name=experiment_name
+    )
     validate_model_step.outputs.yolo_validation_output = Output(
         type="uri_folder", mode="rw_mount", path=yolo_validation_output.result()
     )
@@ -38,12 +41,14 @@ def performance_evaluation_pipeline(
     coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
         annotations_for_coco_metrics=annotations_for_coco_metrics,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
+        experiment_name=experiment_name,
     )
 
     custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
         mounted_dataset=validation_data,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
         annotations_for_custom_metrics=annotations_for_custom_metrics,
+        experiment_name=experiment_name,
     )
     return {}
 
@@ -87,6 +92,7 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         validation_data=validation_images_path,
         annotations_for_coco_metrics=annotations_for_coco_metrics,
         model=model,
+        experiment_name=settings["performance_evaluation_pipeline"]["experiment_name"],
         yolo_validation_output=outputs["yolo_validation_output"],
         annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
