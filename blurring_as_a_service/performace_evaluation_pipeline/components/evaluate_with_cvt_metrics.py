@@ -1,4 +1,5 @@
 import os
+import pathlib
 import sys
 
 from mldesigner import Input, command_component  # noqa: E402
@@ -37,6 +38,7 @@ def evaluate_with_cvt_metrics(
 ):
     true_path = f"{mounted_dataset}/labels/val"
     pred_path = f"{yolo_output_folder}/{experiment_name}/labels"
+    pred_path_tagged = f"{yolo_output_folder}/{experiment_name}/labels_tagged"
 
     # ======== Total Blurred Area metric ========= #
     collect_and_store_tba_results_per_class_and_size(
@@ -45,9 +47,15 @@ def evaluate_with_cvt_metrics(
 
     # ======== False Negative Rate metric ========= #
 
-    metrics_calculator = CustomMetricsCalculator(
-        true_path, annotations_for_custom_metrics
-    )
-    metrics_calculator.calculate_and_store_metrics(
-        markdown_output_path="fnr_results.md"
-    )
+    if pathlib.Path.exists(pathlib.Path(pred_path_tagged)):
+        metrics_calculator = CustomMetricsCalculator(
+            pred_path_tagged, annotations_for_custom_metrics
+        )
+        metrics_calculator.calculate_and_store_metrics(
+            markdown_output_path="fnr_results.md"
+        )
+    else:
+        print(
+            "False Negative Rate metrics can only be run with tagged validation. labels_tagged folder not found."
+            "Make sure you run val.py with the --tagged-data flag in case you want to compute this metric."
+        )
