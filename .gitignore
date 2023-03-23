@@ -153,10 +153,14 @@ tags
 [._]*.un~
 
 
-local_test_data/out:yolo-format/*
+local_test_data/
+experiments/*.jpg
+draw-YOLO-box/*
+yolo-configs/*
 config.json
 config.yml
 /aml-config.yml
 tests/*.jpg
 tests/*.txt
+tests/*.json
 *.DS_Store
