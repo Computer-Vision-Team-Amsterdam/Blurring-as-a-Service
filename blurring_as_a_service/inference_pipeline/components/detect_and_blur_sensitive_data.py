@@ -19,14 +19,14 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 
 
 @command_component(
-    name="detect_sensitive_data",
-    display_name="Uses a training model to detect sensitive data that needs to be blurred.",
+    name="detect_and_blur_sensitive_data",
+    display_name="Detect and blur sensitive data from images",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
 )
-def detect_sensitive_data(
-    folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
+def detect_and_blur_sensitive_data(
+    mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
@@ -35,18 +35,21 @@ def detect_sensitive_data(
 
     Parameters
     ----------
-    data_to_blur:
-        Images to be blurred
+    mounted_root_folder:
+        Path of the mounted folder containing the images.
+    relative_paths_files_to_blur:
+        Text file containing multiple rows where each row has a relative path,
+        taking folder as root and the path to the image.
     model:
         Pre-trained model to be used to blur.
     results_path:
         Where to store the results.
     """
     files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"
-    with open(files_to_blur, "r") as src:
+    with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
-                dest.write(f"{folder}/{line}")
+                dest.write(f"{mounted_root_folder}/{line}")
 
     detect.run(
         weights=f"{model}/best.pt",
@@ -56,6 +59,7 @@ def detect_sensitive_data(
         exist_ok=True,
         name="detection_result",
         imgsz=(2000, 4000),
-        # half=True, # Half can be enabled only if run on GPU.
+        # half=True,  # Half can be enabled only if run on GPU.
         hide_labels=True,
+        save_blurred_image=True,
     )
