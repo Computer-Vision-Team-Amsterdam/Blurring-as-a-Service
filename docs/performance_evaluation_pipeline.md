@@ -1,8 +1,19 @@
 ## Performance evaluation pipeline
 
+`experiment_name`
+
+when we run yolo we set a `--name` flag with the name of the folder where
+the output is stored, e.g. `exp`. 
+If we re-run yolo without adjusting the name of the experiment, then 
+`exp_2` is automatically created.
+Subsequent tasks, i.e. calculation of metrics will compute metrics based on 
+`exp`. With `experiment_name` we want to point explicitly to which output folder is used throughout the tasks.
 
 
-Notes
+Notes on annotation formats:
+
+Azure COCO format, COCO format for evaluation with yolov5
+
 
 Differences between COCO format and Azure COCO format
 
@@ -12,21 +23,13 @@ AzureML COCO file contains area of 0 for all images. Instead, it should contain 
   
 - Missing keys
 
-AzureML COCO file does not contain the "iscrowd" key in the annotations, which causes errors at evaluation time.
+AzureML COCO file does not contain the "iscrowd" and "segmentation" keys in the annotations,
+which causes errors at evaluation time.
 
 
-How to obtain the custom_coco_file.json:
-
-input: yolo annotations
-run `python main.py --yolo-subdir --path /Users/epureanudiana/Documents/Projects/Yolo-to-COCO-format-converter/input --output test-14-mar.json
-` in the YOLO-to-COCO-format-converter
-
-run `python coco-to-customCoco.py` in the YOLO-to-COCO-format-converter
-
-
-| custom_coco_categories_01.json                    | validation-tagged.json                            |
+| COCO annotations for COCO evaluation with yolov5  | Azure COCO annotation                             |
 |---------------------------------------------------|---------------------------------------------------|
 | COCO format                                       | Azure COCO format with tagged classes             |  
 | categories, indexed from 0                        | categories, indexed from 1                        |  
-| categories are not compatible with COCO evaluator | categories are not compatible with COCO evaluator |
+| categories are compatible with COCO evaluator     | categories are not compatible with COCO evaluator |
 | absolute coordinates                              | normalized coordinates                            |  

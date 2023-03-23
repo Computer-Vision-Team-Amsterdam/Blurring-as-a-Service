@@ -44,11 +44,7 @@ performance_evaluation_pipeline:
   outputs:
     yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
-  experiment_name: "when we run an experiment a new folder is created by yolo. e.g. run_with_sample. 
-                  This fails when running multiple experiments with the same name, because yolo automatically 
-                  creates a new experiment_name if experiment_name folder already exists. 
-                  e.g. it creates run_with_sample_2 on the fly, while the subsequent tasks will be using the content 
-                  of the run_with_sample folder."
+  experiment_name: "name of the yolo run, type string. More information in the README.md"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
