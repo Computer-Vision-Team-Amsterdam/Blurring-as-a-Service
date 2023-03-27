@@ -27,13 +27,19 @@ training_pipeline:
     # Possible values: NONE (in case no flag is needed), CREATE_ENVIRONMENT, STORE_MODEL
     - NONE
 
+workload_distribution_pipeline:
+  inputs:
+    data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    number_of_batches: 4
+  outputs:
+    results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
+
 inference_pipeline:
   inputs:
     data_to_blur: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
   outputs:
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
-
 
 performance_evaluation_pipeline:
   inputs:
