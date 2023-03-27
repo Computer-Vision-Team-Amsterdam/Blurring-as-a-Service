@@ -44,7 +44,7 @@ performance_evaluation_pipeline:
   outputs:
     yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
-  experiment_name: "name of the yolo run, type string. More information in the README.md"
+  yolo_run_name: "name of the yolo run, type string. More information in the README.md"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

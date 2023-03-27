@@ -3,10 +3,7 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 
-from blurring_as_a_service.metrics.custom_metrics_calculator import (
-    ImageSize,
-    TargetClass,
-)
+from blurring_as_a_service.metrics.metrics_utils import ImageSize, TargetClass
 from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
 
 

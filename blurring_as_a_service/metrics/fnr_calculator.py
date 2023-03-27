@@ -1,59 +1,17 @@
 import itertools
 import json
-from enum import Enum
 from os import listdir
 from os.path import isfile, join
-from typing import Dict, List
+from typing import List
 
-import numpy.typing as npt
-from tqdm import tqdm
-
-from blurring_as_a_service.metrics.metrics_utils import generate_binary_mask
-from blurring_as_a_service.metrics.total_blurred_area import TotalBlurredArea
+from blurring_as_a_service.metrics.metrics_utils import ImageSize
 from blurring_as_a_service.utils.bias_category_mapper import (
     BiasCategoryMapper,
     SensitiveCategories,
 )
-from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
 
 
-class ImageSize(Enum):
-    small = [0, 5000]
-    medium = [5000, 10000]
-    large = [10000, 1000000]
-
-    def __repr__(self):
-        return self.value
-
-    def __getitem__(self, index):
-        return self.value[index]
-
-
-class TargetClass(Enum):
-    person = 0
-    licence_plate = 1
-
-    def __repr__(self):
-        return self.value
-
-
-class Metrics:
-    def __init__(self):
-        self.true_positives = 0
-        self.false_negatives = 0
-        self.true_positives_small = 0
-        self.true_positives_medium = 0
-        self.true_positives_large = 0
-        self.false_negatives_small = 0
-        self.false_negatives_medium = 0
-        self.false_negatives_large = 0
-        self.false_negative_rate = None
-        self.false_negatives_rate_small = None
-        self.false_negatives_rate_medium = None
-        self.false_negatives_rate_large = None
-
-
-class CustomMetricsCalculator:
+class FalseNegativeRateCalculator:
     """
     Given a folder containing tagged_validation results for multiple images, it loads all the results,
     groups the true positives and false negatives per label, and calculates the metrics.
@@ -446,116 +404,3 @@ class CustomMetricsCalculator:
         False negative rate.
         """
         return round(false_negatives / (false_negatives + true_positives), 3)
-
-
-def get_total_blurred_area_statistics(
-    true_labels: Dict[str, npt.NDArray], predicted_labels: Dict[str, npt.NDArray]
-):
-    """
-    Calculates per pixel statistics (tp, tn, fp, fn, precision, recall, f1 score)
-
-    Each key in the dict is an image, each value is a ndarray (n_detections, 5)
-    The 6 columns are in the yolo format, i.e. (target_class, x_c, y_c, width, height)
-
-    Parameters
-    ----------
-    true_labels
-    predicted_labels
-
-    Returns
-    -------
-
-    """
-    total_blurred_area = TotalBlurredArea()
-
-    for image_id in tqdm(true_labels.keys(), total=len(true_labels)):
-        tba_true_mask = generate_binary_mask(true_labels[image_id][:, 1:5])
-        tba_pred_mask = generate_binary_mask(predicted_labels[image_id][:, 1:5])
-
-        total_blurred_area.update_statistics_based_on_masks(
-            true_mask=tba_true_mask, predicted_mask=tba_pred_mask
-        )
-
-    results = total_blurred_area.get_statistics()
-
-    return results
-
-
-def collect_tba_results_per_class_and_size(true_path: str, pred_path: str):
-    """
-
-    Computes a dict with statistics (tn, tp, fp, fn, precision, recall, f1) for each target class and size.
-
-    Parameters
-    ----------
-    true_path
-    pred_path
-
-    Returns:
-    -------
-
-    """
-    predicted_dataset = YoloLabelsDataset(folder_path=pred_path)
-    results = {}
-
-    for target_class in TargetClass:
-        for size in ImageSize:
-            true_target_class_size = (  # i.e. true_person_small
-                YoloLabelsDataset(folder_path=true_path)
-                .filter_by_class(class_to_keep=target_class)
-                .filter_by_size(size_to_keep=size)
-                .get_filtered_labels()
-            )
-            results[
-                f"{target_class.name}_{size.name}"
-            ] = get_total_blurred_area_statistics(
-                true_target_class_size, predicted_dataset.get_labels()
-            )
-
-    return results
-
-
-def store_tba_results(
-    results: Dict[str, Dict[str, float]], markdown_output_path: str = "tba_scores.mda"
-):
-    """
-    Store information from the results dict into a markdown file.
-    In this case, the recall from the Total Blurred Area is the only interest number.
-
-    Parameters
-    ----------
-    results: dictionary with results
-    markdown_output_path
-
-    Returns
-    -------
-
-    """
-    with open(markdown_output_path, "w") as f:
-        f.write(
-            " Person Small | Person Medium | Person Large |"
-            " License Plate Small |  License Plate Medium  | License Plate Large |\n"
-        )
-        f.write("|----- | ----- |  ----- | ----- | ----- | ----- |\n")
-        f.write(
-            f'| {results["person_small"]["recall"]} | {results["person_medium"]["recall"]} '
-            f'| {results["person_large"]["recall"]}| {results["licence_plate_small"]["recall"]} '
-            f'| {results["licence_plate_medium"]["recall"]} | {results["licence_plate_large"]["recall"]}|\n'
-        )
-        f.write(
-            f"Thresholds used for these calculations: Small=`{ImageSize.small}`, Medium=`{ImageSize.medium}` "
-            f"and Large=`{ImageSize.large}`."
-        )
-        f.write(
-            f"Thresholds used for these calculations: Small=`{ImageSize.small}`, Medium=`{ImageSize.medium}` "
-            f"and Large=`{ImageSize.large}`."
-        )
-
-
-def collect_and_store_tba_results_per_class_and_size(
-    ground_truth_path: str, predictions_path: str, markdown_output_path: str
-):
-    results: Dict[str, Dict[str, float]] = collect_tba_results_per_class_and_size(
-        ground_truth_path, predictions_path
-    )
-    store_tba_results(results, markdown_output_path)

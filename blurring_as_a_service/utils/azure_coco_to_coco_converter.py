@@ -13,9 +13,17 @@ class AzureCocoToCocoConverter:
     def _add_key(self, key: str, value) -> None:
         """
         Adds key to the input file
-        key: name of key to be added in _input[annotations]
-        value: corresponding value for the key
+
+        Parameters
+        ----------
+        key name of key to be added in _input[annotations]
+        value corresponding value for the key
+
+        Returns
+        -------
+
         """
+
         for i, _ in enumerate(self._input["annotations"]):
             self._input["annotations"][i][key] = value
 

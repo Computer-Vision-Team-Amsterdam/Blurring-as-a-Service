@@ -30,7 +30,7 @@ def validate_model(
     model: Input(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type="uri_folder"),  # type: ignore # noqa: F821
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
-    experiment_name: str,
+    yolo_run_name: str,
 ):
     data = dict(
         train=f"{mounted_dataset}/images/train",
@@ -49,7 +49,7 @@ def validate_model(
         batch_size=1,
         project=f"{yolo_validation_output}",
         task="val",
-        name=experiment_name,
+        name=yolo_run_name,
         save_txt=True,
         save_json=True,
         half=True,
