@@ -55,7 +55,7 @@ def main():
     ]
 
     pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=training_pipeline_job, experiment_name="metadata_pipeline"
+        pipeline_job=training_pipeline_job, experiment_name="training_pipeline"
     )
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
