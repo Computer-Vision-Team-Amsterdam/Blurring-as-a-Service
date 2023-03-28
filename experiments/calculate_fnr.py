@@ -2,9 +2,7 @@ import argparse
 import sys
 from pathlib import Path
 
-from blurring_as_a_service.metrics.custom_metrics_calculator import (
-    CustomMetricsCalculator,
-)
+from blurring_as_a_service.metrics.fnr_calculator import FalseNegativeRateCalculator
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # experiments root directory
@@ -17,7 +15,7 @@ def main(opt):
     save_dir = Path(opt.project) / opt.name
     save_dir.mkdir(parents=True, exist_ok=True)  # make dir
 
-    metrics_calculator = CustomMetricsCalculator(
+    metrics_calculator = FalseNegativeRateCalculator(
         tagged_validation_folder=opt.labels_tagged,
         coco_file_with_categories=opt.coco_tagged_annotations,
     )
