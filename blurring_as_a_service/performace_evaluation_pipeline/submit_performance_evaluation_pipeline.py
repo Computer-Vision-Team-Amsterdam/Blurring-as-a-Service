@@ -1,5 +1,3 @@
-from typing import Dict
-
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -53,7 +51,7 @@ def performance_evaluation_pipeline(
     return {}
 
 
-def main(inputs: Dict[str, str], outputs: Dict[str, str]):
+def main():
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
 
@@ -70,6 +68,7 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
             custom_packages=custom_packages,
         )
 
+    inputs = settings["performance_evaluation_pipeline"]["inputs"]
     validation_images_path = Input(
         type=AssetTypes.URI_FOLDER, path=inputs["validation_images_path"]
     )
@@ -88,6 +87,7 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         type=AssetTypes.URI_FILE, path=inputs["annotations_for_custom_metrics"]
     )
 
+    outputs = settings["performance_evaluation_pipeline"]["outputs"]
     performance_evaluation_pipeline_job = performance_evaluation_pipeline(
         validation_data=validation_images_path,
         annotations_for_coco_metrics=annotations_for_coco_metrics,
@@ -110,8 +110,5 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
 
 
 if __name__ == "__main__":
-    settings = BlurringAsAServiceSettings.set_from_yaml("config.yml")
-    main(
-        settings["performance_evaluation_pipeline"]["inputs"],
-        settings["performance_evaluation_pipeline"]["outputs"],
-    )
+    BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    main()
