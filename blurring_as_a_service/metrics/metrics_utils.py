@@ -1,9 +1,30 @@
+from enum import Enum
 from typing import List, Tuple
 
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image
 from PIL.Image import Image as ImageType
+
+
+class ImageSize(Enum):
+    small = [0, 5000]
+    medium = [5000, 10000]
+    large = [10000, 1000000]
+
+    def __repr__(self):
+        return self.value
+
+    def __getitem__(self, index):
+        return self.value[index]
+
+
+class TargetClass(Enum):
+    person = 0
+    licence_plate = 1
+
+    def __repr__(self):
+        return self.value
 
 
 def parse_labels(

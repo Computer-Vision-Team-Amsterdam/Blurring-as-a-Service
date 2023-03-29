@@ -68,5 +68,5 @@ cat yolov5/requirements.txt | grep -o '^[^# ]*' | xargs poetry add
 
 ---
 
-### Data processing 
-More information about the exploratory data analysis can be found in the [eda.md](data-prep/eda.md) file.
+### Pipelines
+More information about the pipelines can be found [here](docs/performance_evaluation_pipeline.md).

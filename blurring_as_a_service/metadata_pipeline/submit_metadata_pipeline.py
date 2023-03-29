@@ -4,8 +4,11 @@ from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.metadata_pipeline.components.convert_coco_to_yolo import (
-    convert_coco_to_yolo,
+from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_coco import (
+    convert_azure_coco_to_coco,
+)
+from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_yolo import (
+    convert_azure_coco_to_yolo,
 )
 from blurring_as_a_service.metadata_pipeline.components.create_metadata import (
     create_metadata,
@@ -16,14 +19,32 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def metadata_pipeline(coco_annotations, labels_path, images_path, metadata_path):
+def metadata_pipeline(
+    coco_annotations,
+    labels_path,
+    images_path,
+    metadata_path,
+    metadata_path_coco_evaluation,
+):
     metadata_flags = BlurringAsAServiceSettings.get_settings()["metadata_pipeline"][
         "flags"
     ]
-    if metadata_flags & PipelineFlag.CONVERT_COCO_TO_YOLO:
-        convert_coco_to_yolo_step = convert_coco_to_yolo(input_data=coco_annotations)
-        convert_coco_to_yolo_step.outputs.output_folder = Output(
+    if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_YOLO:
+        convert_azure_coco_to_yolo_step = convert_azure_coco_to_yolo(
+            input_data=coco_annotations
+        )
+        convert_azure_coco_to_yolo_step.outputs.output_folder = Output(
             type=AssetTypes.URI_FOLDER, path=labels_path.result(), mode="rw_mount"
+        )
+
+    if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_COCO:
+        convert_azure_coco_to_coco_step = convert_azure_coco_to_coco(
+            input_data=coco_annotations
+        )
+        convert_azure_coco_to_coco_step.outputs.output_file = Output(
+            type=AssetTypes.URI_FILE,
+            path=metadata_path_coco_evaluation.result(),
+            mode="rw_mount",
         )
     if metadata_flags & PipelineFlag.CREATE_METADATA:
         metadata_retriever_step = create_metadata(input_directory=images_path)
@@ -56,6 +77,7 @@ def main(inputs: Dict[str, str], outputs: Dict[str, str]):
         labels_path=outputs["labels_path"],
         images_path=images_path,
         metadata_path=outputs["metadata_path"],
+        metadata_path_coco_evaluation=outputs["metadata_path_coco_evaluation"],
     )
 
     metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][

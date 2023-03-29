@@ -24,6 +24,7 @@ class MetadataPipelineSpec(SettingsSpecModel):
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
+    yolo_run_name: str = None
     flags: List[str] = []
 
 
