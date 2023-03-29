@@ -31,7 +31,7 @@ def main():
 
     mounted_root_folder = Input(
         type=AssetTypes.URI_FOLDER,
-        path=settings["inference_pipeline"]["inputs"]["folder"],
+        path=settings["inference_pipeline"]["inputs"]["root_folder"],
         description="Data to be blurred",
     )
     relative_paths_files_to_blur = Input(
