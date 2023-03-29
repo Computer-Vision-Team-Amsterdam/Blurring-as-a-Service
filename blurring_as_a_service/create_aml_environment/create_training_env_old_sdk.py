@@ -17,7 +17,7 @@ def main():
         ws.key: ws.version for ws in pkg_resources.working_set
     }
     packages_and_versions_local_env.pop("panorama")
-    packages_and_versions_local_env.pop("blurring-as-a-service")
+    # packages_and_versions_local_env.pop("blurring-as-a-service")
 
     packages = [
         f"{package}=={version}"
@@ -25,7 +25,7 @@ def main():
     ]
     env = Environment(settings["aml_experiment_details"]["env_name"])
     env.docker.base_image = None
-    env.docker.base_dockerfile = "blur-env"
+    env.docker.base_dockerfile = "blur-env-cuda11.8.Dockerfile"
     cd = CondaDependencies.create(python_version="3.9.16", pip_packages=packages)
     env.python.conda_dependencies = cd
     env.register(workspace=ws)

@@ -6,6 +6,9 @@ from blurring_as_a_service.inference_pipeline.components.blur_images import blur
 from blurring_as_a_service.inference_pipeline.components.detect_sensitive_data import (
     detect_sensitive_data,
 )
+from blurring_as_a_service.inference_pipeline.components.export_model import (
+    export_model,
+)
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 from blurring_as_a_service.utils.aml_interface import AMLInterface
 
@@ -13,6 +16,12 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def inference_pipeline(data_to_blur, model):
     outputs = BlurringAsAServiceSettings.get_settings()["inference_pipeline"]["outputs"]
+
+    export_model_step = export_model(pt_model=model)
+
+    export_model_step.outputs.engine_model = Output(
+        type="uri_folder", mode="rw_mount", path=outputs["results_path"]
+    )
 
     detect_sensitive_data_step = detect_sensitive_data(
         data_to_blur=data_to_blur, model=model
