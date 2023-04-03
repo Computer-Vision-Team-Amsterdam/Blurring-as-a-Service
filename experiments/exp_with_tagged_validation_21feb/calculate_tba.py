@@ -1,4 +1,4 @@
-from blurring_as_a_service.metrics.tba_calculator import (
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (
     collect_and_store_tba_results_per_class_and_size,
 )
 

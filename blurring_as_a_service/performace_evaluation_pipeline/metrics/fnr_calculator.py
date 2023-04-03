@@ -4,7 +4,9 @@ from os import listdir
 from os.path import isfile, join
 from typing import List
 
-from blurring_as_a_service.metrics.metrics_utils import ImageSize
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (
+    ImageSize,
+)
 from blurring_as_a_service.utils.bias_category_mapper import (
     BiasCategoryMapper,
     SensitiveCategories,

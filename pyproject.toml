@@ -6,13 +6,13 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-pandas = ">=1.1.4"
+pandas = {version = ">=1.1.4", source = "PyPI"}
 GitPython = {version = "^3.1.30", source = "PyPI"}
 ipython = {version = "^8.8.0", source = "PyPI"}
-matplotlib = ">=3.2.2"
-numpy = ">=1.18.5"
-opencv-python = ">=4.1.1"
-Pillow = ">=7.1.2"
+matplotlib = {version = ">=3.2.2", source = "PyPI"}
+numpy = {version = ">=1.18.5", source = "PyPI"}
+opencv-python = {version = ">=4.1.1", source = "PyPI"}
+Pillow = {version = ">=7.1.2", source = "PyPI"}
 psutil = {version = "^5.9.4", source = "PyPI"}
 PyYAML = {version = ">=5.3.1", source = "PyPI"}
 requests = {version = ">=2.23.0", source = "PyPI"}
@@ -30,13 +30,14 @@ mldesigner = {version = "^0.1.0-beta.9", source = "PyPI"}
 dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
 python-geohash = {version = "^0.8.5", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
-panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", rev = "v0.2.2"}
 pycocotools = {version = "^2.0.6", source="PyPI"}
-cryptography = "<39.0.0"
-markdown-it-py = "^2.2.0"
-mss = "^7.0.1"
+cryptography = {version = "<39.0.0", source = "PyPI"}
+markdown-it-py = {version="^2.2.0", source = "PyPI"}
+joblib = {version="^1.2.0", source = "PyPI"}
+azureml-core = {version="^1.49.0", source = "PyPI"}
+mss = {version="^7.0.1", source = "PyPI"}
 setuptools = {version="^67.6.0", source = "PyPI"}
-
+panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
 
 [tool.poetry.dev-dependencies]
 

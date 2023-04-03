@@ -42,7 +42,6 @@ class WorkloadDistributionPipelineSpec(SettingsSpecModel):
 class InferencePipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
-    flags: List[str] = []
 
 
 class LoggingSpec(SettingsSpecModel):

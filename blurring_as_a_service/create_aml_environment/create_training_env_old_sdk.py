@@ -25,7 +25,7 @@ def main():
     ]
     env = Environment(settings["aml_experiment_details"]["env_name"])
     env.docker.base_image = None
-    env.docker.base_dockerfile = "blur-env"
+    env.docker.base_dockerfile = "blur-environment.Dockerfile"
     cd = CondaDependencies.create(python_version="3.9.16", pip_packages=packages)
     env.python.conda_dependencies = cd
     env.register(workspace=ws)

@@ -6,10 +6,10 @@ from mldesigner import Input, command_component  # noqa: E402
 
 sys.path.append("../../..")
 
-from blurring_as_a_service.metrics.fnr_calculator import (  # noqa: E402
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator import (  # noqa: E402
     FalseNegativeRateCalculator,
 )
-from blurring_as_a_service.metrics.tba_calculator import (  # noqa: E402
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (  # noqa: E402
     collect_and_store_tba_results_per_class_and_size,
 )
 from blurring_as_a_service.settings.settings import (  # noqa: E402

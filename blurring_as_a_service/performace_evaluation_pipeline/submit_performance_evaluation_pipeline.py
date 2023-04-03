@@ -11,7 +11,6 @@ from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_wi
 from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (
     validate_model,
 )
-from blurring_as_a_service.settings.flags import PipelineFlag
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 from blurring_as_a_service.utils.aml_interface import AMLInterface
 
@@ -55,19 +54,6 @@ def main():
     aml_interface = AMLInterface()
     settings = BlurringAsAServiceSettings.get_settings()
 
-    if (
-        settings["performance_evaluation_pipeline"]["flags"]
-        & PipelineFlag.CREATE_ENVIRONMENT
-    ):
-        custom_packages = {
-            "panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2",
-        }
-        aml_interface.create_aml_environment(
-            settings["aml_experiment_details"]["env_name"],
-            project_name="blurring-as-a-service",
-            custom_packages=custom_packages,
-        )
-
     inputs = settings["performance_evaluation_pipeline"]["inputs"]
     validation_images_path = Input(
         type=AssetTypes.URI_FOLDER, path=inputs["validation_images_path"]
@@ -96,7 +82,6 @@ def main():
         yolo_validation_output=outputs["yolo_validation_output"],
         annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
-
     performance_evaluation_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
@@ -105,7 +90,6 @@ def main():
         pipeline_job=performance_evaluation_pipeline_job,
         experiment_name="performance_evaluation_pipeline",
     )
-
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
 

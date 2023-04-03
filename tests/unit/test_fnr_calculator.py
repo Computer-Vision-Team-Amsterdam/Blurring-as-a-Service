@@ -1,4 +1,6 @@
-from blurring_as_a_service.metrics.fnr_calculator import FalseNegativeRateCalculator
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator import (
+    FalseNegativeRateCalculator,
+)
 
 
 def expected_output():

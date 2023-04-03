@@ -2,7 +2,9 @@ import argparse
 import sys
 from pathlib import Path
 
-from blurring_as_a_service.metrics.fnr_calculator import FalseNegativeRateCalculator
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator import (
+    FalseNegativeRateCalculator,
+)
 
 FILE = Path(__file__).resolve()
 ROOT = FILE.parents[0]  # experiments root directory
