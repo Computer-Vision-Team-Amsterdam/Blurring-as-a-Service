@@ -17,9 +17,17 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def performance_evaluation_pipeline(
-    validation_data, annotations_json, yolo_yaml_path, yolo_validation_output, model
+    validation_data,
+    annotations_for_coco_metrics,
+    yolo_yaml_path,
+    yolo_validation_output,
+    model,
+    yolo_run_name,
+    annotations_for_custom_metrics,
 ):
-    validate_model_step = validate_model(mounted_dataset=validation_data, model=model)
+    validate_model_step = validate_model(
+        mounted_dataset=validation_data, model=model, yolo_run_name=yolo_run_name
+    )
     validate_model_step.outputs.yolo_validation_output = Output(
         type="uri_folder", mode="rw_mount", path=yolo_validation_output.result()
     )
@@ -28,15 +36,17 @@ def performance_evaluation_pipeline(
     )
 
     coco_evaluation_step = evaluate_with_coco(  # type: ignore # noqa: F841
-        annotations_json=annotations_json,
+        annotations_for_coco_metrics=annotations_for_coco_metrics,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
+        yolo_run_name=yolo_run_name,
     )
 
     custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
         mounted_dataset=validation_data,
         yolo_output_folder=validate_model_step.outputs.yolo_validation_output,
+        annotations_for_custom_metrics=annotations_for_custom_metrics,
+        yolo_run_name=yolo_run_name,
     )
-
     return {}
 
 
@@ -48,19 +58,29 @@ def main():
     validation_images_path = Input(
         type=AssetTypes.URI_FOLDER, path=inputs["validation_images_path"]
     )
-    annotations_json = Input(type=AssetTypes.URI_FILE, path=inputs["annotations_json"])
+
+    annotations_for_coco_metrics = Input(
+        type=AssetTypes.URI_FILE, path=inputs["annotations_for_coco_metrics"]
+    )
+
     model = Input(
         type=AssetTypes.URI_FOLDER,
         path=settings["performance_evaluation_pipeline"]["inputs"]["model"],
         description="Model to use for the blurring",
     )
 
+    annotations_for_custom_metrics = Input(
+        type=AssetTypes.URI_FILE, path=inputs["annotations_for_custom_metrics"]
+    )
+
     outputs = settings["performance_evaluation_pipeline"]["outputs"]
     performance_evaluation_pipeline_job = performance_evaluation_pipeline(
         validation_data=validation_images_path,
-        annotations_json=annotations_json,
+        annotations_for_coco_metrics=annotations_for_coco_metrics,
         model=model,
+        yolo_run_name=settings["performance_evaluation_pipeline"]["yolo_run_name"],
         yolo_validation_output=outputs["yolo_validation_output"],
+        annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
     performance_evaluation_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"

@@ -26,6 +26,13 @@ training_pipeline:
     # Possible values: NONE (in case no flag is needed), STORE_MODEL
     - NONE
 
+workload_distribution_pipeline:
+  inputs:
+    data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    number_of_batches: 4
+  outputs:
+    results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
+
 inference_pipeline:
   inputs:
     root_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
@@ -34,15 +41,16 @@ inference_pipeline:
   outputs:
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
 
-
 performance_evaluation_pipeline:
   inputs:
     validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    annotations_json: "azureml://FOLDER_PATH_TO_TAGGED_ANNOTATION"
+    annotations_for_coco_metrics: "azureml://FILE_PATH_TO_COCO_format_annotations_for_COCO_evaluation"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
+    annotations_for_custom_metrics: "azureml://FILE_PATH_TO_Azure_COCO_format_tagged_annotations_for_custom_evaluation"
   outputs:
     yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
+  yolo_run_name: "name of the yolo run, type string. More information in the README.md"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

@@ -5,7 +5,8 @@ from functools import reduce
 @unique
 class PipelineFlag(IntFlag):
     NONE = 0
-    CONVERT_COCO_TO_YOLO = auto()
+    CONVERT_AZURE_COCO_TO_YOLO = auto()
+    CONVERT_AZURE_COCO_TO_COCO = auto()
     CREATE_METADATA = auto()
     VALIDATE_MODEL = auto()
     COCO_EVALUATION = auto()

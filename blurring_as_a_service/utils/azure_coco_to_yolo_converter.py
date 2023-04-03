@@ -3,7 +3,7 @@ import json
 from blurring_as_a_service.utils.bias_category_mapper import BiasCategoryMapper
 
 
-class CocoToYoloConverter:
+class AzureCocoToYoloConverter:
     """
     Converts a COCO annotation dataset to a YOLOv5 format.
     - The bbox changes from x_min, y_min, width, height to x_center, y_center, width, height.

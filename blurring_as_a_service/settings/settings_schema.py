@@ -24,12 +24,19 @@ class MetadataPipelineSpec(SettingsSpecModel):
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
+    yolo_run_name: str = None
+    flags: List[str] = []
 
 
 class TrainingPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
+
+
+class WorkloadDistributionPipelineSpec(SettingsSpecModel):
+    inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
 
 
 class InferencePipelineSpec(SettingsSpecModel):
@@ -59,5 +66,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     metadata_pipeline: MetadataPipelineSpec = None
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
+    workload_distribution_pipeline: WorkloadDistributionPipelineSpec = None
     inference_pipeline: InferencePipelineSpec = None
     logging: LoggingSpec = LoggingSpec()
