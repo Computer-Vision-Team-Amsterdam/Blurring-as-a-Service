@@ -17,6 +17,8 @@ def main():
     aml_interface.create_aml_environment(
         env_name=settings["aml_experiment_details"]["env_name"],
         project_name="blurring-as-a-service",
+        build_context_path="blurring_as_a_service/create_aml_environment",
+        dockerfile_path="blur-environment.Dockerfile",
         submodules=["yolov5"],
         custom_packages=custom_packages,
     )

@@ -46,10 +46,12 @@ class AMLInterface:
         self,
         env_name: str,
         project_name: str,
+        build_context_path: str,
+        dockerfile_path: str,
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ) -> Environment:
-        """Creates an AML environment based on the mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04 image.
+        """Creates an AML environment based on the provided dockerfile image.
         Installs the pip packages present in the env where the code is run.
 
         Parameters
@@ -58,6 +60,10 @@ class AMLInterface:
             Name to give to the new environment.
         project_name: str
             Name of the project to be removed from the dependencies in case locally you are using Poetry.
+        build_context_path: str
+            Path that contains the build context.
+        dockerfile_path: str
+            Dockerfile path inside the build context.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
         custom_packages: Dict[str, str]
@@ -69,22 +75,25 @@ class AMLInterface:
         : Environment
             Created environment.
         """
-        self._create_environment_yml(project_name, submodules, custom_packages)
+        self._create_pip_requirements_file(
+            project_name, build_context_path, submodules, custom_packages
+        )
 
         env = Environment(
             name=env_name,
             build=BuildContext(
-                path="blurring_as_a_service/create_aml_environment",
-                dockerfile_path="blur-environment.Dockerfile",
+                path=build_context_path,
+                dockerfile_path=dockerfile_path,
             ),
         )
         self.ml_client.environments.create_or_update(env)
-        self._delete_environment_yml()
+        self._delete_pip_requirements_file(build_context_path)
         return env
 
     @staticmethod
-    def _create_environment_yml(
+    def _create_pip_requirements_file(
         project_name: str,
+        build_context_path: str = "",
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ):
@@ -96,6 +105,8 @@ class AMLInterface:
         ----------
         project_name: str
             Name of the project to be removed from the dependencies in case locally you are using Poetry.
+        build_context_path: str
+            Path that contains the build context.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
         custom_packages: Dict[str, str]
@@ -115,14 +126,20 @@ class AMLInterface:
 
         for custom_package in custom_packages.values():
             packages.append(f"    - {custom_package}")
-        with open(
-            "blurring_as_a_service/create_aml_environment/requirements.txt", "w"
-        ) as env_file:
+        with open(f"{build_context_path}/requirements.txt", "w") as env_file:
             env_file.write("\n".join(packages))
 
     @staticmethod
-    def _delete_environment_yml():
-        os.remove("blurring_as_a_service/create_aml_environment/requirements.txt")
+    def _delete_pip_requirements_file(build_context_path: str = ""):
+        """
+        Deletes the temporary pip requirements file.
+
+        Parameters
+        ----------
+        build_context_path: str
+            Path that contains the build context.
+        """
+        os.remove(f"{build_context_path}/requirements.txt")
 
     def submit_command_job(self, job):
         """
