@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import pkg_resources
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Environment
+from azure.ai.ml.entities import BuildContext, Environment
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 
 logger = logging.getLogger(__name__)
@@ -70,10 +70,13 @@ class AMLInterface:
             Created environment.
         """
         self._create_environment_yml(project_name, submodules, custom_packages)
+
         env = Environment(
             name=env_name,
-            image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
-            conda_file="environment.yml",
+            build=BuildContext(
+                path="blurring_as_a_service/create_aml_environment",
+                dockerfile_path="blur-environment.Dockerfile",
+            ),
         )
         self.ml_client.environments.create_or_update(env)
         self._delete_environment_yml()
@@ -106,21 +109,20 @@ class AMLInterface:
         for custom_package in custom_packages.keys():
             packages_and_versions_local_env.pop(custom_package)
         packages = [
-            f"    - {key}=={value}" if key not in submodules else f"    - {key}"
+            f"{key}=={value}" if key not in submodules else f"{key}"
             for key, value in packages_and_versions_local_env.items()
         ]
 
         for custom_package in custom_packages.values():
             packages.append(f"    - {custom_package}")
-        with open("environment.yml", "w") as env_file:
-            env_file.write("dependencies:\n")
-            env_file.write("  - python=3.9.*\n")
-            env_file.write("  - pip:\n")
+        with open(
+            "blurring_as_a_service/create_aml_environment/requirements.txt", "w"
+        ) as env_file:
             env_file.write("\n".join(packages))
 
     @staticmethod
     def _delete_environment_yml():
-        os.remove("environment.yml")
+        os.remove("blurring_as_a_service/create_aml_environment/requirements.txt")
 
     def submit_command_job(self, job):
         """

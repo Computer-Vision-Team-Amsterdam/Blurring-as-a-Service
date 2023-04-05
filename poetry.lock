@@ -7,20 +7,6 @@ optional = false
 python-versions = ">=3.6"
 
 [[package]]
-name = "adal"
-version = "1.2.7"
-description = "Note: This library is already replaced by MSAL Python, available here: https://pypi.org/project/msal/ .ADAL Python remains available here as a legacy. The ADAL for Python library makes it easy for python application to authenticate to Azure Active Directory (AAD) in order to access AAD protected web resources."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-cryptography = ">=1.1.0"
-PyJWT = ">=1.0.0,<3"
-python-dateutil = ">=2.1.0,<3"
-requests = ">=2.0.0,<3"
-
-[[package]]
 name = "anyio"
 version = "3.6.2"
 description = "High level compatibility layer for multiple asynchronous event loop implementations"
@@ -44,18 +30,6 @@ description = "Disable App Nap on macOS >= 10.9"
 category = "main"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "argcomplete"
-version = "2.1.2"
-description = "Bash tab completion for argparse"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-lint = ["flake8", "mypy"]
-test = ["coverage", "pexpect", "wheel", "flake8", "mypy"]
 
 [[package]]
 name = "asttokens"
@@ -143,19 +117,6 @@ typing-extensions = ">=4.0.1"
 aio = ["aiohttp (>=3.0)"]
 
 [[package]]
-name = "azure-graphrbac"
-version = "0.61.1"
-description = "Microsoft Azure Graph RBAC Client Library for Python"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-msrest = ">=0.5.0"
-msrestazure = ">=0.4.32,<2.0.0"
-
-[[package]]
 name = "azure-identity"
 version = "1.12.0"
 description = "Microsoft Azure Identity Library for Python"
@@ -171,32 +132,6 @@ msal-extensions = ">=0.3.0,<2.0.0"
 six = ">=1.12.0"
 
 [[package]]
-name = "azure-mgmt-authorization"
-version = "3.0.0"
-description = "Microsoft Azure Authorization Management Client Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.2,<2.0.0"
-msrest = ">=0.7.1"
-
-[[package]]
-name = "azure-mgmt-containerregistry"
-version = "10.1.0"
-description = "Microsoft Azure Container Registry Client Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.2,<2.0.0"
-msrest = ">=0.7.1"
-
-[[package]]
 name = "azure-mgmt-core"
 version = "1.3.2"
 description = "Microsoft Azure Management Core Library for Python"
@@ -206,45 +141,6 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 azure-core = ">=1.24.0,<2.0.0"
-
-[[package]]
-name = "azure-mgmt-keyvault"
-version = "10.2.0"
-description = "Microsoft Azure Key Vault Management Client Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.2,<2.0.0"
-msrest = ">=0.7.1"
-
-[[package]]
-name = "azure-mgmt-resource"
-version = "21.2.1"
-description = "Microsoft Azure Resource Management Client Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.2,<2.0.0"
-msrest = ">=0.7.1"
-
-[[package]]
-name = "azure-mgmt-storage"
-version = "20.1.0"
-description = "Microsoft Azure Storage Management Client Library for Python"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-azure-common = ">=1.1,<2.0"
-azure-mgmt-core = ">=1.3.1,<2.0.0"
-msrest = ">=0.6.21"
 
 [[package]]
 name = "azure-storage-blob"
@@ -298,87 +194,12 @@ typing-extensions = ">=4.0.1"
 aio = ["azure-core[aio] (>=1.26.0,<2.0.0)"]
 
 [[package]]
-name = "azureml-core"
-version = "1.49.0"
-description = "Azure Machine Learning core packages, modules, and classes"
-category = "main"
-optional = false
-python-versions = ">=3.7,< 4.0"
-
-[package.dependencies]
-adal = ">=1.2.0,<=1.2.7"
-argcomplete = "<3"
-azure-common = ">=1.1.12,<2.0.0"
-azure-core = "<2.0.0"
-azure-graphrbac = ">=0.40.0,<1.0.0"
-azure-mgmt-authorization = ">=0.40.0,<4"
-azure-mgmt-containerregistry = ">=8.2.0,<11"
-azure-mgmt-keyvault = ">=0.40.0,<11.0.0"
-azure-mgmt-resource = ">=15.0.0,<22.0.0"
-azure-mgmt-storage = ">=16.0.0,<21.0.0"
-"backports.tempfile" = "*"
-contextlib2 = "<22.0.0"
-cryptography = "<1.9 || >1.9,<2.0.0 || >=2.3.0,<41"
-docker = "<7.0.0"
-humanfriendly = ">=4.7,<11.0"
-jmespath = "<2.0.0"
-jsonpickle = "<3.0.0"
-knack = ">=0.10.0,<0.11.0"
-msal = ">=1.15.0,<2.0.0"
-msal-extensions = ">=0.3.0,<=1.0.0"
-msrest = ">=0.5.1,<=0.7.1"
-msrestazure = ">=0.4.33,<=0.6.4"
-ndg-httpsclient = "<=0.5.1"
-packaging = ">=20.0,<22.0"
-paramiko = ">=2.0.8,<3.0.0"
-pathspec = "<1.0.0"
-pkginfo = "*"
-PyJWT = "<3.0.0"
-pyopenssl = "<24.0.0"
-python-dateutil = ">=2.7.3,<3.0.0"
-pytz = "*"
-requests = {version = ">=2.19.1,<3.0.0", extras = ["socks"]}
-SecretStorage = "<4.0.0"
-urllib3 = ">=1.23,<2.0.0"
-
-[[package]]
 name = "backcall"
 version = "0.2.0"
 description = "Specifications for callback functions passed in to an API"
 category = "main"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "backports.tempfile"
-version = "1.0"
-description = "Backport of new features in Python's tempfile module"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-"backports.weakref" = "*"
-
-[[package]]
-name = "backports.weakref"
-version = "1.0.post1"
-description = "Backport of new features in Python's weakref module"
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
-name = "bcrypt"
-version = "4.0.1"
-description = "Modern password hashing for your software and your servers"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-tests = ["pytest (>=3.2.1,!=3.3.0)"]
-typecheck = ["mypy"]
 
 [[package]]
 name = "cachetools"
@@ -430,14 +251,6 @@ description = "Cross-platform colored terminal text."
 category = "main"
 optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,!=3.6.*,>=2.7"
-
-[[package]]
-name = "contextlib2"
-version = "21.6.0"
-description = "Backports and enhancements for the contextlib module"
-category = "main"
-optional = false
-python-versions = ">=3.6"
 
 [[package]]
 name = "contourpy"
@@ -514,24 +327,6 @@ description = "Distribution utilities"
 category = "main"
 optional = false
 python-versions = "*"
-
-[[package]]
-name = "docker"
-version = "6.0.1"
-description = "A Python library for the Docker Engine API."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.dependencies]
-packaging = ">=14.0"
-pywin32 = {version = ">=304", markers = "sys_platform == \"win32\""}
-requests = ">=2.26.0"
-urllib3 = ">=1.26.0"
-websocket-client = ">=0.32.0"
-
-[package.extras]
-ssh = ["paramiko (>=2.4.3)"]
 
 [[package]]
 name = "exceptiongroup"
@@ -735,17 +530,6 @@ brotli = ["brotlicffi", "brotli"]
 http2 = ["h2 (>=3,<5)"]
 
 [[package]]
-name = "humanfriendly"
-version = "10.0"
-description = "Human friendly output for text interfaces using Python"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
-
-[package.dependencies]
-pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_version >= \"3.8\""}
-
-[[package]]
 name = "identify"
 version = "2.5.22"
 description = "File identification library for Python"
@@ -867,45 +651,12 @@ qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["Django (<3.1)", "attrs", "colorama", "docopt", "pytest (<7.0.0)"]
 
 [[package]]
-name = "jeepney"
-version = "0.8.0"
-description = "Low-level, pure Python DBus protocol wrapper."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-test = ["pytest", "pytest-trio", "pytest-asyncio (>=0.17)", "testpath", "trio", "async-timeout"]
-trio = ["trio", "async-generator"]
-
-[[package]]
-name = "jmespath"
-version = "1.0.1"
-description = "JSON Matching Expressions"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[[package]]
 name = "joblib"
 version = "1.2.0"
 description = "Lightweight pipelining with Python functions"
 category = "main"
 optional = false
 python-versions = ">=3.7"
-
-[[package]]
-name = "jsonpickle"
-version = "2.2.0"
-description = "Python library for serializing any arbitrary object graph into JSON"
-category = "main"
-optional = false
-python-versions = ">=2.7"
-
-[package.extras]
-docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
-testing = ["pytest (>=3.5,!=3.7.3)", "pytest-checkdocs (>=1.2.3)", "pytest-black-multipy", "pytest-cov", "ecdsa", "feedparser", "numpy", "pandas", "pymongo", "scikit-learn", "sqlalchemy", "pytest-flake8 (<1.1.0)", "enum34", "jsonlib", "pytest-flake8 (>=1.1.1)"]
-"testing.libs" = ["simplejson", "ujson", "yajl"]
 
 [[package]]
 name = "jsonschema"
@@ -930,21 +681,6 @@ description = "A fast implementation of the Cassowary constraint solver"
 category = "main"
 optional = false
 python-versions = ">=3.7"
-
-[[package]]
-name = "knack"
-version = "0.10.1"
-description = "A Command-Line Interface framework"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-argcomplete = "*"
-jmespath = "*"
-pygments = "*"
-pyyaml = "*"
-tabulate = "*"
 
 [[package]]
 name = "markdown"
@@ -1112,37 +848,12 @@ requests-oauthlib = ">=0.5.0"
 async = ["aiohttp (>=3.0)", "aiodns"]
 
 [[package]]
-name = "msrestazure"
-version = "0.6.4"
-description = "AutoRest swagger generator Python client runtime. Azure-specific module."
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-adal = ">=0.6.0,<2.0.0"
-msrest = ">=0.6.0,<2.0.0"
-six = "*"
-
-[[package]]
 name = "mss"
 version = "7.0.1"
 description = "An ultra fast cross-platform multiple screenshots module in pure python using ctypes."
 category = "main"
 optional = false
 python-versions = ">=3.5"
-
-[[package]]
-name = "ndg-httpsclient"
-version = "0.5.1"
-description = "Provides enhanced HTTPS support for httplib and urllib2 using PyOpenSSL"
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
-
-[package.dependencies]
-pyasn1 = ">=0.1.1"
-PyOpenSSL = "*"
 
 [[package]]
 name = "nodeenv"
@@ -1271,26 +982,6 @@ reference = "v0.2.2"
 resolved_reference = "98a92686a9ef92b3748f345b137123ea5915c8b1"
 
 [[package]]
-name = "paramiko"
-version = "2.12.0"
-description = "SSH2 protocol library"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-bcrypt = ">=3.1.3"
-cryptography = ">=2.5"
-pynacl = ">=1.0.1"
-six = "*"
-
-[package.extras]
-all = ["pyasn1 (>=0.1.7)", "pynacl (>=1.0.1)", "bcrypt (>=3.1.3)", "invoke (>=1.3)", "gssapi (>=1.4.1)", "pywin32 (>=2.1.8)"]
-ed25519 = ["pynacl (>=1.0.1)", "bcrypt (>=3.1.3)"]
-gssapi = ["pyasn1 (>=0.1.7)", "gssapi (>=1.4.1)", "pywin32 (>=2.1.8)"]
-invoke = ["invoke (>=1.3)"]
-
-[[package]]
 name = "parso"
 version = "0.8.3"
 description = "A Python Parser"
@@ -1301,14 +992,6 @@ python-versions = ">=3.6"
 [package.extras]
 qa = ["flake8 (==3.8.3)", "mypy (==0.782)"]
 testing = ["docopt", "pytest (<6.0.0)"]
-
-[[package]]
-name = "pathspec"
-version = "0.11.1"
-description = "Utility library for gitignore style pattern matching of file paths."
-category = "main"
-optional = false
-python-versions = ">=3.7"
 
 [[package]]
 name = "pexpect"
@@ -1340,17 +1023,6 @@ python-versions = ">=3.7"
 [package.extras]
 docs = ["furo", "olefile", "sphinx (>=2.4)", "sphinx-copybutton", "sphinx-inline-tabs", "sphinx-removed-in", "sphinxext-opengraph"]
 tests = ["check-manifest", "coverage", "defusedxml", "markdown2", "olefile", "packaging", "pyroma", "pytest", "pytest-cov", "pytest-timeout"]
-
-[[package]]
-name = "pkginfo"
-version = "1.9.6"
-description = "Query metadata from sdists / bdists / installed packages."
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.extras]
-testing = ["pytest", "pytest-cov"]
 
 [[package]]
 name = "platformdirs"
@@ -1550,36 +1222,6 @@ docs = ["sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
 tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 
 [[package]]
-name = "pynacl"
-version = "1.5.0"
-description = "Python binding to the Networking and Cryptography (NaCl) library"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-cffi = ">=1.4.1"
-
-[package.extras]
-docs = ["sphinx (>=1.6.5)", "sphinx-rtd-theme"]
-tests = ["pytest (>=3.2.1,!=3.3.0)", "hypothesis (>=3.27.0)"]
-
-[[package]]
-name = "pyopenssl"
-version = "23.1.1"
-description = "Python wrapper module around the OpenSSL library"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-cryptography = ">=38.0.0,<41"
-
-[package.extras]
-docs = ["sphinx (!=5.2.0,!=5.2.0.post0)", "sphinx-rtd-theme"]
-test = ["flaky", "pretend", "pytest (>=3.0.1)"]
-
-[[package]]
 name = "pyparsing"
 version = "3.0.9"
 description = "pyparsing module - Classes and methods to define and execute parsing grammars"
@@ -1591,28 +1233,12 @@ python-versions = ">=3.6.8"
 diagrams = ["railroad-diagrams", "jinja2"]
 
 [[package]]
-name = "pyreadline3"
-version = "3.4.1"
-description = "A python implementation of GNU readline."
-category = "main"
-optional = false
-python-versions = "*"
-
-[[package]]
 name = "pyrsistent"
 version = "0.19.3"
 description = "Persistent/Functional/Immutable data structures"
 category = "main"
 optional = false
 python-versions = ">=3.7"
-
-[[package]]
-name = "pysocks"
-version = "1.7.1"
-description = "A Python SOCKS client module. See https://github.com/Anorov/PySocks for more information."
-category = "main"
-optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pytest"
@@ -1689,7 +1315,6 @@ python-versions = ">=3.7, <4"
 certifi = ">=2017.4.17"
 charset-normalizer = ">=2,<4"
 idna = ">=2.5,<4"
-PySocks = {version = ">=1.5.6,<1.5.7 || >1.5.7", optional = true, markers = "extra == \"socks\""}
 urllib3 = ">=1.21.1,<1.27"
 
 [package.extras]
@@ -1771,18 +1396,6 @@ docs = ["numpydoc", "nbconvert", "ipykernel", "sphinx-copybutton", "sphinx-issue
 stats = ["scipy (>=1.3)", "statsmodels (>=0.10)"]
 
 [[package]]
-name = "secretstorage"
-version = "3.3.3"
-description = "Python bindings to FreeDesktop.org Secret Service API"
-category = "main"
-optional = false
-python-versions = ">=3.6"
-
-[package.dependencies]
-cryptography = ">=2.0"
-jeepney = ">=0.6"
-
-[[package]]
 name = "setuptools-scm"
 version = "7.1.0"
 description = "the blessed package to manage your versions by scm tags"
@@ -1849,17 +1462,6 @@ python-versions = ">=3.7.0"
 
 [package.dependencies]
 python-dateutil = ">=2.6.0"
-
-[[package]]
-name = "tabulate"
-version = "0.9.0"
-description = "Pretty-print tabular data"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-widechars = ["wcwidth"]
 
 [[package]]
 name = "tensorboard"
@@ -2021,19 +1623,6 @@ optional = false
 python-versions = "*"
 
 [[package]]
-name = "websocket-client"
-version = "1.5.1"
-description = "WebSocket client for Python with low level API options"
-category = "main"
-optional = false
-python-versions = ">=3.7"
-
-[package.extras]
-docs = ["Sphinx (>=3.4)", "sphinx-rtd-theme (>=0.5)"]
-optional = ["python-socks", "wsaccel"]
-test = ["websockets"]
-
-[[package]]
 name = "werkzeug"
 version = "2.2.3"
 description = "The comprehensive WSGI web application library."
@@ -2062,20 +1651,15 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "flake8 (<5)", "pytest-co
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.9"
-content-hash = "667f0b3ae421eb99958452600082c3269837f721df01e5d358cb0962c3d3aadb"
+content-hash = "ef89bcb458577fe7e4f72d2fdd0162f67fa1ea8d69ba7828f683f22e1ecb103c"
 
 [metadata.files]
 absl-py = []
-adal = [
-    {file = "adal-1.2.7-py2.py3-none-any.whl", hash = "sha256:2a7451ed7441ddbc57703042204a3e30ef747478eea022c70f789fc7f084bc3d"},
-    {file = "adal-1.2.7.tar.gz", hash = "sha256:d74f45b81317454d96e982fd1c50e6fb5c99ac2223728aea8764433a39f566f1"},
-]
 anyio = []
 appnope = [
     {file = "appnope-0.1.3-py2.py3-none-any.whl", hash = "sha256:265a455292d0bd8a72453494fa24df5a11eb18373a60c7c0430889f22548605e"},
     {file = "appnope-0.1.3.tar.gz", hash = "sha256:02bd91c4de869fbb1e1c50aafc4098827a7a54ab2f39d9dcba6c9547ed920e24"},
 ]
-argcomplete = []
 asttokens = []
 attrs = []
 azure-ai-ml = []
@@ -2084,34 +1668,15 @@ azure-common = [
     {file = "azure_common-1.1.28-py2.py3-none-any.whl", hash = "sha256:5c12d3dcf4ec20599ca6b0d3e09e86e146353d443e7fcc050c9a19c1f9df20ad"},
 ]
 azure-core = []
-azure-graphrbac = [
-    {file = "azure-graphrbac-0.61.1.zip", hash = "sha256:53e98ae2ca7c19b349e9e9bb1b6a824aeae8dcfcbe17190d20fe69c0f185b2e2"},
-    {file = "azure_graphrbac-0.61.1-py2.py3-none-any.whl", hash = "sha256:7b4e0f05676acc912f2b33c71c328d9fb2e4dc8e70ebadc9d3de8ab08bf0b175"},
-]
 azure-identity = []
-azure-mgmt-authorization = []
-azure-mgmt-containerregistry = []
 azure-mgmt-core = []
-azure-mgmt-keyvault = []
-azure-mgmt-resource = []
-azure-mgmt-storage = []
 azure-storage-blob = []
 azure-storage-file-datalake = []
 azure-storage-file-share = []
-azureml-core = []
 backcall = [
     {file = "backcall-0.2.0-py2.py3-none-any.whl", hash = "sha256:fbbce6a29f263178a1f7915c1940bde0ec2b2a967566fe1c65c1dfb7422bd255"},
     {file = "backcall-0.2.0.tar.gz", hash = "sha256:5cbdbf27be5e7cfadb448baf0aa95508f91f2bbc6c6437cd9cd06e2a4c215e1e"},
 ]
-"backports.tempfile" = [
-    {file = "backports.tempfile-1.0-py2.py3-none-any.whl", hash = "sha256:05aa50940946f05759696156a8c39be118169a0e0f94a49d0bb106503891ff54"},
-    {file = "backports.tempfile-1.0.tar.gz", hash = "sha256:1c648c452e8770d759bdc5a5e2431209be70d25484e1be24876cf2168722c762"},
-]
-"backports.weakref" = [
-    {file = "backports.weakref-1.0.post1-py2.py3-none-any.whl", hash = "sha256:81bc9b51c0abc58edc76aefbbc68c62a787918ffe943a37947e162c3f8e19e82"},
-    {file = "backports.weakref-1.0.post1.tar.gz", hash = "sha256:bc4170a29915f8b22c9e7c4939701859650f2eb84184aee80da329ac0b9825c2"},
-]
-bcrypt = []
 cachetools = []
 certifi = []
 cffi = [
@@ -2186,10 +1751,6 @@ cfgv = [
 ]
 charset-normalizer = []
 colorama = []
-contextlib2 = [
-    {file = "contextlib2-21.6.0-py2.py3-none-any.whl", hash = "sha256:3fbdb64466afd23abaf6c977627b75b6139a5a3e8ce38405c5b413aed7a0471f"},
-    {file = "contextlib2-21.6.0.tar.gz", hash = "sha256:ab1e2bfe1d01d968e1b7e8d9023bc51ef3509bba217bb730cee3827e1ee82869"},
-]
 contourpy = []
 cryptography = []
 cycler = [
@@ -2202,7 +1763,6 @@ decorator = [
     {file = "decorator-5.1.1.tar.gz", hash = "sha256:637996211036b6385ef91435e4fae22989472f9d571faba8927ba8253acbc330"},
 ]
 distlib = []
-docker = []
 exceptiongroup = []
 executing = []
 filelock = []
@@ -2217,10 +1777,6 @@ grpcio = []
 h11 = []
 httpcore = []
 httpx = []
-humanfriendly = [
-    {file = "humanfriendly-10.0-py2.py3-none-any.whl", hash = "sha256:1697e1a8a8f550fd43c2865cd84542fc175a61dcb779b6fee18cf6b6ccba1477"},
-    {file = "humanfriendly-10.0.tar.gz", hash = "sha256:6b0b831ce8f15f7300721aa49829fc4e83921a9a301cc7f606be6686a2288ddc"},
-]
 identify = []
 idna = []
 importlib-metadata = []
@@ -2232,19 +1788,9 @@ isodate = [
     {file = "isodate-0.6.1.tar.gz", hash = "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"},
 ]
 jedi = []
-jeepney = [
-    {file = "jeepney-0.8.0-py3-none-any.whl", hash = "sha256:c0a454ad016ca575060802ee4d590dd912e35c122fa04e70306de3d076cce755"},
-    {file = "jeepney-0.8.0.tar.gz", hash = "sha256:5efe48d255973902f6badc3ce55e2aa6c5c3b3bc642059ef3a91247bcfcc5806"},
-]
-jmespath = []
 joblib = []
-jsonpickle = [
-    {file = "jsonpickle-2.2.0-py2.py3-none-any.whl", hash = "sha256:de7f2613818aa4f234138ca11243d6359ff83ae528b2185efdd474f62bcf9ae1"},
-    {file = "jsonpickle-2.2.0.tar.gz", hash = "sha256:7b272918b0554182e53dc340ddd62d9b7f902fec7e7b05620c04f3ccef479a0e"},
-]
 jsonschema = []
 kiwisolver = []
-knack = []
 markdown = []
 markdown-it-py = []
 markupsafe = []
@@ -2259,16 +1805,7 @@ msal-extensions = [
     {file = "msal_extensions-1.0.0-py2.py3-none-any.whl", hash = "sha256:91e3db9620b822d0ed2b4d1850056a0f133cba04455e62f11612e40f5502f2ee"},
 ]
 msrest = []
-msrestazure = [
-    {file = "msrestazure-0.6.4-py2.py3-none-any.whl", hash = "sha256:3de50f56147ef529b31e099a982496690468ecef33f0544cb0fa0cfe1e1de5b9"},
-    {file = "msrestazure-0.6.4.tar.gz", hash = "sha256:a06f0dabc9a6f5efe3b6add4bd8fb623aeadacf816b7a35b0f89107e0544d189"},
-]
 mss = []
-ndg-httpsclient = [
-    {file = "ndg_httpsclient-0.5.1-py2-none-any.whl", hash = "sha256:d2c7225f6a1c6cf698af4ebc962da70178a99bcde24ee6d1961c4f3338130d57"},
-    {file = "ndg_httpsclient-0.5.1-py3-none-any.whl", hash = "sha256:dd174c11d971b6244a891f7be2b32ca9853d3797a72edb34fa5d7b07d8fff7d4"},
-    {file = "ndg_httpsclient-0.5.1.tar.gz", hash = "sha256:d72faed0376ab039736c2ba12e30695e2788c4aa569c9c3e3d72131de2592210"},
-]
 nodeenv = [
     {file = "nodeenv-1.7.0-py2.py3-none-any.whl", hash = "sha256:27083a7b96a25f2f5e1d8cb4b6317ee8aeda3bdd121394e5ac54e498028a042e"},
     {file = "nodeenv-1.7.0.tar.gz", hash = "sha256:e0e7f7dfb85fc5394c6fe1e8fa98131a2473e04311a45afb6508f7cf1836fa2b"},
@@ -2285,12 +1822,10 @@ packaging = [
 ]
 pandas = []
 panorama = []
-paramiko = []
 parso = [
     {file = "parso-0.8.3-py2.py3-none-any.whl", hash = "sha256:c001d4636cd3aecdaf33cbb40aebb59b094be2a74c556778ef5576c175e19e75"},
     {file = "parso-0.8.3.tar.gz", hash = "sha256:8c07be290bb59f03588915921e29e8a50002acaf2cdc5fa0e0114f91709fafa0"},
 ]
-pathspec = []
 pexpect = [
     {file = "pexpect-4.8.0-py2.py3-none-any.whl", hash = "sha256:0b48a55dcb3c05f3329815901ea4fc1537514d6ba867a152b581d69ae3710937"},
     {file = "pexpect-4.8.0.tar.gz", hash = "sha256:fc65a43959d153d0114afe13997d439c22823a27cefceb5ff35c2178c6784c0c"},
@@ -2300,7 +1835,6 @@ pickleshare = [
     {file = "pickleshare-0.7.5.tar.gz", hash = "sha256:87683d47965c1da65cdacaf31c8441d12b8044cdec9aca500cd78fc2c683afca"},
 ]
 pillow = []
-pkginfo = []
 platformdirs = []
 pluggy = [
     {file = "pluggy-1.0.0-py2.py3-none-any.whl", hash = "sha256:74134bbf457f031a36d68416e1509f34bd5ccc019f0bcc952c7b909d06b37bd3"},
@@ -2358,33 +1892,11 @@ pydantic = []
 pydash = []
 pygments = []
 pyjwt = []
-pynacl = [
-    {file = "PyNaCl-1.5.0-cp36-abi3-macosx_10_10_universal2.whl", hash = "sha256:401002a4aaa07c9414132aaed7f6836ff98f59277a234704ff66878c2ee4a0d1"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.manylinux_2_24_aarch64.whl", hash = "sha256:52cb72a79269189d4e0dc537556f4740f7f0a9ec41c1322598799b0bdad4ef92"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:a36d4a9dda1f19ce6e03c9a784a2921a4b726b02e1c736600ca9c22029474394"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:0c84947a22519e013607c9be43706dd42513f9e6ae5d39d3613ca1e142fba44d"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:06b8f6fa7f5de8d5d2f7573fe8c863c051225a27b61e6860fd047b1775807858"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-musllinux_1_1_aarch64.whl", hash = "sha256:a422368fc821589c228f4c49438a368831cb5bbc0eab5ebe1d7fac9dded6567b"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-musllinux_1_1_x86_64.whl", hash = "sha256:61f642bf2378713e2c2e1de73444a3778e5f0a38be6fee0fe532fe30060282ff"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-win32.whl", hash = "sha256:e46dae94e34b085175f8abb3b0aaa7da40767865ac82c928eeb9e57e1ea8a543"},
-    {file = "PyNaCl-1.5.0-cp36-abi3-win_amd64.whl", hash = "sha256:20f42270d27e1b6a29f54032090b972d97f0a1b0948cc52392041ef7831fee93"},
-    {file = "PyNaCl-1.5.0.tar.gz", hash = "sha256:8ac7448f09ab85811607bdd21ec2464495ac8b7c66d146bf545b0f08fb9220ba"},
-]
-pyopenssl = []
 pyparsing = [
     {file = "pyparsing-3.0.9-py3-none-any.whl", hash = "sha256:5026bae9a10eeaefb61dab2f09052b9f4307d44aee4eda64b309723d8d206bbc"},
     {file = "pyparsing-3.0.9.tar.gz", hash = "sha256:2b020ecf7d21b687f219b71ecad3631f644a47f01403fa1d1036b0c6416d70fb"},
 ]
-pyreadline3 = [
-    {file = "pyreadline3-3.4.1-py3-none-any.whl", hash = "sha256:b0efb6516fd4fb07b45949053826a62fa4cb353db5be2bbb4a7aa1fdd1e345fb"},
-    {file = "pyreadline3-3.4.1.tar.gz", hash = "sha256:6f3d1f7b8a31ba32b73917cefc1f28cc660562f39aea8646d30bd6eff21f7bae"},
-]
 pyrsistent = []
-pysocks = [
-    {file = "PySocks-1.7.1-py27-none-any.whl", hash = "sha256:08e69f092cc6dbe92a0fdd16eeb9b9ffbc13cadfe5ca4c7bd92ffb078b293299"},
-    {file = "PySocks-1.7.1-py3-none-any.whl", hash = "sha256:2725bd0a9925919b9b51739eea5f9e2bae91e83288108a9ad338b2e3a4435ee5"},
-    {file = "PySocks-1.7.1.tar.gz", hash = "sha256:3f8804571ebe159c380ac6de37643bb4685970655d3bba243530d6558b799aa0"},
-]
 pytest = []
 python-dateutil = [
     {file = "python-dateutil-2.8.2.tar.gz", hash = "sha256:0123cacc1627ae19ddf3c27a5de5bd67ee4586fbdd6440d9748f8abb483d3e86"},
@@ -2437,7 +1949,6 @@ rfc3986 = []
 rsa = []
 scipy = []
 seaborn = []
-secretstorage = []
 setuptools-scm = []
 six = [
     {file = "six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
@@ -2447,7 +1958,6 @@ smmap = []
 sniffio = []
 stack-data = []
 strictyaml = []
-tabulate = []
 tensorboard = []
 tensorboard-data-server = []
 tensorboard-plugin-wit = [
@@ -2466,6 +1976,5 @@ typing-extensions = []
 urllib3 = []
 virtualenv = []
 wcwidth = []
-websocket-client = []
 werkzeug = []
 zipp = []
