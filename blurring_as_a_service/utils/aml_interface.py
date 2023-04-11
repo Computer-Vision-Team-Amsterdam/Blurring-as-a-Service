@@ -99,7 +99,7 @@ class AMLInterface:
     ):
         """
         Retrieves all packages currently installed in the local venv used to execute the code,
-        and creates a conda environment yaml file to be used to install the packages on AzureML env.
+        and creates a txt requirements file to be used to install the packages on AzureML env.
 
         Parameters
         ----------

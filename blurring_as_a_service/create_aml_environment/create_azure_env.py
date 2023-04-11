@@ -5,7 +5,6 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 def main():
     """
     This file creates an AML environment.
-    This code is commented because before running it, it's necessary to temporary install azureml-core package.
     """
     settings = BlurringAsAServiceSettings.get_settings()
 
