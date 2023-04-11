@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import pkg_resources
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import Environment
+from azure.ai.ml.entities import BuildContext, Environment
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 
 logger = logging.getLogger(__name__)
@@ -46,10 +46,12 @@ class AMLInterface:
         self,
         env_name: str,
         project_name: str,
+        build_context_path: str,
+        dockerfile_path: str,
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ) -> Environment:
-        """Creates an AML environment based on the mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04 image.
+        """Creates an AML environment based on the provided dockerfile image.
         Installs the pip packages present in the env where the code is run.
 
         Parameters
@@ -58,6 +60,10 @@ class AMLInterface:
             Name to give to the new environment.
         project_name: str
             Name of the project to be removed from the dependencies in case locally you are using Poetry.
+        build_context_path: str
+            Path that contains the build context.
+        dockerfile_path: str
+            Dockerfile path inside the build context.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
         custom_packages: Dict[str, str]
@@ -69,30 +75,38 @@ class AMLInterface:
         : Environment
             Created environment.
         """
-        self._create_environment_yml(project_name, submodules, custom_packages)
+        self._create_pip_requirements_file(
+            project_name, build_context_path, submodules, custom_packages
+        )
+
         env = Environment(
             name=env_name,
-            image="mcr.microsoft.com/azureml/openmpi4.1.0-ubuntu20.04",
-            conda_file="environment.yml",
+            build=BuildContext(
+                path=build_context_path,
+                dockerfile_path=dockerfile_path,
+            ),
         )
         self.ml_client.environments.create_or_update(env)
-        self._delete_environment_yml()
+        self._delete_pip_requirements_file(build_context_path)
         return env
 
     @staticmethod
-    def _create_environment_yml(
+    def _create_pip_requirements_file(
         project_name: str,
+        build_context_path: str = "",
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ):
         """
         Retrieves all packages currently installed in the local venv used to execute the code,
-        and creates a conda environment yaml file to be used to install the packages on AzureML env.
+        and creates a txt requirements file to be used to install the packages on AzureML env.
 
         Parameters
         ----------
         project_name: str
             Name of the project to be removed from the dependencies in case locally you are using Poetry.
+        build_context_path: str
+            Path that contains the build context.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
         custom_packages: Dict[str, str]
@@ -106,21 +120,26 @@ class AMLInterface:
         for custom_package in custom_packages.keys():
             packages_and_versions_local_env.pop(custom_package)
         packages = [
-            f"    - {key}=={value}" if key not in submodules else f"    - {key}"
+            f"{key}=={value}" if key not in submodules else f"{key}"
             for key, value in packages_and_versions_local_env.items()
         ]
 
         for custom_package in custom_packages.values():
             packages.append(f"    - {custom_package}")
-        with open("environment.yml", "w") as env_file:
-            env_file.write("dependencies:\n")
-            env_file.write("  - python=3.9.*\n")
-            env_file.write("  - pip:\n")
+        with open(f"{build_context_path}/requirements.txt", "w") as env_file:
             env_file.write("\n".join(packages))
 
     @staticmethod
-    def _delete_environment_yml():
-        os.remove("environment.yml")
+    def _delete_pip_requirements_file(build_context_path: str = ""):
+        """
+        Deletes the temporary pip requirements file.
+
+        Parameters
+        ----------
+        build_context_path: str
+            Path that contains the build context.
+        """
+        os.remove(f"{build_context_path}/requirements.txt")
 
     def submit_command_job(self, job):
         """

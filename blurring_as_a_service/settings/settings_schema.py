@@ -62,7 +62,7 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     class Config:
         extra = "forbid"
 
-    aml_experiment_details: AMLExperimentDetailsSpec = None
+    aml_experiment_details: AMLExperimentDetailsSpec
     metadata_pipeline: MetadataPipelineSpec = None
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None

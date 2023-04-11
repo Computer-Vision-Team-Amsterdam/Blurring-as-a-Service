@@ -34,7 +34,6 @@ pycocotools = {version = "^2.0.6", source="PyPI"}
 cryptography = {version = "<39.0.0", source = "PyPI"}
 markdown-it-py = {version="^2.2.0", source = "PyPI"}
 joblib = {version="^1.2.0", source = "PyPI"}
-azureml-core = {version="^1.49.0", source = "PyPI"}
 mss = {version="^7.0.1", source = "PyPI"}
 setuptools = {version="^67.6.0", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
