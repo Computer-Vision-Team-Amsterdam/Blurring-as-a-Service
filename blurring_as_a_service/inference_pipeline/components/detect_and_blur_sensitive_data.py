@@ -13,9 +13,8 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
-aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
-    "aml_experiment_details"
-]
+settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+aml_experiment_settings = settings["aml_experiment_details"]
 
 
 @command_component(
@@ -52,15 +51,16 @@ def detect_and_blur_sensitive_data(
             for line in src:
                 dest.write(f"{mounted_root_folder}/{line}")
 
+    model_parameters = settings["inference_pipeline"]["model_parameters"]
     detect.run(
         weights=f"{model}/best.pt",
         source=files_to_blur_full_path,
         project=results_path,
-        save_txt=True,
-        exist_ok=True,
+        save_txt=model_parameters["save_txt"],
+        exist_ok=model_parameters["exist_ok"],
         name="detection_result",
-        imgsz=(2000, 4000),
-        # half=True,  # Half can be enabled only if run on GPU.
-        hide_labels=True,
-        save_blurred_image=True,
+        imgsz=model_parameters["img_size"],
+        half=model_parameters["half"],  # Half can be enabled only if run on GPU.
+        hide_labels=model_parameters["hide_labels"],
+        save_blurred_image=model_parameters["save_blurred_image"],
     )

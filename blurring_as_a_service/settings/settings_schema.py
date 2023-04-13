@@ -28,7 +28,14 @@ class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class TrainingModelParameters(SettingsSpecModel):
+    img_size: int = 2048
+    batch_size: int = 8
+    epochs: int = 2
+
+
 class TrainingPipelineSpec(SettingsSpecModel):
+    model_parameters: TrainingModelParameters
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
@@ -39,7 +46,17 @@ class WorkloadDistributionPipelineSpec(SettingsSpecModel):
     outputs: Dict[str, str] = None
 
 
+class InferenceModelParameters(SettingsSpecModel):
+    img_size = (2000, 4000)
+    save_txt: bool = True
+    exist_ok: bool = True
+    half: bool = True
+    hide_labels: bool = True
+    save_blurred_image: bool = True
+
+
 class InferencePipelineSpec(SettingsSpecModel):
+    model_parameters: InferenceModelParameters
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
 

@@ -55,12 +55,13 @@ def train_model(
         model_output = trained_model
     else:
         model_output = "../../../outputs/runs/train"
+    model_parameters = settings["training_pipeline"]["model_parameters"]
     train.run(
         data=f"{yolo_yaml_path}/yolo_configuration.yaml",
         weights=f"{model_weights}/yolov5m.pt",
         cfg="../../../yolov5/models/yolov5s.yaml",
-        img=2048,
-        batch_size=8,
-        epochs=2,
+        img=model_parameters["img_size"],
+        batch_size=model_parameters["batch_size"],
+        epochs=model_parameters["epochs"],
         project=model_output,
     )
