@@ -3,9 +3,9 @@ import sys
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
-
+import torch
 sys.path.append("../../..")
-import yolov5.detect as detect  # noqa: E402
+import yolov5.val as val  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -45,22 +45,29 @@ def detect_and_blur_sensitive_data(
     results_path:
         Where to store the results.
     """
-    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"
-    with open(relative_paths_files_to_blur, "r") as src:
-        with open(files_to_blur_full_path, "w") as dest:
-            for line in src:
-                dest.write(f"{mounted_root_folder}/{line}")
+    files_to_blur_full_path = "yolov5/data/pano.yaml"
+    print(f"Is het een file? : {os.path.exists(files_to_blur_full_path)}")
+    # Read in the file
+    with open(files_to_blur_full_path, 'r') as file:
+        filedata = file.read()
 
+    # Replace the target string
+    filedata = filedata.replace('{here}', mounted_root_folder)
+
+    # Write the file out again
+    with open(files_to_blur_full_path, 'w') as file:
+        file.write(filedata)
+
+    cuda_device = torch.cuda.current_device()
     model_parameters = settings["inference_pipeline"]["model_parameters"]
-    detect.run(
+    val.run(
         weights=f"{model}/best.pt",
-        source=files_to_blur_full_path,
+        data=files_to_blur_full_path,
         project=results_path,
-        save_txt=model_parameters["save_txt"],
-        exist_ok=model_parameters["exist_ok"],
+        # save_txt=model_parameters["save_txt"],
+        # exist_ok=model_parameters["exist_ok"],
+        batch_size=4,
+        device=cuda_device,
         name="detection_result",
-        imgsz=model_parameters["img_size"],
-        half=model_parameters["half"],  # Half can be enabled only if run on GPU.
-        hide_labels=model_parameters["hide_labels"],
-        save_blurred_image=model_parameters["save_blurred_image"],
+        imgsz=4000,
     )

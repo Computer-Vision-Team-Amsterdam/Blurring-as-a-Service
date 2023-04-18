@@ -47,7 +47,7 @@ class WorkloadDistributionPipelineSpec(SettingsSpecModel):
 
 
 class InferenceModelParameters(SettingsSpecModel):
-    img_size = (2000, 4000)
+    # img_size = (2000, 4000)
     save_txt: bool = True
     exist_ok: bool = True
     half: bool = True
