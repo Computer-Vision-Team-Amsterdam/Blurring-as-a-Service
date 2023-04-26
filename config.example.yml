@@ -39,7 +39,7 @@ workload_distribution_pipeline:
 
 inference_pipeline:
   model_parameters:
-    img_size: (2000, 4000)
+    img_size: 4000
     save_txt: True
     exist_ok: True
     half: True
@@ -50,6 +50,7 @@ inference_pipeline:
     files_to_blur: "azureml://FILE_WITH_RELATIVE_PATHS_OF_BLUR_IMAGES"
     model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
   outputs:
+    yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
 
 performance_evaluation_pipeline:

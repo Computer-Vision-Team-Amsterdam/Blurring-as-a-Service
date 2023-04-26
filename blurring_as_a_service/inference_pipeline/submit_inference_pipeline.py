@@ -21,6 +21,9 @@ def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model)
     detect_and_blur_sensitive_data_step.outputs.results_path = Output(
         type="uri_folder", mode="rw_mount", path=outputs["results_path"]
     )
+    detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
+        type="uri_folder", mode="rw_mount", path=outputs["yolo_yaml_path"]
+    )
 
     return {}
 

@@ -1,9 +1,11 @@
 import os
 import sys
 
+import torch
+import yaml
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
-import torch
+
 sys.path.append("../../..")
 import yolov5.val as val  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
@@ -28,6 +30,7 @@ def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     """
@@ -44,30 +47,37 @@ def detect_and_blur_sensitive_data(
         Pre-trained model to be used to blur.
     results_path:
         Where to store the results.
+    yolo_yaml_path:
+        Where to store the yaml file which is used during validation
+
     """
-    files_to_blur_full_path = "yolov5/data/pano.yaml"
-    print(f"Is het een file? : {os.path.exists(files_to_blur_full_path)}")
-    # Read in the file
-    with open(files_to_blur_full_path, 'r') as file:
-        filedata = file.read()
+    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"  # use outputs folder as Azure expects outputs there
+    with open(relative_paths_files_to_blur, "r") as src:
+        with open(files_to_blur_full_path, "w") as dest:
+            for line in src:
+                dest.write(f"{mounted_root_folder}/{line}")
+                print(f"{mounted_root_folder}/{line}")
 
-    # Replace the target string
-    filedata = filedata.replace('{here}', mounted_root_folder)
+    data = dict(
+        train=f"../{files_to_blur_full_path}",
+        val=f"../{files_to_blur_full_path}",
+        test=f"../{files_to_blur_full_path}",
+        nc=2,
+        names=["person", "license_plate"],
+    )
 
-    # Write the file out again
-    with open(files_to_blur_full_path, 'w') as file:
-        file.write(filedata)
-
+    with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
+        yaml.dump(data, outfile, default_flow_style=False)
     cuda_device = torch.cuda.current_device()
     model_parameters = settings["inference_pipeline"]["model_parameters"]
     val.run(
         weights=f"{model}/best.pt",
-        data=files_to_blur_full_path,
+        data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
-        # save_txt=model_parameters["save_txt"],
-        # exist_ok=model_parameters["exist_ok"],
         batch_size=4,
         device=cuda_device,
-        name="detection_result",
-        imgsz=4000,
+        name="val_detection_results",
+        imgsz=model_parameters["img_size"],
+        skip_evaluation=True,
+        save_blurred_image=True,
     )
