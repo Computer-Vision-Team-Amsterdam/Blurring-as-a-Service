@@ -45,6 +45,7 @@ inference_pipeline:
     half: True
     hide_labels: True
     save_blurred_image: True
+    batch_size: 1
   inputs:
     root_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
     files_to_blur: "azureml://FILE_WITH_RELATIVE_PATHS_OF_BLUR_IMAGES"

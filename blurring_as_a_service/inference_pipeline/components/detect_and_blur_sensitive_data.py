@@ -74,7 +74,7 @@ def detect_and_blur_sensitive_data(
         weights=f"{model}/best.pt",
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
-        batch_size=4,
+        batch_size=model_parameters["batch_size"],
         device=cuda_device,
         name="val_detection_results",
         imgsz=model_parameters["img_size"],

@@ -53,6 +53,7 @@ class InferenceModelParameters(SettingsSpecModel):
     half: bool = True
     hide_labels: bool = True
     save_blurred_image: bool = True
+    batch_size: int = 1
 
 
 class InferencePipelineSpec(SettingsSpecModel):
