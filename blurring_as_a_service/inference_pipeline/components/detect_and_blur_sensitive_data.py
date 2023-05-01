@@ -70,14 +70,16 @@ def detect_and_blur_sensitive_data(
         yaml.dump(data, outfile, default_flow_style=False)
     cuda_device = torch.cuda.current_device()
     model_parameters = settings["inference_pipeline"]["model_parameters"]
+    # TODO loop over model_parameters
     val.run(
         weights=f"{model}/best.pt",
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
-        batch_size=model_parameters["batch_size"],
         device=cuda_device,
         name="val_detection_results",
-        imgsz=model_parameters["img_size"],
-        skip_evaluation=True,
-        save_blurred_image=True,
+        batch_size=model_parameters["batch_size"],
+        imgsz=model_parameters["imgsz"],
+        skip_evaluation=model_parameters["skip_evaluation"],
+        save_blurred_image=model_parameters["save_blurred_image"],
+        save_csv=model_parameters["save_csv"],
     )

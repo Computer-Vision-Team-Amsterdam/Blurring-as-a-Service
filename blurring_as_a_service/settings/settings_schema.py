@@ -47,13 +47,12 @@ class WorkloadDistributionPipelineSpec(SettingsSpecModel):
 
 
 class InferenceModelParameters(SettingsSpecModel):
-    img_size: int = 4000
+    imgsz: int = 4000
     save_txt: bool = True
     exist_ok: bool = True
-    half: bool = True
-    hide_labels: bool = True
     save_blurred_image: bool = True
     batch_size: int = 1
+    save_csv: bool = True
 
 
 class InferencePipelineSpec(SettingsSpecModel):

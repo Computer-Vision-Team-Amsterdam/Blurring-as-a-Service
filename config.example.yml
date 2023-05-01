@@ -39,11 +39,10 @@ workload_distribution_pipeline:
 
 inference_pipeline:
   model_parameters:
-    img_size: 4000
+    imgsz: 4000
     save_txt: True
     exist_ok: True
-    half: True
-    hide_labels: True
+    save_csv: True
     save_blurred_image: True
     batch_size: 1
   inputs:
