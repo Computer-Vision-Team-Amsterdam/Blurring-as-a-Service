@@ -43,6 +43,7 @@ inference_pipeline:
     save_txt: True
     exist_ok: True
     save_csv: True
+    skip_evaluation: True
     save_blurred_image: True
     batch_size: 1
   inputs:
