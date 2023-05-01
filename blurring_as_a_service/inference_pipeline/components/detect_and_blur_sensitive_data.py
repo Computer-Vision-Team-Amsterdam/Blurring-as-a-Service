@@ -1,11 +1,13 @@
 import os
 import sys
 
+import torch
+import yaml
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-import yolov5.detect as detect  # noqa: E402
+import yolov5.val as val  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -28,6 +30,7 @@ def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     """
@@ -44,23 +47,37 @@ def detect_and_blur_sensitive_data(
         Pre-trained model to be used to blur.
     results_path:
         Where to store the results.
+    yolo_yaml_path:
+        Where to store the yaml file which is used during validation
+
     """
-    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"
+    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"  # use outputs folder as Azure expects outputs there
     with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
                 dest.write(f"{mounted_root_folder}/{line}")
+                print(f"{mounted_root_folder}/{line}")
 
+    data = dict(
+        train=f"../{files_to_blur_full_path}",
+        val=f"../{files_to_blur_full_path}",
+        test=f"../{files_to_blur_full_path}",
+        nc=2,
+        names=["person", "license_plate"],
+    )
+
+    with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
+        yaml.dump(data, outfile, default_flow_style=False)
+    cuda_device = torch.cuda.current_device()
     model_parameters = settings["inference_pipeline"]["model_parameters"]
-    detect.run(
+    val.run(
         weights=f"{model}/best.pt",
-        source=files_to_blur_full_path,
+        data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
-        save_txt=model_parameters["save_txt"],
-        exist_ok=model_parameters["exist_ok"],
-        name="detection_result",
+        batch_size=model_parameters["batch_size"],
+        device=cuda_device,
+        name="val_detection_results",
         imgsz=model_parameters["img_size"],
-        half=model_parameters["half"],  # Half can be enabled only if run on GPU.
-        hide_labels=model_parameters["hide_labels"],
-        save_blurred_image=model_parameters["save_blurred_image"],
+        skip_evaluation=True,
+        save_blurred_image=True,
     )
