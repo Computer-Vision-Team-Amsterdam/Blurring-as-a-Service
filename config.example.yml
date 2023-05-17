@@ -54,6 +54,12 @@ inference_pipeline:
     yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
 
+move_data_pipeline:
+  inputs:
+    container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
+  outputs:
+    container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
+
 performance_evaluation_pipeline:
   inputs:
     validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
