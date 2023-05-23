@@ -43,9 +43,15 @@ def move_files(
     # List all files in the mounted folder
     files = os.listdir(input_container)
 
+    if len(files) == 0:
+        print("No files in the input zone. Aborting...")
+        return  # Skip the rest of the code and exit the function
+
     # Get today's date
     today = date.today()
     date_prefix = today.strftime("%Y-%m-%d")
+
+    # TODO handle when no files are in the folder
 
     # Move each file to the target container
     for file_name in files:
