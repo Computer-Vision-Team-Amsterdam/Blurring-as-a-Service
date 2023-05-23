@@ -9,7 +9,7 @@ module_path = os.path.abspath(os.path.join("../.."))
 if module_path not in sys.path:
     sys.path.insert(0, module_path)
 
-from blurring_as_a_service.inference_pipeline.components.move_files import (  # noqa: E402
+from blurring_as_a_service.move_data_pipeline.components.move_files import (  # noqa: E402
     move_files,
 )
 from blurring_as_a_service.settings.settings import (  # noqa: E402
@@ -20,13 +20,13 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 @pipeline()
 def move_files_pipeline():
-    customer_list = move_data_settings["inputs"]["customers"]
+    customer_list = move_data_settings["customers"]
 
     for customer in customer_list:
         move_data = move_files()
 
-        azureml_input = move_data_settings["inputs"]["container_root"]
-        azureml_output = move_data_settings["outputs"]["container_root"]
+        azureml_input = move_data_settings["input_container_root"]
+        azureml_output = move_data_settings["output_container_root"]
 
         azureml_input_formatted = azureml_input.format(
             subscription=subscription_id,
