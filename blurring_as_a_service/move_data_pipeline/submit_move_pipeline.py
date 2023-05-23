@@ -19,16 +19,36 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 @pipeline()
 def move_files_pipeline(settings):
-    move_data = move_files()
+    customer_list = settings["inputs"]["customers"]
 
-    move_data.outputs.output_container = Output(
-        type="uri_folder", mode="rw_mount", path=settings["outputs"]["container_root"]
-    )
+    for customer in customer_list:
+        move_data = move_files()
 
-    # We need to use Output to also delete the files.
-    move_data.outputs.input_container = Output(
-        type="uri_folder", mode="rw_mount", path=settings["inputs"]["container_root"]
-    )
+        azureml_input = settings["inputs"]["container_root"]
+        azureml_output = settings["outputs"]["container_root"]
+
+        azureml_input_formatted = azureml_input.format(
+            # subscription="your_subscription",  # TODO get from config.json
+            # resourcegroup="your_resource_group",
+            # workspace="your_workspace",
+            datastore_name=customer
+        )
+
+        azureml_output_formatted = azureml_output.format(
+            # subscription="your_subscription",
+            # resourcegroup="your_resource_group",
+            # workspace="your_workspace",
+            datastore_name=customer
+        )
+
+        # NOTE We need to use Output to also delete the files.
+        move_data.outputs.input_container = Output(
+            type="uri_folder", mode="rw_mount", path=azureml_input_formatted
+        )
+
+        move_data.outputs.output_container = Output(
+            type="uri_folder", mode="rw_mount", path=azureml_output_formatted
+        )
 
     return {}
 
