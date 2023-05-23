@@ -51,8 +51,6 @@ def move_files(
     today = date.today()
     date_prefix = today.strftime("%Y-%m-%d")
 
-    # TODO handle when no files are in the folder
-
     # Move each file to the target container
     for file_name in files:
         if file_name.lower().endswith((".png", ".jpg", ".jpeg")):
