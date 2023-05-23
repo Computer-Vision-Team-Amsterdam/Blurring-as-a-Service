@@ -55,6 +55,8 @@ inference_pipeline:
     results_path: "azureml://FOLDER_PATH_WHERE_STORE_BLURRED_IMAGES"
 
 move_data_pipeline:
+  customers:
+    - example-customer
   inputs:
     container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
   outputs:
