@@ -1,13 +1,7 @@
-import os
-import sys
 import json
 
 from azure.ai.ml import Output
 from azure.ai.ml.dsl import pipeline
-
-module_path = os.path.abspath(os.path.join("../.."))
-if module_path not in sys.path:
-    sys.path.insert(0, module_path)
 
 from blurring_as_a_service.move_data_pipeline.components.move_files import (  # noqa: E402
     move_files,
