@@ -51,15 +51,15 @@ def move_files(
     today = date.today()
     date_prefix = today.strftime("%Y-%m-%d")
 
+    target_folder_path = os.path.join(output_container, date_prefix)
+    # Create the target folder if it doesn't exist
+    os.makedirs(target_folder_path, exist_ok=True)
+
     # Move each file to the target container
     for file_name in files:
         if file_name.lower().endswith((".png", ".jpg", ".jpeg")):
             source_file_path = os.path.join(input_container, file_name)
-            target_folder_path = os.path.join(output_container, date_prefix)
             target_file_path = os.path.join(target_folder_path, file_name)
-
-            # Create the target folder if it doesn't exist
-            os.makedirs(target_folder_path, exist_ok=True)
 
             # Copy the file to the target directory
             shutil.copy(source_file_path, target_file_path)
