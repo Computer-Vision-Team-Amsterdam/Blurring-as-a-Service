@@ -32,6 +32,7 @@ def detect_and_blur_sensitive_data(
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    customer: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -76,5 +77,6 @@ def detect_and_blur_sensitive_data(
         project=results_path,
         device=cuda_device,
         name="val_detection_results",
+        customer=customer,
         **model_parameters,
     )
