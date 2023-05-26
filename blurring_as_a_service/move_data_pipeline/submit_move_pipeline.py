@@ -33,7 +33,7 @@ def move_files_pipeline():
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
-            datastore_name=f"{customer}_output"
+            datastore_name=f"{customer}_input_structured"
         )
 
         # NOTE We need to use Output to also delete the files.
