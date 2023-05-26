@@ -13,13 +13,21 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model):
-    outputs = inference_settings["outputs"]
     customer_list = inference_settings["customers"]
+    azureml_input = inference_settings["input_container_root"]
+    azureml_output = inference_settings["outputs"]
 
     # TODO replace {} dingen in yaml vars
     # TODO remove files_to_blur yaml approuch, use something scalable
 
     for customer in customer_list:
+        azureml_input_formatted = azureml_input.format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer}_input_structured"
+        )
+
         detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
             mounted_root_folder=mounted_root_folder,
             relative_paths_files_to_blur=relative_paths_files_to_blur,
@@ -27,10 +35,10 @@ def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model)
             customer=customer
         )
         detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-            type="uri_folder", mode="rw_mount", path=outputs["results_path"]
+            type="uri_folder", mode="rw_mount", path=azureml_output["results_path"]
         )
         detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=outputs["yolo_yaml_path"]
+            type="uri_folder", mode="rw_mount", path=azureml_output["yolo_yaml_path"]
         )
 
     return {}
