@@ -17,6 +17,7 @@ def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model)
     customer_list = inference_settings["customers"]
 
     # TODO replace {} dingen in yaml vars
+    # TODO remove files_to_blur yaml approuch, use something scalable
 
     for customer in customer_list:
         detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
