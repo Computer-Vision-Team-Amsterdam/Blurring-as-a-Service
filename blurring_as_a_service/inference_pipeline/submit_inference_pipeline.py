@@ -42,7 +42,7 @@ def inference_pipeline():
             mounted_root_folder=mounted_root_folder,
             relative_paths_files_to_blur=relative_paths_files_to_blur,
             model=model,
-            customer=customer_name,
+            customer_name=customer_name,
             model_parameters_json=model_parameters_json
         )
 

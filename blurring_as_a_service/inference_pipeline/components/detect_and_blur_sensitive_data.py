@@ -33,7 +33,7 @@ def detect_and_blur_sensitive_data(
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    customer: str,
+    customer_name: str,
     model_parameters_json: str
 ):
     """
@@ -79,6 +79,6 @@ def detect_and_blur_sensitive_data(
         project=results_path,
         device=cuda_device,
         name="val_detection_results",
-        customer=customer,  # We want to save this info in a database
+        customer_name=customer_name,  # We want to save this info in a database
         **model_parameters,
     )
