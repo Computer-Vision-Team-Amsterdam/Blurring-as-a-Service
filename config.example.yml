@@ -39,7 +39,7 @@ workload_distribution_pipeline:
 
 inference_pipeline:
   customers:
-    - name: customerA
+    - name: customer1
       model_parameters:
         imgsz: 4000
         save_txt: True
