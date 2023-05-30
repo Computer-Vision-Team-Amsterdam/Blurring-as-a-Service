@@ -32,8 +32,6 @@ class AttrDict(dict):
         for k, v in d.items():
             if isinstance(v, dict):
                 data[k] = cls(v)
-            elif isinstance(v, str):
-                data[k] = v  # Skip the formatting step for strings # TODO Sebastian
             else:
                 data[k] = cls.process_value(k, v)
         return data
