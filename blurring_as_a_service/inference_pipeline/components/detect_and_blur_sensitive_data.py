@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 import torch
 import yaml
@@ -32,7 +33,8 @@ def detect_and_blur_sensitive_data(
     model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    customer: str
+    customer: str,
+    model_parameters_json: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -70,13 +72,13 @@ def detect_and_blur_sensitive_data(
     with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     cuda_device = torch.cuda.current_device()
-    model_parameters = settings["inference_pipeline"]["model_parameters"]
+    model_parameters = json.loads(model_parameters_json)
     val.run(
         weights=f"{model}/best.pt",
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
         device=cuda_device,
         name="val_detection_results",
-        customer=customer,
+        customer=customer,  # We want to save this info in a database
         **model_parameters,
     )

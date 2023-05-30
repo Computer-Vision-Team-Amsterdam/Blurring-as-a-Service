@@ -12,60 +12,54 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model):
-    customer_list = inference_settings["customers"]
-    azureml_input = inference_settings["input_container_root"]
-    azureml_output = inference_settings["outputs"]
+def inference_pipeline():
+    # Iterate over all customers
+    for customer in inference_settings['customers']:
+        customer_name = customer['name']
 
-    # TODO replace {} dingen in yaml vars
-    # TODO remove files_to_blur yaml approuch, use something scalable
-
-    for customer in customer_list:
-        azureml_input_formatted = azureml_input.format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer}_input_structured"
+        mounted_root_folder = Input(
+            type=AssetTypes.URI_FOLDER,
+            path=customer['inputs']['container_root'],
+            description="Data to be blurred",
         )
+
+        model = Input(
+            type=AssetTypes.URI_FOLDER,
+            path=customer['inputs']['model'],
+            description="Model to use for the blurring",
+        )
+
+        relative_paths_files_to_blur = Input(
+            type=AssetTypes.URI_FILE,
+            path=customer['inputs']['files_to_blur'],
+            description="Data to be blurred",
+        )
+
+        model_parameters = customer['model_parameters']
+        model_parameters_json = json.dumps(model_parameters) # TODO it seems I can not pass a string to @command_component function
 
         detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
             mounted_root_folder=mounted_root_folder,
             relative_paths_files_to_blur=relative_paths_files_to_blur,
             model=model,
-            customer=customer
+            customer=customer_name,
+            model_parameters_json=model_parameters_json
         )
+
+        azureml_outputs = customer['outputs']
+
         detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_output["results_path"]
+            type="uri_folder", mode="rw_mount", path=azureml_outputs["results_path"]
         )
         detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_output["yolo_yaml_path"]
+            type="uri_folder", mode="rw_mount", path=azureml_outputs["yolo_yaml_path"]
         )
 
     return {}
 
 
 def main():
-    # TODO move to inference_pipeline
-    mounted_root_folder = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=inference_settings["inputs"]["root_folder"],
-        description="Data to be blurred",
-    )
-    relative_paths_files_to_blur = Input(
-        type=AssetTypes.URI_FILE,
-        path=inference_settings["inputs"]["files_to_blur"],
-        description="Data to be blurred",
-    )
-    model = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=inference_settings["inputs"]["model"],
-        description="Model to use for the blurring",
-    )
-    inference_pipeline_job = inference_pipeline(
-        mounted_root_folder=mounted_root_folder,
-        relative_paths_files_to_blur=relative_paths_files_to_blur,
-        model=model,
-    )
+    inference_pipeline_job = inference_pipeline()
 
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"

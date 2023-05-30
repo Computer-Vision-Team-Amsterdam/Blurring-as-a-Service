@@ -56,10 +56,15 @@ class InferenceModelParameters(SettingsSpecModel):
     save_csv: bool = True
 
 
-class InferencePipelineSpec(SettingsSpecModel):
+class InferenceCustomerPipelineSpec(SettingsSpecModel):
+    name: str
     model_parameters: InferenceModelParameters
-    inputs: Dict[str, str] = None
-    outputs: Dict[str, str] = None
+    inputs: Dict[str, Any] = None
+    outputs: Dict[str, Any] = None
+
+
+class InferencePipelineSpec(SettingsSpecModel):
+    customers: List[InferenceCustomerPipelineSpec]
 
 
 class MoveDataSpec(SettingsSpecModel):
