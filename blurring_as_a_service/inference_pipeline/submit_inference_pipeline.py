@@ -17,15 +17,29 @@ def inference_pipeline():
     for customer in inference_settings['customers']:
         customer_name = customer['name']
 
+        container_root_formatted = customer['container_root'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer}_input_structured"
+        )
+
         mounted_root_folder = Input(
             type=AssetTypes.URI_FOLDER,
-            path=customer['container_root'],
+            path=container_root_formatted,
             description="Data to be blurred",
+        )
+
+        files_to_blur_formatted = customer['inputs']['files_to_blur'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer}_input_structured"
         )
 
         relative_paths_files_to_blur = Input(
             type=AssetTypes.URI_FILE,
-            path=customer['inputs']['files_to_blur'],
+            path=files_to_blur_formatted,
             description="Data to be blurred",
         )
 
@@ -39,13 +53,18 @@ def inference_pipeline():
             model_parameters_json=model_parameters_json
         )
 
-        azureml_outputs = customer['outputs']
+        azureml_outputs_formatted = customer['outputs']['results_path'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer}_input_structured"
+        )
 
         detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_outputs['results_path']
+            type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
         )
         detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=customer['container_root']
+            type="uri_folder", mode="rw_mount", path=container_root_formatted
         )
 
     return {}
