@@ -58,6 +58,7 @@ class InferenceModelParameters(SettingsSpecModel):
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     name: str
+    container_root: str
     model_parameters: InferenceModelParameters
     inputs: Dict[str, Any] = None
     outputs: Dict[str, Any] = None

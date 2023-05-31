@@ -19,14 +19,8 @@ def inference_pipeline():
 
         mounted_root_folder = Input(
             type=AssetTypes.URI_FOLDER,
-            path=customer['inputs']['container_root'],
+            path=customer['container_root'],
             description="Data to be blurred",
-        )
-
-        model = Input(
-            type=AssetTypes.URI_FOLDER,
-            path=customer['inputs']['model'],
-            description="Model to use for the blurring",
         )
 
         relative_paths_files_to_blur = Input(
@@ -36,12 +30,11 @@ def inference_pipeline():
         )
 
         model_parameters = customer['model_parameters']
-        model_parameters_json = json.dumps(model_parameters) # TODO it seems I can not pass a string to @command_component function
+        model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
 
         detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
             mounted_root_folder=mounted_root_folder,
             relative_paths_files_to_blur=relative_paths_files_to_blur,
-            model=model,
             customer_name=customer_name,
             model_parameters_json=model_parameters_json
         )
@@ -49,10 +42,10 @@ def inference_pipeline():
         azureml_outputs = customer['outputs']
 
         detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_outputs["results_path"]
+            type="uri_folder", mode="rw_mount", path=azureml_outputs['results_path']
         )
         detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_outputs["yolo_yaml_path"]
+            type="uri_folder", mode="rw_mount", path=customer['container_root']
         )
 
     return {}

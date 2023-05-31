@@ -30,7 +30,6 @@ aml_experiment_settings = settings["aml_experiment_details"]
 def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
-    model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
@@ -46,8 +45,6 @@ def detect_and_blur_sensitive_data(
     relative_paths_files_to_blur:
         Text file containing multiple rows where each row has a relative path,
         taking folder as root and the path to the image.
-    model:
-        Pre-trained model to be used to blur.
     results_path:
         Where to store the results.
     yolo_yaml_path:
@@ -74,7 +71,7 @@ def detect_and_blur_sensitive_data(
     cuda_device = torch.cuda.current_device()
     model_parameters = json.loads(model_parameters_json)
     val.run(
-        weights=f"{model}/best.pt",
+        weights=f"{mounted_root_folder}/best.pt",
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
         device=cuda_device,
