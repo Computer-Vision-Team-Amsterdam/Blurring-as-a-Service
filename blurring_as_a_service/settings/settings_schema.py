@@ -62,6 +62,12 @@ class InferencePipelineSpec(SettingsSpecModel):
     outputs: Dict[str, str] = None
 
 
+class MoveDataSpec(SettingsSpecModel):
+    input_container_root: str = None
+    output_container_root: str = None
+    customers: List[str] = None
+
+
 class LoggingSpec(SettingsSpecModel):
     loglevel_own: str = "INFO"
     own_packages: List[str] = [
@@ -86,4 +92,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     training_pipeline: TrainingPipelineSpec = None
     workload_distribution_pipeline: WorkloadDistributionPipelineSpec = None
     inference_pipeline: InferencePipelineSpec = None
+    move_data_pipeline: MoveDataSpec = None
     logging: LoggingSpec = LoggingSpec()
