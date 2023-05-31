@@ -21,7 +21,7 @@ def inference_pipeline():
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
-            datastore_name=f"{customer}_input_structured"
+            datastore_name=f"{customer_name}_input_structured"
         )
 
         mounted_root_folder = Input(
@@ -34,7 +34,7 @@ def inference_pipeline():
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
-            datastore_name=f"{customer}_input_structured"
+            datastore_name=f"{customer_name}_input_structured"
         )
 
         relative_paths_files_to_blur = Input(
@@ -57,7 +57,7 @@ def inference_pipeline():
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
-            datastore_name=f"{customer}_output"
+            datastore_name=f"{customer_name}_output"
         )
 
         detect_and_blur_sensitive_data_step.outputs.results_path = Output(
