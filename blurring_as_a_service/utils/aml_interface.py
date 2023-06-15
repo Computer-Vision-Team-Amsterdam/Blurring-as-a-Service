@@ -79,6 +79,9 @@ class AMLInterface:
             project_name, build_context_path, submodules, custom_packages
         )
 
+        ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
+        ws.image_build_compute = "defaultBuildClusterCvt"
+
         env = Environment(
             name=env_name,
             build=BuildContext(
