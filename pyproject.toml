@@ -8,9 +8,8 @@ authors = ["Your Name <you@example.com>"]
 python = "~3.9"
 pandas = {version = ">=1.1.4", source = "PyPI"}
 GitPython = {version = "^3.1.30", source = "PyPI"}
-ipython = {version = "^8.8.0", source = "PyPI"}
 matplotlib = {version = ">=3.2.2", source = "PyPI"}
-numpy = {version = ">=1.18.5", source = "PyPI"}
+numpy = "1.23"
 opencv-python = {version = ">=4.1.1", source = "PyPI"}
 Pillow = {version = ">=7.1.2", source = "PyPI"}
 psutil = {version = "^5.9.4", source = "PyPI"}
@@ -37,6 +36,7 @@ joblib = {version="^1.2.0", source = "PyPI"}
 mss = {version="^7.0.1", source = "PyPI"}
 setuptools = {version="^67.6.0", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
+packaging = "20.0"
 
 [tool.poetry.dev-dependencies]
 
