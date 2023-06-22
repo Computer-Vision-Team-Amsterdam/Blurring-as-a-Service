@@ -37,6 +37,7 @@ joblib = {version="^1.2.0", source = "PyPI"}
 mss = {version="^7.0.1", source = "PyPI"}
 setuptools = ">=65.5.1"
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
+packaging = "20.0"
 
 [tool.poetry.dev-dependencies]
 
