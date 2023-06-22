@@ -48,6 +48,7 @@ class AMLInterface:
         project_name: str,
         build_context_path: str,
         dockerfile_path: str,
+        build_cluster: str = "defaultBuildClusterCvt",
         submodules: List[str] = [],
         custom_packages: Dict[str, str] = {},
     ) -> Environment:
@@ -64,6 +65,8 @@ class AMLInterface:
             Path that contains the build context.
         dockerfile_path: str
             Dockerfile path inside the build context.
+        build_cluster: str
+            Cluster to be used when building environments within Analyse Services.
         submodules : List[str]
             Packages that are actually submodules and not pip installed.
         custom_packages: Dict[str, str]
@@ -75,12 +78,13 @@ class AMLInterface:
         : Environment
             Created environment.
         """
+
+        ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
+        ws.image_build_compute = build_cluster
+
         self._create_pip_requirements_file(
             project_name, build_context_path, submodules, custom_packages
         )
-
-        ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
-        ws.image_build_compute = "defaultBuildClusterCvt"
 
         env = Environment(
             name=env_name,
