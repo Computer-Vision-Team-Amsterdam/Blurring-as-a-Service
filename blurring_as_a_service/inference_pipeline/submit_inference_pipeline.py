@@ -79,7 +79,6 @@ def main():
         "aml_experiment_details"
     ]["compute_name"]
 
-    aml_interface = AMLInterface()
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=inference_pipeline_job, experiment_name="inference_pipeline"
     )
@@ -87,14 +86,12 @@ def main():
 
 
 if __name__ == "__main__":
-    # Load the JSON file
-    with open('config.json') as f:
-        config = json.load(f)
+    aml_interface = AMLInterface()
 
-    # Retrieve values from the JSON
-    subscription_id = config["subscription_id"]
-    resource_group = config["resource_group"]
-    workspace_name = config["workspace_name"]
+    # Access the workspace details
+    workspace_name = aml_interface.get_workspace_name()
+    subscription_id = aml_interface.get_subscription_id()
+    resource_group = aml_interface.get_resource_group()
 
     # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
