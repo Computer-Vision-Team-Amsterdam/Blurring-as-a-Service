@@ -52,7 +52,7 @@ class AMLInterface:
 
     def get_resource_group(self):
         """Retrieve the Azure resource group name."""
-        return self.ml_client.resource_group
+        return self.ml_client.resource_group_name
 
     def create_aml_environment(
         self,
