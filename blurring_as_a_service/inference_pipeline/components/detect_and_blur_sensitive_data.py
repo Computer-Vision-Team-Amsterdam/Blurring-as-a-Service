@@ -52,7 +52,7 @@ def detect_and_blur_sensitive_data(
     customer_name
         The name of the customer, with spaces replaced by underscores
     model_parameters_json
-        All paramaters used to run YOLOv5 inference
+        All parameters used to run YOLOv5 inference in json format
 
     """
     files_to_blur_full_path = "outputs/files_to_blur.txt"  # use outputs folder as Azure expects outputs there
