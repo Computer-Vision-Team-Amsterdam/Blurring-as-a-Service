@@ -17,29 +17,31 @@ def inference_pipeline():
     for customer in inference_settings['customers']:
         customer_name = customer['name']
 
-        container_root_formatted = customer['container_root'].format(
+        # Format the root path of the Blob Storage Container in Azure using placeholders
+        blob_container_path = customer['container_root'].format(
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
             datastore_name=f"{customer_name}_input_structured"
         )
 
-        mounted_root_folder = Input(
+        input_root_folder = Input(
             type=AssetTypes.URI_FOLDER,
-            path=container_root_formatted,
+            path=blob_container_path,
             description="Data to be blurred",
         )
 
-        files_to_blur_formatted = customer['inputs']['files_to_blur'].format(
+        # Get the txt file that contains all paths of the files to run inference on
+        files_to_blur_path = customer['inputs']['files_to_blur'].format(
             subscription=subscription_id,
             resourcegroup=resource_group,
             workspace=workspace_name,
             datastore_name=f"{customer_name}_input_structured"
         )
 
-        relative_paths_files_to_blur = Input(
+        files_to_blur_txt = Input(
             type=AssetTypes.URI_FILE,
-            path=files_to_blur_formatted,
+            path=files_to_blur_path,
             description="Data to be blurred",
         )
 
@@ -47,8 +49,8 @@ def inference_pipeline():
         model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
 
         detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
-            mounted_root_folder=mounted_root_folder,
-            relative_paths_files_to_blur=relative_paths_files_to_blur,
+            mounted_root_folder=input_root_folder,
+            relative_paths_files_to_blur=files_to_blur_txt,
             customer_name=customer_name,
             model_parameters_json=model_parameters_json
         )
@@ -64,7 +66,7 @@ def inference_pipeline():
             type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
         )
         detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=container_root_formatted
+            type="uri_folder", mode="rw_mount", path=blob_container_path
         )
 
     return {}

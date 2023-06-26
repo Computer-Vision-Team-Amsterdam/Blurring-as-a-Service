@@ -51,7 +51,7 @@ def detect_and_blur_sensitive_data(
         Where to store the yaml file which is used during validation
 
     """
-    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"  # use outputs folder as Azure expects outputs there
+    files_to_blur_full_path = "outputs/files_to_blur.txt"  # use outputs folder as Azure expects outputs there
     with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
