@@ -49,6 +49,10 @@ def detect_and_blur_sensitive_data(
         Where to store the results.
     yolo_yaml_path:
         Where to store the yaml file which is used during validation
+    customer_name
+        The name of the customer, with spaces replaced by underscores
+    model_parameters_json
+        All paramaters used to run YOLOv5 inference
 
     """
     files_to_blur_full_path = "outputs/files_to_blur.txt"  # use outputs folder as Azure expects outputs there
