@@ -12,7 +12,7 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def inference_pipeline():
+def inference_pipeline(workspace_name, subscription_id, resource_group):
     # Iterate over all customers
     for customer in inference_settings['customers']:
         customer_name = customer['name']
@@ -73,8 +73,14 @@ def inference_pipeline():
 
 
 def main():
-    inference_pipeline_job = inference_pipeline()
+    aml_interface = AMLInterface()
 
+    # Access the workspace details
+    workspace_name = aml_interface.get_workspace_name()
+    subscription_id = aml_interface.get_subscription_id()
+    resource_group = aml_interface.get_resource_group()
+
+    inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group)
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
@@ -86,13 +92,6 @@ def main():
 
 
 if __name__ == "__main__":
-    aml_interface = AMLInterface()
-
-    # Access the workspace details
-    workspace_name = aml_interface.get_workspace_name()
-    subscription_id = aml_interface.get_subscription_id()
-    resource_group = aml_interface.get_resource_group()
-
     # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
