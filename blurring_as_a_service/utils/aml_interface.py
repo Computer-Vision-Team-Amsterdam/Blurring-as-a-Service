@@ -42,6 +42,18 @@ class AMLInterface:
             credential = InteractiveBrowserCredential()
         return credential
 
+    def get_workspace_name(self):
+        """Retrieve the Azure ML workspace name."""
+        return self.ml_client.workspace_name
+
+    def get_subscription_id(self):
+        """Retrieve the Azure subscription ID."""
+        return self.ml_client.subscription_id
+
+    def get_resource_group(self):
+        """Retrieve the Azure resource group name."""
+        return self.ml_client.resource_group_name
+
     def create_aml_environment(
         self,
         env_name: str,

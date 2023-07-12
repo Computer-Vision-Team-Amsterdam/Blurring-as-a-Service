@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 import torch
 import yaml
@@ -29,9 +30,10 @@ aml_experiment_settings = settings["aml_experiment_details"]
 def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
-    model: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    customer_name: str,
+    model_parameters_json: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -43,15 +45,17 @@ def detect_and_blur_sensitive_data(
     relative_paths_files_to_blur:
         Text file containing multiple rows where each row has a relative path,
         taking folder as root and the path to the image.
-    model:
-        Pre-trained model to be used to blur.
     results_path:
         Where to store the results.
     yolo_yaml_path:
         Where to store the yaml file which is used during validation
+    customer_name
+        The name of the customer, with spaces replaced by underscores
+    model_parameters_json
+        All parameters used to run YOLOv5 inference in json format
 
     """
-    files_to_blur_full_path = "outputs/files_to_blur_full_path.txt"  # use outputs folder as Azure expects outputs there
+    files_to_blur_full_path = "outputs/files_to_blur.txt"  # use outputs folder as Azure expects outputs there
     with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
@@ -69,15 +73,13 @@ def detect_and_blur_sensitive_data(
     with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     cuda_device = torch.cuda.current_device()
-    model_parameters = settings["inference_pipeline"]["model_parameters"]
+    model_parameters = json.loads(model_parameters_json)
     val.run(
-        weights=f"{model}/best.pt",
+        weights=f"{mounted_root_folder}/best.pt",
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
-        batch_size=model_parameters["batch_size"],
         device=cuda_device,
         name="val_detection_results",
-        imgsz=model_parameters["img_size"],
-        skip_evaluation=True,
-        save_blurred_image=True,
+        customer_name=customer_name,  # We want to save this info in a database
+        **model_parameters,
     )

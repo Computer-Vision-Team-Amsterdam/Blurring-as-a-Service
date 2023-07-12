@@ -1,3 +1,5 @@
+import json
+
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -10,52 +12,79 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def inference_pipeline(mounted_root_folder, relative_paths_files_to_blur, model):
-    outputs = BlurringAsAServiceSettings.get_settings()["inference_pipeline"]["outputs"]
+def inference_pipeline(workspace_name, subscription_id, resource_group):
+    # Iterate over all customers
+    for customer in inference_settings['customers']:
+        customer_name = customer['name']
 
-    detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
-        mounted_root_folder=mounted_root_folder,
-        relative_paths_files_to_blur=relative_paths_files_to_blur,
-        model=model,
-    )
-    detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-        type="uri_folder", mode="rw_mount", path=outputs["results_path"]
-    )
-    detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-        type="uri_folder", mode="rw_mount", path=outputs["yolo_yaml_path"]
-    )
+        # Format the root path of the Blob Storage Container in Azure using placeholders
+        blob_container_path = customer['container_root'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer_name}_input_structured"
+        )
+
+        input_root_folder = Input(
+            type=AssetTypes.URI_FOLDER,
+            path=blob_container_path,
+            description="Data to be blurred",
+        )
+
+        # Get the txt file that contains all paths of the files to run inference on
+        files_to_blur_path = customer['inputs']['files_to_blur'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer_name}_input_structured"
+        )
+
+        files_to_blur_txt = Input(
+            type=AssetTypes.URI_FILE,
+            path=files_to_blur_path,
+            description="Data to be blurred",
+        )
+
+        model_parameters = customer['model_parameters']
+        model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
+
+        detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
+            mounted_root_folder=input_root_folder,
+            relative_paths_files_to_blur=files_to_blur_txt,
+            customer_name=customer_name,
+            model_parameters_json=model_parameters_json
+        )
+
+        azureml_outputs_formatted = customer['outputs']['results_path'].format(
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
+            datastore_name=f"{customer_name}_output"
+        )
+
+        detect_and_blur_sensitive_data_step.outputs.results_path = Output(
+            type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
+        )
+        detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
+            type="uri_folder", mode="rw_mount", path=blob_container_path
+        )
 
     return {}
 
 
 def main():
     aml_interface = AMLInterface()
-    settings = BlurringAsAServiceSettings.get_settings()
 
-    mounted_root_folder = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=settings["inference_pipeline"]["inputs"]["root_folder"],
-        description="Data to be blurred",
-    )
-    relative_paths_files_to_blur = Input(
-        type=AssetTypes.URI_FILE,
-        path=settings["inference_pipeline"]["inputs"]["files_to_blur"],
-        description="Data to be blurred",
-    )
-    model = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=settings["inference_pipeline"]["inputs"]["model"],
-        description="Model to use for the blurring",
-    )
-    inference_pipeline_job = inference_pipeline(
-        mounted_root_folder=mounted_root_folder,
-        relative_paths_files_to_blur=relative_paths_files_to_blur,
-        model=model,
-    )
+    # Access the workspace details
+    workspace_name = aml_interface.get_workspace_name()
+    subscription_id = aml_interface.get_subscription_id()
+    resource_group = aml_interface.get_resource_group()
 
+    inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group)
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
+
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=inference_pipeline_job, experiment_name="inference_pipeline"
     )
@@ -63,5 +92,9 @@ def main():
 
 
 if __name__ == "__main__":
+    # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    settings = BlurringAsAServiceSettings.get_settings()
+    inference_settings = settings["inference_pipeline"]
+
     main()

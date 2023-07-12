@@ -47,19 +47,25 @@ class WorkloadDistributionPipelineSpec(SettingsSpecModel):
 
 
 class InferenceModelParameters(SettingsSpecModel):
-    img_size: int = 4000
+    imgsz: int = 4000
     save_txt: bool = True
     exist_ok: bool = True
-    half: bool = True
-    hide_labels: bool = True
+    skip_evaluation: bool = True
     save_blurred_image: bool = True
     batch_size: int = 1
+    save_csv: bool = True
+
+
+class InferenceCustomerPipelineSpec(SettingsSpecModel):
+    name: str
+    container_root: str
+    model_parameters: InferenceModelParameters
+    inputs: Dict[str, Any] = None
+    outputs: Dict[str, Any] = None
 
 
 class InferencePipelineSpec(SettingsSpecModel):
-    model_parameters: InferenceModelParameters
-    inputs: Dict[str, str] = None
-    outputs: Dict[str, str] = None
+    customers: List[InferenceCustomerPipelineSpec]
 
 
 class MoveDataSpec(SettingsSpecModel):
