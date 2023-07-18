@@ -1,0 +1,756 @@
+{
+  "images": [
+    {
+      "file_name": "TMX7316010203-000992_pano_0001_000323.jpg",
+      "height": 4000,
+      "width": 8000,
+      "id": "TMX7316010203-000992_pano_0001_000323"
+    },
+    {
+      "file_name": "TMX7316010203-000998_pano_0004_001175.jpg",
+      "height": 4000,
+      "width": 8000,
+      "id": "TMX7316010203-000998_pano_0004_001175"
+    },
+    {
+      "file_name": "TMX7316010203-001011_pano_0016_000064.jpg",
+      "height": 4000,
+      "width": 8000,
+      "id": "TMX7316010203-001011_pano_0016_000064"
+    },
+    {
+      "file_name": "TMX7316010203-001041_pano_0002_002709.jpg",
+      "height": 4000,
+      "width": 8000,
+      "id": "TMX7316010203-001041_pano_0002_002709"
+    }
+  ],
+  "annotations": [
+    {
+      "id": 1,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        4881.0,
+        2037.0,
+        217.0,
+        453.0
+      ],
+      "area": 98301,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 2,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        4741.0,
+        2019.0,
+        167.0,
+        445.0
+      ],
+      "area": 74315,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 3,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        7568.0,
+        2017.0,
+        87.0,
+        179.0
+      ],
+      "area": 15573,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 4,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        879.0,
+        1972.0,
+        56.0,
+        98.0
+      ],
+      "area": 5488,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 5,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        530.0,
+        1992.0,
+        77.0,
+        114.0
+      ],
+      "area": 8778,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 6,
+      "image_id": "TMX7316010203-000992_pano_0001_000323",
+      "bbox": [
+        451.0,
+        1992.0,
+        71.0,
+        122.0
+      ],
+      "area": 8662,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 7,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        101.0,
+        2036.0,
+        41.0,
+        117.0
+      ],
+      "area": 4797,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 8,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        135.0,
+        2070.0,
+        98.0,
+        168.0
+      ],
+      "area": 16464,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 9,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        215.0,
+        2051.0,
+        63.0,
+        138.0
+      ],
+      "area": 8694,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 10,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        586.0,
+        2092.0,
+        73.0,
+        151.0
+      ],
+      "area": 11023,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 11,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        786.0,
+        2063.0,
+        47.0,
+        150.0
+      ],
+      "area": 7050,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 12,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        826.0,
+        2057.0,
+        54.0,
+        150.0
+      ],
+      "area": 8100,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 13,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        655.0,
+        2123.0,
+        108.0,
+        265.0
+      ],
+      "area": 28620,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 14,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        1219.0,
+        2046.0,
+        32.0,
+        57.0
+      ],
+      "area": 1824,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 15,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        1554.0,
+        2076.0,
+        69.0,
+        177.0
+      ],
+      "area": 12213,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 16,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        2451.0,
+        2040.0,
+        80.0,
+        183.0
+      ],
+      "area": 14640,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 17,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        2813.0,
+        2028.0,
+        34.0,
+        101.0
+      ],
+      "area": 3434,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 18,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        2958.0,
+        2037.0,
+        35.0,
+        104.0
+      ],
+      "area": 3640,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 19,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3114.0,
+        2027.0,
+        25.0,
+        59.0
+      ],
+      "area": 1475,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 20,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3138.0,
+        2032.0,
+        37.0,
+        86.0
+      ],
+      "area": 3182,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 21,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3052.0,
+        2044.0,
+        124.0,
+        248.0
+      ],
+      "area": 30752,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 22,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3022.0,
+        2039.0,
+        14.0,
+        58.0
+      ],
+      "area": 812,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 23,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3624.0,
+        2020.0,
+        39.0,
+        127.0
+      ],
+      "area": 4953,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 24,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3584.0,
+        2015.0,
+        46.0,
+        144.0
+      ],
+      "area": 6624,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 25,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        3781.0,
+        2000.0,
+        24.0,
+        61.0
+      ],
+      "area": 1464,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 26,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        4204.0,
+        2071.0,
+        24.0,
+        11.0
+      ],
+      "area": 264,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 27,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        4355.0,
+        2082.0,
+        31.0,
+        9.0
+      ],
+      "area": 279,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 28,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        5186.0,
+        2089.0,
+        30.0,
+        13.0
+      ],
+      "area": 390,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 29,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        5408.0,
+        2035.0,
+        129.0,
+        200.0
+      ],
+      "area": 25800,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 30,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        6283.0,
+        2100.0,
+        39.0,
+        12.0
+      ],
+      "area": 468,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 31,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        7632.0,
+        2037.0,
+        47.0,
+        95.0
+      ],
+      "area": 4465,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 32,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        7760.0,
+        2039.0,
+        55.0,
+        122.0
+      ],
+      "area": 6710,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 33,
+      "image_id": "TMX7316010203-000998_pano_0004_001175",
+      "bbox": [
+        7886.0,
+        2060.0,
+        52.0,
+        130.0
+      ],
+      "area": 6760,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 34,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        272.0,
+        2036.0,
+        58.0,
+        195.0
+      ],
+      "area": 11310,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 35,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        750.0,
+        2011.0,
+        37.0,
+        109.0
+      ],
+      "area": 4033,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 36,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        5112.0,
+        2023.0,
+        69.0,
+        192.0
+      ],
+      "area": 13248,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 37,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        5188.0,
+        2016.0,
+        58.0,
+        116.0
+      ],
+      "area": 6728,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 38,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        5276.0,
+        2022.0,
+        27.0,
+        61.0
+      ],
+      "area": 1647,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 39,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        5498.0,
+        2018.0,
+        29.0,
+        84.0
+      ],
+      "area": 2436,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 40,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        5874.0,
+        2051.0,
+        65.0,
+        182.0
+      ],
+      "area": 11830,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 41,
+      "image_id": "TMX7316010203-001011_pano_0016_000064",
+      "bbox": [
+        6131.0,
+        2038.0,
+        113.0,
+        369.0
+      ],
+      "area": 41697,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 42,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        2216.0,
+        2011.0,
+        27.0,
+        96.0
+      ],
+      "area": 2592,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 43,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        2579.0,
+        2120.0,
+        14.0,
+        10.0
+      ],
+      "area": 140,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 44,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        2671.0,
+        2137.0,
+        11.0,
+        15.0
+      ],
+      "area": 165,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 45,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        4688.0,
+        1989.0,
+        178.0,
+        608.0
+      ],
+      "area": 108224,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 46,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        4918.0,
+        2032.0,
+        104.0,
+        356.0
+      ],
+      "area": 37024,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 47,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        5514.0,
+        2093.0,
+        49.0,
+        15.0
+      ],
+      "area": 735,
+      "iscrowd": 0,
+      "category_id": 1,
+      "segmentation": []
+    },
+    {
+      "id": 48,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        5745.0,
+        2008.0,
+        52.0,
+        108.0
+      ],
+      "area": 5616,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 49,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        5842.0,
+        2016.0,
+        60.0,
+        142.0
+      ],
+      "area": 8520,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 50,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        7328.0,
+        1987.0,
+        97.0,
+        397.0
+      ],
+      "area": 38509,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    },
+    {
+      "id": 51,
+      "image_id": "TMX7316010203-001041_pano_0002_002709",
+      "bbox": [
+        7438.0,
+        2092.0,
+        165.0,
+        342.0
+      ],
+      "area": 56430,
+      "iscrowd": 0,
+      "category_id": 0,
+      "segmentation": []
+    }
+  ],
+  "categories": [
+    {
+      "supercategory": "Defect",
+      "id": 0,
+      "name": "person"
+    },
+    {
+      "supercategory": "Defect",
+      "id": 1,
+      "name": "licence_plate"
+    }
+  ]
+}
