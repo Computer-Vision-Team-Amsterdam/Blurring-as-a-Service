@@ -53,7 +53,6 @@ class InferenceModelParameters(SettingsSpecModel):
     skip_evaluation: bool = True
     save_blurred_image: bool = True
     batch_size: int = 1
-    save_csv: bool = True
 
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
