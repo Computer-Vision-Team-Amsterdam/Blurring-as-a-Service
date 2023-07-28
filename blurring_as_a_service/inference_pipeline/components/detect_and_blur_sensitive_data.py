@@ -79,7 +79,7 @@ def detect_and_blur_sensitive_data(
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
         device=cuda_device,
-        name="val_detection_results",
+        name="",
         customer_name=customer_name,  # We want to save this info in a database
         **model_parameters,
     )

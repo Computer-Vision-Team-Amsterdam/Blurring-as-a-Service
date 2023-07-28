@@ -3,6 +3,7 @@ import json
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
+from azure.ai.ml.entities import ManagedIdentityConfiguration
 
 from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensitive_data import (
     detect_and_blur_sensitive_data,
@@ -81,6 +82,7 @@ def main():
     resource_group = aml_interface.get_resource_group()
 
     inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group)
+    inference_pipeline_job.identity = ManagedIdentityConfiguration()
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
