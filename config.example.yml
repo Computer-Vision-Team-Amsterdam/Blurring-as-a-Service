@@ -45,7 +45,6 @@ inference_pipeline:
         imgsz: 4000
         save_txt: True
         exist_ok: True
-        save_csv: True
         skip_evaluation: True
         save_blurred_image: True
         batch_size: 4
