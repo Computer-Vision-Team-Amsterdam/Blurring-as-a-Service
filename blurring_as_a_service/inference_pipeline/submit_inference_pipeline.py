@@ -14,15 +14,21 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def inference_pipeline(workspace_name, subscription_id, resource_group):
+
+    # Call .result() to get the actual values
+    workspace_name_actual = workspace_name.result()
+    subscription_id_actual = subscription_id.result()
+    resource_group_actual = resource_group.result()
+
     # Iterate over all customers
     for customer in inference_settings['customers']:
         customer_name = customer['name']
 
         # Format the root path of the Blob Storage Container in Azure using placeholders
         blob_container_path = customer['container_root'].format(
-            subscription=subscription_id.result(),
-            resourcegroup=resource_group.result(),
-            workspace=workspace_name.result(),
+            subscription=subscription_id_actual,
+            resourcegroup=resource_group_actual,
+            workspace=workspace_name_actual,
             datastore_name=f"{customer_name}_input_structured"
         )
 
@@ -34,9 +40,9 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
 
         # Get the txt file that contains all paths of the files to run inference on
         files_to_blur_path = customer['inputs']['files_to_blur'].format(
-            subscription=subscription_id.result(),
-            resourcegroup=resource_group.result(),
-            workspace=workspace_name.result(),
+            subscription=subscription_id_actual,
+            resourcegroup=resource_group_actual,
+            workspace=workspace_name_actual,
             datastore_name=f"{customer_name}_input_structured"
         )
 
@@ -57,9 +63,9 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
         )
 
         azureml_outputs_formatted = customer['outputs']['results_path'].format(
-            subscription=subscription_id.result(),
-            resourcegroup=resource_group.result(),
-            workspace=workspace_name.result(),
+            subscription=subscription_id_actual,
+            resourcegroup=resource_group_actual,
+            workspace=workspace_name_actual,
             datastore_name=f"{customer_name}_output"
         )
 
