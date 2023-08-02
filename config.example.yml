@@ -58,7 +58,7 @@ inference_pipeline:
 move_data_pipeline:
   customers:
     - example-customer
-  container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
+  input_container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
 
 performance_evaluation_pipeline:
   inputs:

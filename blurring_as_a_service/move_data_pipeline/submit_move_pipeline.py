@@ -1,5 +1,3 @@
-import json
-
 from azure.ai.ml import Output
 from azure.ai.ml.dsl import pipeline
 
@@ -20,7 +18,7 @@ def move_files_pipeline(workspace_name, subscription_id, resource_group):
     subscription_id_actual = subscription_id.result()
     resource_group_actual = resource_group.result()
 
-    azureml_path = move_data_settings["container_root"]
+    azureml_path = move_data_settings["input_container_root"]
 
     for customer in move_data_settings["customers"]:
         move_data = move_files()

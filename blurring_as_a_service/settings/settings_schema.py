@@ -70,7 +70,6 @@ class InferencePipelineSpec(SettingsSpecModel):
 
 class MoveDataSpec(SettingsSpecModel):
     input_container_root: str = None
-    output_container_root: str = None
     customers: List[str] = None
 
 
