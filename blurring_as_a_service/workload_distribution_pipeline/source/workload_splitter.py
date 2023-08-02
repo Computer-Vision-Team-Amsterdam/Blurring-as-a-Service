@@ -1,6 +1,7 @@
 import math
 import os
 
+IMG_FORMATS = ('bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm')  # image suffixes defined in YOLOv5
 
 class WorkloadSplitter:
     @staticmethod
@@ -37,7 +38,7 @@ class WorkloadSplitter:
         image_files = []
         for root, dirs, files in os.walk(data_folder):
             for file in files:
-                if file.endswith(".jpg") or file.endswith(".jpeg"):
+                if file.lower().endswith(IMG_FORMATS):
                     image_files.append(os.path.join(root, file))
 
         images_per_batch = math.ceil(len(image_files) / number_of_batches)

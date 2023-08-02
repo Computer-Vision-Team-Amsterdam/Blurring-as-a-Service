@@ -16,7 +16,7 @@ config_path = os.path.abspath(
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
-
+IMG_FORMATS = ('bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm')  # image suffixes defined in YOLOv5
 
 @command_component(
     name="move_files",
@@ -57,7 +57,7 @@ def move_files(
 
     # Move each file to the target container
     for file_name in files:
-        if file_name.lower().endswith((".png", ".jpg", ".jpeg")):
+        if file_name.lower().endswith(IMG_FORMATS):
             source_file_path = os.path.join(input_container, file_name)
             target_file_path = os.path.join(target_folder_path, file_name)
 
