@@ -20,20 +20,19 @@ def move_files_pipeline(workspace_name, subscription_id, resource_group):
     subscription_id_actual = subscription_id.result()
     resource_group_actual = resource_group.result()
 
-    azureml_input = move_data_settings["input_container_root"]
-    azureml_output = move_data_settings["output_container_root"]
+    azureml_path = move_data_settings["container_root"]
 
     for customer in move_data_settings["customers"]:
         move_data = move_files()
 
-        azureml_input_formatted = azureml_input.format(
+        azureml_input_formatted = azureml_path.format(
             subscription=subscription_id_actual,
             resourcegroup=resource_group_actual,
             workspace=workspace_name_actual,
             datastore_name=f"{customer}_input"
         )
 
-        azureml_output_formatted = azureml_output.format(
+        azureml_output_formatted = azureml_path.format(
             subscription=subscription_id_actual,
             resourcegroup=resource_group_actual,
             workspace=workspace_name_actual,
