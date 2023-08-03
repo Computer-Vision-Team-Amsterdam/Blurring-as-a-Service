@@ -55,7 +55,7 @@ def detect_and_blur_sensitive_data(
         All parameters used to run YOLOv5 inference in json format
 
     """
-    files_to_blur_full_path = "outputs/files_to_blur.txt"  # use outputs folder as Azure expects outputs there
+    files_to_blur_full_path = "outputs/batch_1.txt"  # use outputs folder as Azure expects outputs there
     with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
@@ -75,11 +75,11 @@ def detect_and_blur_sensitive_data(
     cuda_device = torch.cuda.current_device()
     model_parameters = json.loads(model_parameters_json)
     val.run(
-        weights=f"{mounted_root_folder}/best.pt",
+        weights=f"{mounted_root_folder}/best.pt", # TODO get from Azure ML models
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
         device=cuda_device,
-        name="val_detection_results",
+        name="",
         customer_name=customer_name,  # We want to save this info in a database
         **model_parameters,
     )
