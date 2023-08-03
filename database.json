@@ -1,6 +1,6 @@
 {
-    "hostname": "psql-flexi-blur-ont-weu-oml-01.postgres.database.azure.com",
-    "username": "aml-compute-cvo-p",
+    "hostname": "TODO.postgres.database.azure.com",
+    "username": "TODO",
     "database_name": "blur",
-    "client_id": "40e5c19f-2f3c-4cff-81c3-dc33f9cd4a88"
+    "client_id": "TODO"
 }
