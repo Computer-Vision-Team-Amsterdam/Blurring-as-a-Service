@@ -3,6 +3,7 @@ import json
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
+from azure.ai.ml.entities import ManagedIdentityConfiguration
 
 from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensitive_data import (
     detect_and_blur_sensitive_data,
@@ -13,61 +14,64 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def inference_pipeline(workspace_name, subscription_id, resource_group):
-    # Iterate over all customers
-    for customer in inference_settings['customers']:
-        customer_name = customer['name']
+    # Call .result() to get the actual values
+    workspace_name_actual = workspace_name.result()
+    subscription_id_actual = subscription_id.result()
+    resource_group_actual = resource_group.result()
 
-        # Format the root path of the Blob Storage Container in Azure using placeholders
-        blob_container_path = customer['container_root'].format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer_name}_input_structured"
-        )
+    customer_name = inference_settings['name']
 
-        input_root_folder = Input(
-            type=AssetTypes.URI_FOLDER,
-            path=blob_container_path,
-            description="Data to be blurred",
-        )
+    # Format the root path of the Blob Storage Container in Azure using placeholders
+    blob_container_path = inference_settings['container_root'].format(
+        subscription=subscription_id_actual,
+        resourcegroup=resource_group_actual,
+        workspace=workspace_name_actual,
+        datastore_name=f"{customer_name}_input_structured"
+    )
 
-        # Get the txt file that contains all paths of the files to run inference on
-        files_to_blur_path = customer['inputs']['files_to_blur'].format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer_name}_input_structured"
-        )
+    input_root_folder = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=blob_container_path,
+        description="Data to be blurred",
+    )
 
-        files_to_blur_txt = Input(
-            type=AssetTypes.URI_FILE,
-            path=files_to_blur_path,
-            description="Data to be blurred",
-        )
+    # Get the txt file that contains all paths of the files to run inference on
+    files_to_blur_path = inference_settings['inputs']['files_to_blur'].format(
+        subscription=subscription_id_actual,
+        resourcegroup=resource_group_actual,
+        workspace=workspace_name_actual,
+        datastore_name=f"{customer_name}_input_structured"
+    )
 
-        model_parameters = customer['model_parameters']
-        model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
+    files_to_blur_txt = Input(
+        type=AssetTypes.URI_FILE,
+        path=files_to_blur_path,
+        description="Data to be blurred",
+    )
 
-        detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
-            mounted_root_folder=input_root_folder,
-            relative_paths_files_to_blur=files_to_blur_txt,
-            customer_name=customer_name,
-            model_parameters_json=model_parameters_json
-        )
+    model_parameters = inference_settings['model_parameters']
+    model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
 
-        azureml_outputs_formatted = customer['outputs']['results_path'].format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer_name}_output"
-        )
+    detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
+        mounted_root_folder=input_root_folder,
+        relative_paths_files_to_blur=files_to_blur_txt,
+        customer_name=customer_name,
+        model_parameters_json=model_parameters_json
+    )
 
-        detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
-        )
-        detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-            type="uri_folder", mode="rw_mount", path=blob_container_path
-        )
+    azureml_outputs_formatted = inference_settings['outputs']['results_path'].format(
+        subscription=subscription_id_actual,
+        resourcegroup=resource_group_actual,
+        workspace=workspace_name_actual,
+        datastore_name=f"{customer_name}_output"
+    )
+
+    detect_and_blur_sensitive_data_step.outputs.results_path = Output(
+        type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
+    )
+    detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
+        type="uri_folder", mode="rw_mount", path=blob_container_path
+    )
 
     return {}
 
@@ -81,6 +85,7 @@ def main():
     resource_group = aml_interface.get_resource_group()
 
     inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group)
+    inference_pipeline_job.identity = ManagedIdentityConfiguration()
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]

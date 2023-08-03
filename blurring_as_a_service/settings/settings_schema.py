@@ -53,19 +53,14 @@ class InferenceModelParameters(SettingsSpecModel):
     skip_evaluation: bool = True
     save_blurred_image: bool = True
     batch_size: int = 1
-    save_csv: bool = True
 
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
-    name: str
+    customer_name: str
     container_root: str
     model_parameters: InferenceModelParameters
     inputs: Dict[str, Any] = None
     outputs: Dict[str, Any] = None
-
-
-class InferencePipelineSpec(SettingsSpecModel):
-    customers: List[InferenceCustomerPipelineSpec]
 
 
 class MoveDataSpec(SettingsSpecModel):
@@ -96,6 +91,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
     workload_distribution_pipeline: WorkloadDistributionPipelineSpec = None
-    inference_pipeline: InferencePipelineSpec = None
+    inference_pipeline: InferenceCustomerPipelineSpec = None
     move_data_pipeline: MoveDataSpec = None
     logging: LoggingSpec = LoggingSpec()
