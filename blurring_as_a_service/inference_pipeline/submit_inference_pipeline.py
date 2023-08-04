@@ -19,7 +19,7 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
     subscription_id_actual = subscription_id.result()
     resource_group_actual = resource_group.result()
 
-    customer_name = inference_settings['name']
+    customer_name = inference_settings['customer_name']
 
     # Format the root path of the Blob Storage Container in Azure using placeholders
     blob_container_path = inference_settings['container_root'].format(
