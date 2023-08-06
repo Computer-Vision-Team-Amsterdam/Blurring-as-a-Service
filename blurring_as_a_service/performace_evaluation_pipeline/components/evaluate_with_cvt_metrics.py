@@ -2,7 +2,7 @@ import os
 import sys
 from pathlib import Path
 
-from mldesigner import Input, command_component  # noqa: E402
+from mldesigner import Input, Output, command_component  # noqa: E402
 
 sys.path.append("../../..")
 
@@ -36,6 +36,7 @@ def evaluate_with_cvt_metrics(
     yolo_output_folder: Input(type="uri_folder"),  # type: ignore # noqa: F821
     annotations_for_custom_metrics: Input(type="uri_file"),  # type: ignore # noqa: F821
     yolo_run_name: str,  # type: ignore # noqa: F821
+    cvt_metrics_tba_results: Output(type="uri_folder"),  # type: ignore # noqa: F821
 ):
     true_path = f"{mounted_dataset}/labels/val"
     pred_path = f"{yolo_output_folder}/{yolo_run_name}/labels"
@@ -43,7 +44,9 @@ def evaluate_with_cvt_metrics(
 
     # ======== Total Blurred Area metric ========= #
     collect_and_store_tba_results_per_class_and_size(
-        true_path, pred_path, markdown_output_path="tba_results.md"
+        true_path,
+        pred_path,
+        markdown_output_path=f"{cvt_metrics_tba_results}/tba_results.md",
     )
 
     # ======== False Negative Rate metric ========= #

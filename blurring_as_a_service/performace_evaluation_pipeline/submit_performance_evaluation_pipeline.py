@@ -23,6 +23,7 @@ def performance_evaluation_pipeline(
     yolo_validation_output,
     model,
     yolo_run_name,
+    cvt_metrics_tba_results,
     annotations_for_custom_metrics,
 ):
     validate_model_step = validate_model(
@@ -47,6 +48,11 @@ def performance_evaluation_pipeline(
         annotations_for_custom_metrics=annotations_for_custom_metrics,
         yolo_run_name=yolo_run_name,
     )
+
+    custom_evaluation_step.outputs.cvt_metrics_tba_results = Output(
+        type="uri_folder", mode="rw_mount", path=cvt_metrics_tba_results.result()
+    )
+
     return {}
 
 
@@ -80,6 +86,7 @@ def main():
         model=model,
         yolo_run_name=settings["performance_evaluation_pipeline"]["yolo_run_name"],
         yolo_validation_output=outputs["yolo_validation_output"],
+        cvt_metrics_tba_results=outputs["cvt_metrics_tba_results"],
         annotations_for_custom_metrics=annotations_for_custom_metrics,
     )
     performance_evaluation_pipeline_job.settings.default_compute = settings[
