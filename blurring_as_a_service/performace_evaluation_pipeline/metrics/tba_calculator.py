@@ -1,15 +1,20 @@
+import sys
 from typing import Dict
 
 import numpy as np
 import numpy.typing as npt
 from tqdm import tqdm
 
-from blurring_as_a_service.metrics.metrics_utils import (
+sys.path.append("../../..")
+
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (  # noqa: E402
     ImageSize,
     TargetClass,
     generate_binary_mask,
 )
-from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
+from blurring_as_a_service.utils.yolo_labels_dataset import (  # noqa: E402
+    YoloLabelsDataset,
+)
 
 
 class TotalBlurredArea:
@@ -162,8 +167,8 @@ def store_tba_results(
         f.write("|----- | ----- |  ----- | ----- | ----- | ----- |\n")
         f.write(
             f'| {results["person_small"]["recall"]} | {results["person_medium"]["recall"]} '
-            f'| {results["person_large"]["recall"]}| {results["licence_plate_small"]["recall"]} '
-            f'| {results["licence_plate_medium"]["recall"]} | {results["licence_plate_large"]["recall"]}|\n'
+            f'| {results["person_large"]["recall"]}| {results["license_plate_small"]["recall"]} '
+            f'| {results["license_plate_medium"]["recall"]} | {results["license_plate_large"]["recall"]}|\n'
         )
         f.write(
             f"Thresholds used for these calculations: Small=`{ImageSize.small}`, Medium=`{ImageSize.medium}` "

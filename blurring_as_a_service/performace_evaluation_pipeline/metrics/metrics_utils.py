@@ -21,7 +21,7 @@ class ImageSize(Enum):
 
 class TargetClass(Enum):
     person = 0
-    licence_plate = 1
+    license_plate = 1
 
     def __repr__(self):
         return self.value
