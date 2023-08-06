@@ -13,15 +13,15 @@ class SensitiveCategories:
                 "sex",
                 "age",
                 "skin_color",
-                "licence_plate_origin",
-                "licence_plate_color",
+                "license_plate_origin",
+                "license_plate_color",
             ]
 
 
 class BiasCategoryMapper:
     def __init__(self, categories: List[dict]):
         """
-        Group categories into person or licence plates based on the original category name.
+        Group categories into person or license plates based on the original category name.
 
         Parameters
         ----------
@@ -38,7 +38,7 @@ class BiasCategoryMapper:
             ]
         """
         for category in categories:
-            if category["name"].startswith("licence_plate"):
+            if category["name"].startswith("license_plate"):
                 category["grouped_category"] = 1
             else:
                 category["grouped_category"] = 0

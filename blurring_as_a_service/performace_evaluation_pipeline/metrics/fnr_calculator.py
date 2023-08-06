@@ -82,7 +82,7 @@ class FalseNegativeRateCalculator:
     def calculate_false_negative_rate_for_all_categories(self) -> List[dict]:
         """
         Using the calculate_false_negative_rate_for_a_category function, it calculates the value for the following categories:
-            - 'grouped_category': Persons or licence plates.
+            - 'grouped_category': Persons or license plates.
             - 'sex'.
             - 'age'.
             - 'skin_color'.
@@ -351,14 +351,14 @@ class FalseNegativeRateCalculator:
                     "gt_boxes": [],
                     "pred_boxes": [],
                 }
-                if attr_1 == "licence_plate":
+                if attr_1 == "license_plate":
                     self._statistics_per_category[d["id"]].update(
                         {
                             "sex": "",
                             "age": "",
                             "skin_color": "",
-                            "licence_plate_origin": attr_2,
-                            "licence_plate_color": attr_3,
+                            "license_plate_origin": attr_2,
+                            "license_plate_color": attr_3,
                         }
                     )
                 else:
@@ -367,8 +367,8 @@ class FalseNegativeRateCalculator:
                             "sex": attr_1,
                             "age": attr_2,
                             "skin_color": attr_3,
-                            "licence_plate_origin": "",
-                            "licence_plate_color": "",
+                            "license_plate_origin": "",
+                            "license_plate_color": "",
                         }
                     )
 
