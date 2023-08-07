@@ -8,15 +8,12 @@ authors = ["Your Name <you@example.com>"]
 python = "~3.9"
 pandas = ">=1.1.4"
 GitPython = ">=3.1.30"
-ipython = {version = "^8.8.0", source = "PyPI"}
 matplotlib = ">=3.2.2"
-numpy = ">=1.18.5"
 opencv-python = ">=4.1.1"
 Pillow = ">=7.1.2"
 psutil = {version = "^5.9.4", source = "PyPI"}
 PyYAML = ">=5.3.1"
 requests = ">=2.23.0"
-scipy = ">=1.4.1"
 thop = ">=0.1.1"
 torch = ">=1.7.0"
 torchvision = ">=0.8.1"
@@ -37,7 +34,13 @@ joblib = {version="^1.2.0", source = "PyPI"}
 mss = {version="^7.0.1", source = "PyPI"}
 setuptools = ">=65.5.1"
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
-packaging = "20.0"
+packaging = "20.9"
+psycopg2 = "^2.9.6"
+ipython = "8.13.0"
+scipy = "1.10.0"
+numpy = "1.23.0"
+azure-cli = "^2.50.0"
+sqlalchemy = "^2.0.19"
 
 [tool.poetry.dev-dependencies]
 
