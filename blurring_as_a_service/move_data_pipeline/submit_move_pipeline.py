@@ -58,7 +58,6 @@ def main():
     resource_group = aml_interface.get_resource_group()
 
     inference_pipeline_job = move_files_pipeline(workspace_name, subscription_id, resource_group)
-    # TODO do we need managed identity
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
