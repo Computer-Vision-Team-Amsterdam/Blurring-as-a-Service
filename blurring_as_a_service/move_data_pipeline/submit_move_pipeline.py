@@ -12,28 +12,22 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 @pipeline()
 def move_files_pipeline(workspace_name, subscription_id, resource_group):
-
-    # Call .result() to get the actual values
-    workspace_name_actual = workspace_name.result()
-    subscription_id_actual = subscription_id.result()
-    resource_group_actual = resource_group.result()
-
     azureml_path = move_data_settings["input_container_root"]
 
     for customer in move_data_settings["customers"]:
         move_data = move_files()
 
         azureml_input_formatted = azureml_path.format(
-            subscription=subscription_id_actual,
-            resourcegroup=resource_group_actual,
-            workspace=workspace_name_actual,
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
             datastore_name=f"{customer}_input"
         )
 
         azureml_output_formatted = azureml_path.format(
-            subscription=subscription_id_actual,
-            resourcegroup=resource_group_actual,
-            workspace=workspace_name_actual,
+            subscription=subscription_id,
+            resourcegroup=resource_group,
+            workspace=workspace_name,
             datastore_name=f"{customer}_input_structured"
         )
 
@@ -52,10 +46,10 @@ def move_files_pipeline(workspace_name, subscription_id, resource_group):
 def main():
     aml_interface = AMLInterface()
 
-    # Access the workspace details
-    workspace_name = aml_interface.get_workspace_name()
-    subscription_id = aml_interface.get_subscription_id()
-    resource_group = aml_interface.get_resource_group()
+    # Access the workspace details, Call .result() to get the actual values
+    workspace_name = aml_interface.get_workspace_name().result()
+    subscription_id = aml_interface.get_subscription_id().result()
+    resource_group = aml_interface.get_resource_group().result()
 
     inference_pipeline_job = move_files_pipeline(workspace_name, subscription_id, resource_group)
     inference_pipeline_job.settings.default_compute = settings[
