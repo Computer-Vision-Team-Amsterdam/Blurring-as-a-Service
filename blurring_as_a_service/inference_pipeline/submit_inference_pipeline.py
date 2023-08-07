@@ -13,7 +13,7 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def inference_pipeline(workspace_name, subscription_id, resource_group, run_id):
+def inference_pipeline(workspace_name, subscription_id, resource_group):
     # Call .result() to get the actual values
     workspace_name_actual = workspace_name.result()
     subscription_id_actual = subscription_id.result()
@@ -56,8 +56,7 @@ def inference_pipeline(workspace_name, subscription_id, resource_group, run_id):
         mounted_root_folder=input_root_folder,
         relative_paths_files_to_blur=files_to_blur_txt,
         customer_name=customer_name,
-        model_parameters_json=model_parameters_json,
-        run_id=run_id
+        model_parameters_json=model_parameters_json
     )
 
     azureml_outputs_formatted = inference_settings['outputs']['results_path'].format(
@@ -85,9 +84,7 @@ def main():
     subscription_id = aml_interface.get_subscription_id()
     resource_group = aml_interface.get_resource_group()
 
-    run_id = aml_interface.get_run_id()
-
-    inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group, run_id)
+    inference_pipeline_job = inference_pipeline(workspace_name, subscription_id, resource_group)
     inference_pipeline_job.identity = ManagedIdentityConfiguration()
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"

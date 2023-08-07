@@ -33,8 +33,7 @@ def detect_and_blur_sensitive_data(
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
-    model_parameters_json: str,
-    run_id: str
+    model_parameters_json: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -54,8 +53,6 @@ def detect_and_blur_sensitive_data(
         The name of the customer, with spaces replaced by underscores
     model_parameters_json
         All parameters used to run YOLOv5 inference in json format
-    run_id
-        The run id of the Azure Machine Learning pipeline run
 
     """
     filename = os.path.basename(relative_paths_files_to_blur)
@@ -87,6 +84,5 @@ def detect_and_blur_sensitive_data(
         device=cuda_device,
         name="",
         customer_name=customer_name,  # We want to save this info in a database
-        run_id=run_id,
         **model_parameters,
     )
