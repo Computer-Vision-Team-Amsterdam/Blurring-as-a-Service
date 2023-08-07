@@ -55,7 +55,8 @@ def detect_and_blur_sensitive_data(
         All parameters used to run YOLOv5 inference in json format
 
     """
-    files_to_blur_full_path = "outputs/batch_1.txt"  # use outputs folder as Azure expects outputs there
+    filename = os.path.basename(relative_paths_files_to_blur)
+    files_to_blur_full_path = os.path.join("outputs", filename)  # use outputs folder as Azure expects outputs there
     with open(relative_paths_files_to_blur, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
