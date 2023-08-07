@@ -71,12 +71,14 @@ def detect_and_blur_sensitive_data(
         names=["person", "license_plate"],
     )
 
+    # TODO create postgresql string and send to val.py
+
     with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     cuda_device = torch.cuda.current_device()
     model_parameters = json.loads(model_parameters_json)
     val.run(
-        weights=f"{mounted_root_folder}/best.pt", # TODO get from Azure ML models
+        weights=f"{mounted_root_folder}/best.pt",  # TODO get from Azure ML models
         data=f"{yolo_yaml_path}/pano.yaml",
         project=results_path,
         device=cuda_device,
