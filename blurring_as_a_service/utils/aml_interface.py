@@ -54,6 +54,11 @@ class AMLInterface:
         """Retrieve the Azure resource group name."""
         return self.ml_client.resource_group_name
 
+    def get_run_id(self):
+        """Retrieve the Run ID for the current run."""
+        this_job = self.ml_client.jobs.get(os.environ["MLFLOW_RUN_ID"])
+        return this_job
+
     def create_aml_environment(
         self,
         env_name: str,

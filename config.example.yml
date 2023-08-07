@@ -48,7 +48,7 @@ inference_pipeline:
     save_blurred_image: True
     batch_size: 4
   inputs:
-    files_to_blur: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/batch_1.txt"
+    files_to_blur: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/batch_0.txt"
   outputs:
     results_path: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
 
