@@ -35,7 +35,7 @@ workload_distribution_pipeline:
     data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
     date_folders:
       - "2023-08-08"
-    number_of_batches: 4
+    number_of_batches: 1
   outputs:
     results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
 
