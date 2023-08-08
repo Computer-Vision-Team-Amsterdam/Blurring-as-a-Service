@@ -33,6 +33,8 @@ training_pipeline:
 workload_distribution_pipeline:
   inputs:
     data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
+    date_folders:
+      - "2023-08-08"
     number_of_batches: 4
   outputs:
     results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"

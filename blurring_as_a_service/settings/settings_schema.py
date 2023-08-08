@@ -41,8 +41,14 @@ class TrainingPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class WorkloadDistributionPipelineInputs(SettingsSpecModel):
+    data_folder: str
+    date_folders: List[str]
+    number_of_batches: int
+
+
 class WorkloadDistributionPipelineSpec(SettingsSpecModel):
-    inputs: Dict[str, str] = None
+    inputs: WorkloadDistributionPipelineInputs
     outputs: Dict[str, str] = None
 
 
