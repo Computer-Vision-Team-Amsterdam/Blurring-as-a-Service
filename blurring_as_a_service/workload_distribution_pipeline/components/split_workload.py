@@ -1,5 +1,6 @@
 import os
 import sys
+import json
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
@@ -28,10 +29,13 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     is_deterministic=False,
 )
 def split_workload(
-    data_folder: Input(type=AssetTypes.URI_FOLDER), number_of_batches: int, results_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
+    data_folder: Input(type=AssetTypes.URI_FOLDER), date_folders_json: str, number_of_batches: int, results_folder: Output(type=AssetTypes.URI_FOLDER)  # type: ignore # noqa: F821
 ):
+    date_folders_list = json.loads(date_folders_json)
+
     WorkloadSplitter.create_batches(
         data_folder=data_folder,
         number_of_batches=number_of_batches,
+        date_folders=date_folders_list,
         output_folder=results_folder,
     )

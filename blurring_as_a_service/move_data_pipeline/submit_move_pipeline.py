@@ -1,5 +1,3 @@
-import json
-
 from azure.ai.ml import Output
 from azure.ai.ml.dsl import pipeline
 
@@ -13,25 +11,29 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()
-def move_files_pipeline():
-    customer_list = move_data_settings["customers"]
-    azureml_input = move_data_settings["input_container_root"]
-    azureml_output = move_data_settings["output_container_root"]
+def move_files_pipeline(workspace_name, subscription_id, resource_group):
 
-    for customer in customer_list:
+    # Call .result() to get the actual values
+    workspace_name_actual = workspace_name.result()
+    subscription_id_actual = subscription_id.result()
+    resource_group_actual = resource_group.result()
+
+    azureml_path = move_data_settings["input_container_root"]
+
+    for customer in move_data_settings["customers"]:
         move_data = move_files()
 
-        azureml_input_formatted = azureml_input.format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
+        azureml_input_formatted = azureml_path.format(
+            subscription=subscription_id_actual,
+            resourcegroup=resource_group_actual,
+            workspace=workspace_name_actual,
             datastore_name=f"{customer}_input"
         )
 
-        azureml_output_formatted = azureml_output.format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
+        azureml_output_formatted = azureml_path.format(
+            subscription=subscription_id_actual,
+            resourcegroup=resource_group_actual,
+            workspace=workspace_name_actual,
             datastore_name=f"{customer}_input_structured"
         )
 
@@ -48,13 +50,18 @@ def move_files_pipeline():
 
 
 def main():
-    inference_pipeline_job = move_files_pipeline()
+    aml_interface = AMLInterface()
 
+    # Access the workspace details
+    workspace_name = aml_interface.get_workspace_name()
+    subscription_id = aml_interface.get_subscription_id()
+    resource_group = aml_interface.get_resource_group()
+
+    inference_pipeline_job = move_files_pipeline(workspace_name, subscription_id, resource_group)
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
 
-    aml_interface = AMLInterface()
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=inference_pipeline_job, experiment_name="move_data_pipeline"
     )
@@ -62,15 +69,6 @@ def main():
 
 
 if __name__ == "__main__":
-    # Load the JSON file
-    with open('config.json') as f:
-        config = json.load(f)
-
-    # Retrieve values from the JSON
-    subscription_id = config["subscription_id"]
-    resource_group = config["resource_group"]
-    workspace_name = config["workspace_name"]
-
     # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
