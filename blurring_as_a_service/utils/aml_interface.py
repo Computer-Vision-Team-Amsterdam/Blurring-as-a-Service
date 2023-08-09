@@ -26,6 +26,13 @@ class AMLInterface:
             f"Retrieved the following workspace: {self.ml_client.workspace_name}"
         )
 
+        # Initialize Azure ML workspace details
+        self.workspace_name = self.ml_client.workspace_name
+        self.subscription_id = self.ml_client.subscription_id
+        self.resource_group = self.ml_client.resource_group_name
+
+        self.azureml_path = "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
+
     @staticmethod
     def _connect():
         """
@@ -42,17 +49,15 @@ class AMLInterface:
             credential = InteractiveBrowserCredential()
         return credential
 
-    def get_workspace_name(self):
-        """Retrieve the Azure ML workspace name."""
-        return self.ml_client.workspace_name
+    def get_azureml_path(self, datastore_name):
+        full_path = self.azureml_path.format(
+            subscription=self.subscription_id,
+            resourcegroup=self.resource_group,
+            workspace=self.ml_client.workspace_name,
+            datastore_name=datastore_name
+        )
 
-    def get_subscription_id(self):
-        """Retrieve the Azure subscription ID."""
-        return self.ml_client.subscription_id
-
-    def get_resource_group(self):
-        """Retrieve the Azure resource group name."""
-        return self.ml_client.resource_group_name
+        return full_path
 
     def create_aml_environment(
         self,

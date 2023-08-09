@@ -46,7 +46,6 @@ class PreInferencePipelineInputs(SettingsSpecModel):
 
 
 class PreInferencePipelineSpec(SettingsSpecModel):
-    input_container_root: str = None
     customers: List[str] = None
     inputs: PreInferencePipelineInputs
     outputs: Dict[str, str] = None
@@ -63,10 +62,7 @@ class InferenceModelParameters(SettingsSpecModel):
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
-    container_root: str
     model_parameters: InferenceModelParameters
-    inputs: Dict[str, Any] = None
-    outputs: Dict[str, Any] = None
 
 
 class LoggingSpec(SettingsSpecModel):

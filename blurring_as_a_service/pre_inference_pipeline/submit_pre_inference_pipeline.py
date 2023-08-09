@@ -16,30 +16,14 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()
-def pre_inference_pipeline(
-    workspace_name, subscription_id, resource_group, number_of_batches, results_folder
-):
-    azureml_path = pre_inference_settings["input_container_root"]
+def pre_inference_pipeline(number_of_batches, results_folder):
     execution_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
-    subscription_id = subscription_id.result()
-    resource_group = resource_group.result()
-    workspace_name = workspace_name.result()
 
     for customer in pre_inference_settings["customers"]:
         move_data = move_files(execution_time=execution_time)
-
-        azureml_input_formatted = azureml_path.format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer}_input",
-        )
-
-        azureml_output_formatted = azureml_path.format(
-            subscription=subscription_id,
-            resourcegroup=resource_group,
-            workspace=workspace_name,
-            datastore_name=f"{customer}_input_structured",
+        azureml_input_formatted = aml_interface.get_azureml_path(f"{customer}_input")
+        azureml_output_formatted = aml_interface.get_azureml_path(
+            f"{customer}_input_structured"
         )
 
         # NOTE We need to use Output to also delete the files.
@@ -64,17 +48,7 @@ def pre_inference_pipeline(
 
 
 def main():
-    aml_interface = AMLInterface()
-
-    # Access the workspace details
-    workspace_name = aml_interface.get_workspace_name()
-    subscription_id = aml_interface.get_subscription_id()
-    resource_group = aml_interface.get_resource_group()
-
     pre_inference_pipeline_job = pre_inference_pipeline(
-        workspace_name,
-        subscription_id,
-        resource_group,
         number_of_batches=pre_inference_settings["inputs"]["number_of_batches"],
         results_folder=pre_inference_settings["outputs"]["results_folder"],
     )
@@ -95,4 +69,5 @@ if __name__ == "__main__":
     settings = BlurringAsAServiceSettings.get_settings()
     pre_inference_settings = settings["pre_inference_pipeline"]
 
+    aml_interface = AMLInterface()
     main()
