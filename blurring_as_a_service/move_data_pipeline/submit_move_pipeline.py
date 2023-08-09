@@ -8,6 +8,7 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
 from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
+from blurring_as_a_service.utils.constants import AZUREML_PATH
 
 
 @pipeline()
@@ -18,19 +19,17 @@ def move_files_pipeline(workspace_name, subscription_id, resource_group):
     subscription_id_actual = subscription_id.result()
     resource_group_actual = resource_group.result()
 
-    azureml_path = move_data_settings["input_container_root"]
-
     for customer in move_data_settings["customers"]:
         move_data = move_files()
 
-        azureml_input_formatted = azureml_path.format(
+        azureml_input_formatted = AZUREML_PATH.format(
             subscription=subscription_id_actual,
             resourcegroup=resource_group_actual,
             workspace=workspace_name_actual,
             datastore_name=f"{customer}_input"
         )
 
-        azureml_output_formatted = azureml_path.format(
+        azureml_output_formatted = AZUREML_PATH.format(
             subscription=subscription_id_actual,
             resourcegroup=resource_group_actual,
             workspace=workspace_name_actual,

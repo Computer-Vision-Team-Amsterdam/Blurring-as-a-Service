@@ -10,6 +10,7 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 )
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 from blurring_as_a_service.utils.aml_interface import AMLInterface
+from blurring_as_a_service.utils.constants import AZUREML_PATH
 
 
 @pipeline()
@@ -22,7 +23,7 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
     customer_name = inference_settings['customer_name']
 
     # Format the root path of the Blob Storage Container in Azure using placeholders
-    blob_container_path = inference_settings['container_root'].format(
+    blob_container_path = AZUREML_PATH.format(
         subscription=subscription_id_actual,
         resourcegroup=resource_group_actual,
         workspace=workspace_name_actual,
@@ -35,7 +36,7 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
         description="Data to be blurred",
     )
 
-    # Get the txt file that contains all paths of the files to run inference on
+    # Get the txt file that contains all paths of the files to run inference on # TODO refactor files_to_blur
     files_to_blur_path = inference_settings['inputs']['files_to_blur'].format(
         subscription=subscription_id_actual,
         resourcegroup=resource_group_actual,
@@ -59,7 +60,7 @@ def inference_pipeline(workspace_name, subscription_id, resource_group):
         model_parameters_json=model_parameters_json
     )
 
-    azureml_outputs_formatted = inference_settings['outputs']['results_path'].format(
+    azureml_outputs_formatted = AZUREML_PATH.format(
         subscription=subscription_id_actual,
         resourcegroup=resource_group_actual,
         workspace=workspace_name_actual,

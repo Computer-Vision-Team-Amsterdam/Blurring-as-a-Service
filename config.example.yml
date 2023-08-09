@@ -41,7 +41,6 @@ workload_distribution_pipeline:
 
 inference_pipeline:
   customer_name: data_office
-  container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
   model_parameters:
     imgsz: 4000
     save_txt: True
@@ -49,8 +48,6 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
-  inputs:
-    files_to_blur: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/batch_0.txt"
   outputs:
     results_path: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
 
@@ -58,7 +55,6 @@ inference_pipeline:
 move_data_pipeline:
   customers:
     - example-customer
-  input_container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
 
 performance_evaluation_pipeline:
   inputs:
