@@ -34,6 +34,7 @@ def detect_and_blur_sensitive_data(
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
     model_parameters_json: str,
+    database_parameters_json: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -53,6 +54,8 @@ def detect_and_blur_sensitive_data(
         The name of the customer, with spaces replaced by underscores
     model_parameters_json
         All parameters used to run YOLOv5 inference in json format
+    database_parameters_json
+        Database credentials
 
     """
     filename = os.path.basename(batch_file_txt)
@@ -87,6 +90,7 @@ def detect_and_blur_sensitive_data(
         name="",
         customer_name=customer_name,  # We want to save this info in a database
         **model_parameters,
+        **database_parameters_json,
     )
 
     try:

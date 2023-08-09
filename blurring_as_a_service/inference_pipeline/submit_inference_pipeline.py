@@ -42,11 +42,14 @@ def inference_pipeline():
             model_parameters_json = json.dumps(
                 model_parameters
             )  # TODO it seems I can not pass a string to @command_component function
+            database_parameters = inference_settings['database_parameters']
+            database_parameters_json = json.dumps(database_parameters)
 
             detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
                 mounted_root_folder=input_root_folder,
                 customer_name=customer_name,
                 model_parameters_json=model_parameters_json,
+                database_parameters_json=database_parameters_json
             )
 
             azureml_outputs_formatted = aml_interface.get_azureml_path(
