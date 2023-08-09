@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 
 from azure.ai.ml import Output
@@ -16,8 +17,8 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()
-def pre_inference_pipeline(number_of_batches, results_folder):
-    execution_time = datetime.now().strftime("%d-%m-%Y %H:%M:%S")
+def pre_inference_pipeline(number_of_batches):
+    execution_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     for customer in pre_inference_settings["customers"]:
         move_data = move_files(execution_time=execution_time)
@@ -41,7 +42,9 @@ def pre_inference_pipeline(number_of_batches, results_folder):
             number_of_batches=number_of_batches,
         )
         split_workload_step.outputs.results_folder = Output(
-            type="uri_folder", mode="rw_mount", path=results_folder
+            type="uri_folder",
+            mode="rw_mount",
+            path=os.path.join(azureml_output_formatted, "inference_queue"),
         )
 
     return {}
@@ -50,7 +53,6 @@ def pre_inference_pipeline(number_of_batches, results_folder):
 def main():
     pre_inference_pipeline_job = pre_inference_pipeline(
         number_of_batches=pre_inference_settings["inputs"]["number_of_batches"],
-        results_folder=pre_inference_settings["outputs"]["results_folder"],
     )
     pre_inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"

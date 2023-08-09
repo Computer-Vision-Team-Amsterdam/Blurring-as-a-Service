@@ -1,6 +1,6 @@
+import json
 import os
 import sys
-import json
 
 import torch
 import yaml
@@ -29,11 +29,11 @@ aml_experiment_settings = settings["aml_experiment_details"]
 )
 def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    relative_paths_files_to_blur: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
+    batch_file_txt: Output(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
-    model_parameters_json: str
+    model_parameters_json: str,
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -42,7 +42,7 @@ def detect_and_blur_sensitive_data(
     ----------
     mounted_root_folder:
         Path of the mounted folder containing the images.
-    relative_paths_files_to_blur:
+    batch_file_txt:
         Text file containing multiple rows where each row has a relative path,
         taking folder as root and the path to the image.
     results_path:
@@ -55,9 +55,11 @@ def detect_and_blur_sensitive_data(
         All parameters used to run YOLOv5 inference in json format
 
     """
-    filename = os.path.basename(relative_paths_files_to_blur)
-    files_to_blur_full_path = os.path.join("outputs", filename)  # use outputs folder as Azure expects outputs there
-    with open(relative_paths_files_to_blur, "r") as src:
+    filename = os.path.basename(batch_file_txt)
+    files_to_blur_full_path = os.path.join(
+        "outputs", filename
+    )  # use outputs folder as Azure expects outputs there
+    with open(batch_file_txt, "r") as src:
         with open(files_to_blur_full_path, "w") as dest:
             for line in src:
                 dest.write(f"{mounted_root_folder}/{line}")
@@ -86,3 +88,8 @@ def detect_and_blur_sensitive_data(
         customer_name=customer_name,  # We want to save this info in a database
         **model_parameters,
     )
+
+    try:
+        os.remove(batch_file_txt)
+    except OSError as error:
+        raise OSError(f"Failed to remove file '{batch_file_txt}': {error}")

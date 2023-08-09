@@ -36,8 +36,6 @@ pre_inference_pipeline:
     - example-customer
   inputs:
     number_of_batches: 1
-  outputs:
-    results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
 
 
 inference_pipeline:
