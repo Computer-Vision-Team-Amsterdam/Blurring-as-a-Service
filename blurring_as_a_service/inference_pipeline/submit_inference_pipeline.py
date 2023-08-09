@@ -25,7 +25,7 @@ def inference_pipeline():
         description="Data to be blurred",
     )
 
-    # Get the txt file that contains all paths of the files to run inference on # TODO refactor files_to_blur
+    # Get the txt file that contains all paths of the files to run inference on
     files_to_blur_path = aml_interface.format_azureml_path(f"{customer_name}_input_structured", "batch_0.txt")
 
     files_to_blur_txt = Input(
