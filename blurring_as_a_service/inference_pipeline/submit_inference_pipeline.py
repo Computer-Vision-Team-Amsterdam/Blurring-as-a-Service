@@ -75,6 +75,6 @@ if __name__ == "__main__":
     settings = BlurringAsAServiceSettings.get_settings()
     inference_settings = settings["inference_pipeline"]
 
-    aml_interface = AMLInterface() # TODO i dont know how to pass this to move_files_pipeline, so its a global var for now
+    aml_interface = AMLInterface()
 
     main()
