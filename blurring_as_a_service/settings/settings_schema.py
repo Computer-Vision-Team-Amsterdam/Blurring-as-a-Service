@@ -64,8 +64,6 @@ class InferenceModelParameters(SettingsSpecModel):
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
     model_parameters: InferenceModelParameters
-    inputs: Dict[str, Any] = None
-
 
 class MoveDataSpec(SettingsSpecModel):
     customers: List[str] = None

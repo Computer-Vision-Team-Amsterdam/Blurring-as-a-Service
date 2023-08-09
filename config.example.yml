@@ -48,9 +48,6 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
-  inputs:
-    files_to_blur: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/batch_0.txt"
-
 
 move_data_pipeline:
   customers:

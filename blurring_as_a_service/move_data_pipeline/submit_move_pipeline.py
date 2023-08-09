@@ -8,33 +8,15 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
 from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
-from blurring_as_a_service.utils.constants import AZUREML_PATH
 
 
 @pipeline()
-def move_files_pipeline(workspace_name, subscription_id, resource_group):
-
-    # Call .result() to get the actual values
-    workspace_name_actual = workspace_name.result()
-    subscription_id_actual = subscription_id.result()
-    resource_group_actual = resource_group.result()
-
+def move_files_pipeline():
     for customer in move_data_settings["customers"]:
         move_data = move_files()
 
-        azureml_input_formatted = AZUREML_PATH.format(
-            subscription=subscription_id_actual,
-            resourcegroup=resource_group_actual,
-            workspace=workspace_name_actual,
-            datastore_name=f"{customer}_input"
-        )
-
-        azureml_output_formatted = AZUREML_PATH.format(
-            subscription=subscription_id_actual,
-            resourcegroup=resource_group_actual,
-            workspace=workspace_name_actual,
-            datastore_name=f"{customer}_input_structured"
-        )
+        azureml_input_formatted = aml_interface.format_azureml_path(f"{customer}_input")
+        azureml_output_formatted = aml_interface.format_azureml_path(f"{customer}_input_structured")
 
         # NOTE We need to use Output to also delete the files.
         move_data.outputs.input_container = Output(
@@ -49,14 +31,7 @@ def move_files_pipeline(workspace_name, subscription_id, resource_group):
 
 
 def main():
-    aml_interface = AMLInterface()
-
-    # Access the workspace details
-    workspace_name = aml_interface.get_workspace_name()
-    subscription_id = aml_interface.get_subscription_id()
-    resource_group = aml_interface.get_resource_group()
-
-    inference_pipeline_job = move_files_pipeline(workspace_name, subscription_id, resource_group)
+    inference_pipeline_job = move_files_pipeline()
     inference_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
@@ -72,5 +47,7 @@ if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
     move_data_settings = settings["move_data_pipeline"]
+
+    aml_interface = AMLInterface() # TODO i dont know how to pass this to move_files_pipeline, so its a global var for now
 
     main()
