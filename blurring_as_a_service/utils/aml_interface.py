@@ -49,16 +49,13 @@ class AMLInterface:
             credential = InteractiveBrowserCredential()
         return credential
 
-    def format_azureml_path(self, datastore_name, additional_path=None):
+    def get_azureml_path(self, datastore_name):
         full_path = self.azureml_path.format(
             subscription=self.subscription_id,
             resourcegroup=self.resource_group,
             workspace=self.ml_client.workspace_name,
             datastore_name=datastore_name
         )
-
-        if additional_path:
-            full_path = os.path.join(full_path, additional_path)
 
         return full_path
 

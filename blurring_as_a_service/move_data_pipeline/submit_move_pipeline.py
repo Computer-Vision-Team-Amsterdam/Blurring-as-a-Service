@@ -15,8 +15,8 @@ def move_files_pipeline():
     for customer in move_data_settings["customers"]:
         move_data = move_files()
 
-        azureml_input_formatted = aml_interface.format_azureml_path(f"{customer}_input")
-        azureml_output_formatted = aml_interface.format_azureml_path(f"{customer}_input_structured")
+        azureml_input_formatted = aml_interface.get_azureml_path(f"{customer}_input")
+        azureml_output_formatted = aml_interface.get_azureml_path(f"{customer}_input_structured")
 
         # NOTE We need to use Output to also delete the files.
         move_data.outputs.input_container = Output(
