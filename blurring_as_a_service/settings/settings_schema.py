@@ -60,9 +60,16 @@ class InferenceModelParameters(SettingsSpecModel):
     batch_size: int = 1
 
 
+class InferenceDatabaseCredentials(SettingsSpecModel):
+    db_username: str
+    db_hostname: str
+    db_name: str
+
+
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
     model_parameters: InferenceModelParameters
+    database_parameters: InferenceDatabaseCredentials
 
 
 class LoggingSpec(SettingsSpecModel):

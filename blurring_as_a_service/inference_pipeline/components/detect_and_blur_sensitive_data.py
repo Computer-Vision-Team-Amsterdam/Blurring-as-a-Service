@@ -29,11 +29,12 @@ aml_experiment_settings = settings["aml_experiment_details"]
 )
 def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    batch_file_txt: Output(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
+    batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
     model_parameters_json: str,
+    database_parameters_json: str
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -53,43 +54,56 @@ def detect_and_blur_sensitive_data(
         The name of the customer, with spaces replaced by underscores
     model_parameters_json
         All parameters used to run YOLOv5 inference in json format
+    database_parameters_json
+        Database credentials
 
     """
-    filename = os.path.basename(batch_file_txt)
-    files_to_blur_full_path = os.path.join(
-        "outputs", filename
-    )  # use outputs folder as Azure expects outputs there
-    with open(batch_file_txt, "r") as src:
-        with open(files_to_blur_full_path, "w") as dest:
-            for line in src:
-                dest.write(f"{mounted_root_folder}/{line}")
-                print(f"{mounted_root_folder}/{line}")
+    # Check if the folder exists
+    if not os.path.exists(batches_files_path):
+        raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
+    # Iterate over files in the folder
+    for batch_file_txt in os.listdir(batches_files_path):
+        file_path = os.path.join(batches_files_path, batch_file_txt)
+        # Check if the path points to a file (not a directory)
+        if os.path.isfile(file_path):
+            print(f"Creating inference step: {file_path}")
 
-    data = dict(
-        train=f"../{files_to_blur_full_path}",
-        val=f"../{files_to_blur_full_path}",
-        test=f"../{files_to_blur_full_path}",
-        nc=2,
-        names=["person", "license_plate"],
-    )
+            files_to_blur_full_path = os.path.join(
+                "outputs", batch_file_txt
+            )  # use outputs folder as Azure expects outputs there
+            with open(file_path, "r") as src:
+                with open(files_to_blur_full_path, "w") as dest:
+                    for line in src:
+                        dest.write(f"{mounted_root_folder}/{line}")
+                        print(f"{mounted_root_folder}/{line}")
 
-    # TODO create postgresql string and send to val.py
+            data = dict(
+                train=f"../{files_to_blur_full_path}",
+                val=f"../{files_to_blur_full_path}",
+                test=f"../{files_to_blur_full_path}",
+                nc=2,
+                names=["person", "license_plate"],
+            )
 
-    with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
-        yaml.dump(data, outfile, default_flow_style=False)
-    cuda_device = torch.cuda.current_device()
-    model_parameters = json.loads(model_parameters_json)
-    val.run(
-        weights=f"{mounted_root_folder}/best.pt",  # TODO get from Azure ML models
-        data=f"{yolo_yaml_path}/pano.yaml",
-        project=results_path,
-        device=cuda_device,
-        name="",
-        customer_name=customer_name,  # We want to save this info in a database
-        **model_parameters,
-    )
+            # TODO create postgresql string and send to val.py
 
-    try:
-        os.remove(batch_file_txt)
-    except OSError as error:
-        raise OSError(f"Failed to remove file '{batch_file_txt}': {error}")
+            with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
+                yaml.dump(data, outfile, default_flow_style=False)
+            cuda_device = torch.cuda.current_device()
+            model_parameters = json.loads(model_parameters_json)
+            database_parameters = json.loads(database_parameters_json)
+            val.run(
+                weights=f"{mounted_root_folder}/best.pt",  # TODO get from Azure ML models
+                data=f"{yolo_yaml_path}/pano.yaml",
+                project=results_path,
+                device=cuda_device,
+                name="",
+                customer_name=customer_name,  # We want to save this info in a database
+                **model_parameters,
+                **database_parameters,
+            )
+
+            try:
+                os.remove(file_path)
+            except OSError as error:
+                raise OSError(f"Failed to remove file '{file_path}': {error}")
