@@ -54,4 +54,5 @@ def validate_model(
         save_json=True,
         half=True,
         tagged_data=True,
+        skip_evaluation=False,
     )
