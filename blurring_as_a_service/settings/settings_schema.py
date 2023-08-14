@@ -20,12 +20,47 @@ class MetadataPipelineSpec(SettingsSpecModel):
     outputs: Dict[str, str] = None
     flags: List[str] = []
 
+    def __init__(self, inputs=None, outputs=None, flags=None, **kwargs):
+        super().__init__(inputs=inputs, outputs=outputs, flags=flags, **kwargs)
+
+        # Get paths from inputs and outputs
+        images_path = self.inputs.get("images_path", "")
+        yolo_annotations = self.outputs.get("yolo_annotations", "")
+
+        # Check images_path and labels_path for the required structure
+        if not images_path.endswith("images/val"):
+            raise ValueError(
+                "The image files must be stored in the dataset_name/images/val structure."
+            )
+        if not yolo_annotations.endswith("labels/val"):
+            raise ValueError(
+                "The yolo labels must be stored in the dataset_name/labels/val structure."
+            )
+
+        # Check if images and labels share the same root folder
+        if images_path.split("/")[-3] != yolo_annotations.split("/")[-3]:
+            raise ValueError(
+                "The images and the labels are not under the same root folder, as expected in yolov5."
+            )
+
+
+class ValidationModelParameters(SettingsSpecModel):
+    imgsz: int
+    name: str
+    save_blurred_image: bool
+
+
+class MetricsMetadata(SettingsSpecModel):
+    image_height: int
+    image_width: int
+    image_area: int
+
 
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
-    yolo_run_name: str = None
-    flags: List[str] = []
+    metrics_metadata: MetricsMetadata
+    model_parameters: ValidationModelParameters
 
 
 class TrainingModelParameters(SettingsSpecModel):

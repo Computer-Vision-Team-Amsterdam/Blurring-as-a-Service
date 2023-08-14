@@ -11,6 +11,7 @@ metadata_pipeline:
   outputs:
     labels_path: "azureml://FOLDER_PATH_WHERE_STORE_YOLO_LABELS"
     metadata_path: "azureml://FOLDER_PATH_WHERE_STORE_METADATA"
+    metadata_path_coco_evaluation: "azureml://FOLDER_PATH_WHERE_STORE_COCO_EVAL_FILE"
   flags:
     # Possible values: NONE (in case no flag is needed), CONVERT_COCO_TO_YOLO, CREATE_METADATA
     - CONVERT_COCO_TO_YOLO

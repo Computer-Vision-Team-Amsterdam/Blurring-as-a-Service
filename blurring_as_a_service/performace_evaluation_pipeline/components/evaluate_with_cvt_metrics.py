@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 from pathlib import Path
@@ -32,28 +33,36 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     is_deterministic=False,
 )
 def evaluate_with_cvt_metrics(
-    mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    yolo_output_folder: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    annotations_for_custom_metrics: Input(type="uri_file"),  # type: ignore # noqa: F821
-    yolo_run_name: str,  # type: ignore # noqa: F821
-    cvt_metrics_tba_results: Output(type="uri_folder"),  # type: ignore # noqa: F821
+    mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821,
+    yolo_validation_output: Input(type="uri_folder"),  # type: ignore # noqa: F821,
+    coco_annotations: Input(type="uri_file"),  # type: ignore # noqa: F821,
+    model_parameters_json: str,
+    metrics_metadata_json: str,
+    metrics_results: Output(type="uri_folder"),  # type: ignore # noqa: F821
 ):
-    true_path = f"{mounted_dataset}/labels/val"
-    pred_path = f"{yolo_output_folder}/{yolo_run_name}/labels"
-    pred_path_tagged = f"{yolo_output_folder}/{yolo_run_name}/labels_tagged"
+    model_parameters = json.loads(model_parameters_json)
+    metrics_metadata = json.loads(metrics_metadata_json)
+    save_dir = f"{yolo_validation_output}/{model_parameters['name']}"
+
+    gt_yolo_labels = f"{mounted_dataset}/labels/val"
+    dt_yolo_labels = f"{save_dir}/labels"
+    dt_yolo_tagged_jsons = f"{save_dir}/labels_tagged"
 
     # ======== Total Blurred Area metric ========= #
     collect_and_store_tba_results_per_class_and_size(
-        true_path,
-        pred_path,
-        markdown_output_path=f"{cvt_metrics_tba_results}/tba_results.md",
+        gt_yolo_labels,
+        dt_yolo_labels,
+        markdown_output_path=f"{metrics_results}/tba_results.md",
+        image_area=metrics_metadata["image_area"],
     )
 
     # ======== False Negative Rate metric ========= #
 
-    if Path.exists(Path(pred_path_tagged)):
+    if Path.exists(Path(dt_yolo_tagged_jsons)):
         metrics_calculator = FalseNegativeRateCalculator(
-            pred_path_tagged, annotations_for_custom_metrics
+            dt_yolo_tagged_jsons,
+            coco_annotations,
+            image_area=metrics_metadata["image_area"],
         )
         metrics_calculator.calculate_and_store_metrics(
             markdown_output_path="fnr_results.md"
