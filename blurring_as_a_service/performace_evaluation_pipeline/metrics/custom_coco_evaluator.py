@@ -101,12 +101,9 @@ class CustomCOCOeval:
             gts = self.cocoGt.loadAnns(
                 self.cocoGt.getAnnIds(imgIds=p.imgIds, catIds=p.catIds)
             )
-            print(f"IN COCO: gts names: {gts}")
-
             dts = self.cocoDt.loadAnns(
                 self.cocoDt.getAnnIds(imgIds=p.imgIds, catIds=p.catIds)
             )
-            print(f"IN COCO: image names from coco_predictions_json: {dts}")
 
         else:
             gts = self.cocoGt.loadAnns(self.cocoGt.getAnnIds(imgIds=p.imgIds))
