@@ -24,10 +24,6 @@ def coco_evaluation(
 
     """
 
-    # Opening JSON file
-    with open(coco_annotations_json) as f:
-        data = json.load(f)
-
     COCO_gt = COCO(coco_annotations_json)  # init annotations api
     try:
         COCO_dt = COCO_gt.loadRes(coco_predictions_json)  # init predictions api
@@ -45,7 +41,6 @@ def coco_evaluation(
 
     height = data["images"][0]["height"]
     width = data["images"][0]["width"]
-    print(f"Metrics metadata: {metrics_metadata}")
     if (
         height != metrics_metadata["image_height"]
         or width != metrics_metadata["image_width"]
@@ -67,9 +62,3 @@ def coco_evaluation(
     evaluation.evaluate()
     evaluation.accumulate()
     evaluation.summarize()
-
-
-#
-# coco_evaluation(coco_annotations_json="/Users/epureanudiana/Desktop/AAAAA/coco.json",
-#                 coco_predictions_json="/Users/epureanudiana/Desktop/AAAAA/predictions.json",
-#                 metrics_metadata={"image_height": 4000, "image_width": 8000})
