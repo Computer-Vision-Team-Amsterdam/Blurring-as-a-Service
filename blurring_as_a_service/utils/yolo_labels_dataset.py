@@ -8,9 +8,10 @@ from torch.utils.data import Dataset
 
 
 class YoloLabelsDataset(Dataset):
-    def __init__(self, folder_path: str):
+    def __init__(self, folder_path: str, image_area: int):
         self.folder_path = folder_path
         self.label_files = os.listdir(folder_path)
+        self.image_area = image_area
         self._labels: Dict[str, npt.NDArray] = {}
         self._filtered_labels: Dict[str, npt.NDArray] = {}
         self._prepare_labels()
@@ -56,17 +57,18 @@ class YoloLabelsDataset(Dataset):
 
         self._filtered_labels = self._labels.copy()
 
-    def filter_by_size(self, size_to_keep, image_area=32000000):
+    def filter_by_size(self, size_to_keep):
         def _keep_labels_with_area_in_interval(bboxes, interval, img_area):
             product = bboxes[:, 3] * bboxes[:, 4] * img_area
             selected_rows = bboxes[
                 (product >= interval[0]) & (product <= interval[1]), :
             ]
+
             return selected_rows
 
         for image_id, labels in self._filtered_labels.items():
             self._filtered_labels[image_id] = _keep_labels_with_area_in_interval(
-                labels, size_to_keep, image_area
+                labels, size_to_keep, self.image_area
             )
 
         return self
