@@ -40,6 +40,14 @@ class AzureCocoToCocoConverter:
         """
         width = self._input["images"][0]["width"]
         height = self._input["images"][0]["height"]
+        # width = 13504
+        # height = 6752
+        # width = 8000
+        # height = 4000
+        #
+        # for i, image in enumerate(self._input["images"]):
+        #     self._input["images"][i]["width"] = 8000
+        #     self._input["images"][i]["height"] = 4000
 
         for i, ann in enumerate(self._input["annotations"]):
             bbox_absolute_values = []
