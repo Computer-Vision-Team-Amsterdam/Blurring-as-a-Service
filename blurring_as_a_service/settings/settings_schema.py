@@ -76,8 +76,14 @@ class TrainingPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
+class WorkloadDistributionPipelineInputs(SettingsSpecModel):
+    data_folder: str
+    date_folders: List[str]
+    number_of_batches: int
+
+
 class WorkloadDistributionPipelineSpec(SettingsSpecModel):
-    inputs: Dict[str, str] = None
+    inputs: WorkloadDistributionPipelineInputs
     outputs: Dict[str, str] = None
 
 
@@ -88,24 +94,14 @@ class InferenceModelParameters(SettingsSpecModel):
     skip_evaluation: bool = True
     save_blurred_image: bool = True
     batch_size: int = 1
-    # save_csv: bool = True
 
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
-    name: str
-    container_root: str
+    customer_name: str
     model_parameters: InferenceModelParameters
-    inputs: Dict[str, Any] = None
-    outputs: Dict[str, Any] = None
-
-
-class InferencePipelineSpec(SettingsSpecModel):
-    customers: List[InferenceCustomerPipelineSpec]
 
 
 class MoveDataSpec(SettingsSpecModel):
-    input_container_root: str = None
-    output_container_root: str = None
     customers: List[str] = None
 
 
@@ -132,6 +128,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
     workload_distribution_pipeline: WorkloadDistributionPipelineSpec = None
-    inference_pipeline: InferencePipelineSpec = None
+    inference_pipeline: InferenceCustomerPipelineSpec = None
     move_data_pipeline: MoveDataSpec = None
     logging: LoggingSpec = LoggingSpec()

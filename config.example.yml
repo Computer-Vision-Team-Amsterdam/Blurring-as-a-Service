@@ -34,33 +34,25 @@ training_pipeline:
 workload_distribution_pipeline:
   inputs:
     data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    number_of_batches: 4
+    date_folders:
+      - "2023-08-08"
+    number_of_batches: 1
   outputs:
     results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
 
 inference_pipeline:
-  customers:
-    - name: customer1
-      container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
-      model_parameters:
-        imgsz: 4000
-        save_txt: True
-        exist_ok: True
-        save_csv: True
-        skip_evaluation: True
-        save_blurred_image: True
-        batch_size: 4
-      inputs:
-        files_to_blur: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/files_to_blur.txt"
-      outputs:
-        results_path: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
-
+  customer_name: data_office
+  model_parameters:
+    imgsz: 4000
+    save_txt: True
+    exist_ok: True
+    skip_evaluation: True
+    save_blurred_image: True
+    batch_size: 4
 
 move_data_pipeline:
   customers:
     - example-customer
-  input_container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
-  output_container_root: "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
 
 performance_evaluation_pipeline:
   inputs:

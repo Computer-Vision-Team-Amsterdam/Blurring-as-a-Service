@@ -6,20 +6,20 @@ authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
 python = "~3.9"
-pandas = ">=1.1.4"
-GitPython = ">=3.1.30"
-matplotlib = ">=3.2.2"
-opencv-python = ">=4.1.1"
-Pillow = ">=7.1.2"
+pandas = {version = ">=1.1.4", source = "PyPI"}
+GitPython = {version = ">=3.1.30", source = "PyPI"}
+matplotlib = {version = ">=3.2.2", source = "PyPI"}
+opencv-python = {version = ">=4.1.1", source = "PyPI"}
+Pillow = {version = ">=7.1.2", source = "PyPI"}
 psutil = {version = "^5.9.4", source = "PyPI"}
-PyYAML = ">=5.3.1"
-requests = ">=2.23.0"
-thop = ">=0.1.1"
-torch = ">=1.7.0"
-torchvision = ">=0.8.1"
-tqdm = ">=4.64.0"
-tensorboard = ">=2.4.1"
-seaborn = ">=0.11.0"
+PyYAML = {version = ">=5.3.1", source = "PyPI"}
+requests = {version = ">=2.23.0", source = "PyPI"}
+thop = {version = ">=0.1.1", source = "PyPI"}
+torch = {version = ">=1.7.0", source = "PyPI"}
+torchvision = {version = ">=0.8.1", source = "PyPI"}
+tqdm = {version = ">=4.64.0", source = "PyPI"}
+tensorboard = {version = ">=2.4.1", source = "PyPI"}
+seaborn = {version = ">=0.11.0", source = "PyPI"}
 pre-commit = {version = "^2.21.0", source = "PyPI"}
 pytest = {version = "^7.2.1", source = "PyPI"}
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
@@ -32,14 +32,16 @@ cryptography = {version = "<39.0.0", source = "PyPI"}
 markdown-it-py = {version="^2.2.0", source = "PyPI"}
 joblib = {version="^1.2.0", source = "PyPI"}
 mss = {version="^7.0.1", source = "PyPI"}
-setuptools = ">=65.5.1"
+setuptools = {version = ">=65.5.1", source = "PyPI"}
 panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
-packaging = "20.9"
-psycopg2 = "^2.9.6"
-ipython = "8.13.0"
-scipy = "1.10.0"
-numpy = "1.23.0"
-azure-cli = "^2.50.0"
+packaging = {version = "20.9", source = "PyPI"}
+psycopg2 = {version = "^2.9.6", source = "PyPI"}
+ipython = {version = "8.13.0", source = "PyPI"}
+scipy = {version = "1.10.0", source = "PyPI"}
+numpy = {version = "1.23.0", source = "PyPI"}
+sqlalchemy = {version = "^2.0.19", source = "PyPI"}
+azure-cli = {version = "2.51.0", source = "PyPI"}
+msal = {version = "1.24.0b1", source = "PyPI"}
 
 [tool.poetry.dev-dependencies]
 
