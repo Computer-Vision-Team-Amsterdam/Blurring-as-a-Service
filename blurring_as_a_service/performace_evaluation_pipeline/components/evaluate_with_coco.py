@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -27,8 +28,14 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     is_deterministic=False,
 )
 def evaluate_with_coco(
-    annotations_for_coco_metrics: Input(type="uri_file"),  # type: ignore # noqa: F821
-    yolo_output_folder: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    yolo_run_name: str,
+    coco_annotations: Input(type="uri_file"),  # type: ignore # noqa: F821
+    yolo_validation_output: Input(type="uri_folder"),  # type: ignore # noqa: F821
+    model_parameters_json: str,
+    metrics_metadata_json: str,
 ):
-    coco_evaluation(annotations_for_coco_metrics, yolo_output_folder, yolo_run_name)
+    model_parameters = json.loads(model_parameters_json)
+    metrics_metadata = json.loads(metrics_metadata_json)
+    coco_predictions = (
+        f"{yolo_validation_output}/{model_parameters['name']}/predictions.json"
+    )
+    coco_evaluation(coco_annotations, coco_predictions, metrics_metadata)
