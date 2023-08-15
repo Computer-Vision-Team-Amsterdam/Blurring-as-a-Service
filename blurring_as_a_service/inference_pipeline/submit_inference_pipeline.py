@@ -34,36 +34,34 @@ def inference_pipeline():
         "inference_queue",
     )
 
-    for root, dirs, batches_files in os.walk(batches_files_path):
-        for batch_file in batches_files:
-            print(f"Creating inference step: {batch_file}")
+    model_parameters = inference_settings["model_parameters"]
+    model_parameters_json = json.dumps(
+        model_parameters
+    )  # TODO it seems I can not pass a string to @command_component function
+    database_parameters = inference_settings['database_parameters']
+    database_parameters_json = json.dumps(database_parameters)
 
-            model_parameters = inference_settings["model_parameters"]
-            model_parameters_json = json.dumps(
-                model_parameters
-            )  # TODO it seems I can not pass a string to @command_component function
+    detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
+        mounted_root_folder=input_root_folder,
+        customer_name=customer_name,
+        model_parameters_json=model_parameters_json,
+        database_parameters_json=database_parameters_json
+    )
 
-            detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
-                mounted_root_folder=input_root_folder,
-                customer_name=customer_name,
-                model_parameters_json=model_parameters_json,
-            )
+    azureml_outputs_formatted = aml_interface.get_azureml_path(
+        f"{customer_name}_output"
+    )
 
-            azureml_outputs_formatted = aml_interface.get_azureml_path(
-                f"{customer_name}_output"
-            )
+    detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
+        type="uri_folder", mode="rw_mount", path=batches_files_path
+    )
 
-            detect_and_blur_sensitive_data_step.outputs.batch_file_txt = Output(
-                type="uri_file",
-                mode="rw_mount",
-                path=os.path.join(batches_files_path, batch_file),
-            )
-            detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-                type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
-            )
-            detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-                type="uri_folder", mode="rw_mount", path=blob_container_path
-            )
+    detect_and_blur_sensitive_data_step.outputs.results_path = Output(
+        type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
+    )
+    detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
+        type="uri_folder", mode="rw_mount", path=blob_container_path
+    )
 
     return {}
 
