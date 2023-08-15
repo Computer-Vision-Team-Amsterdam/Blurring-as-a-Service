@@ -63,5 +63,6 @@ class WorkloadSplitter:
                 f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
             ) as batch_file:
                 for j in range(start_index, end_index):
-                    relative_path = os.path.relpath(image_files[j], data_folder)
-                    batch_file.write(relative_path + "\n")
+                    file_name = os.path.basename(image_files[j])
+                    image_path = os.path.join(execution_time, file_name)
+                    batch_file.write(image_path + "\n")

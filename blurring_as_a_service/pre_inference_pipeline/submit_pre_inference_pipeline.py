@@ -18,7 +18,7 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 @pipeline()
 def pre_inference_pipeline(number_of_batches):
-    execution_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    execution_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
     for customer in pre_inference_settings["customers"]:
         move_data = move_files(execution_time=execution_time)
