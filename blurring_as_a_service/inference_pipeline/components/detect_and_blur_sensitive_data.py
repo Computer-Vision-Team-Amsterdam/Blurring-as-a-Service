@@ -93,7 +93,7 @@ def detect_and_blur_sensitive_data(
             model_parameters = json.loads(model_parameters_json)
             database_parameters = json.loads(database_parameters_json)
             val.run(
-                weights=f"{mounted_root_folder}/best.pt",  # TODO get from Azure ML models
+                weights=f"{mounted_root_folder}/best.pt",
                 data=f"{yolo_yaml_path}/pano.yaml",
                 project=results_path,
                 device=cuda_device,

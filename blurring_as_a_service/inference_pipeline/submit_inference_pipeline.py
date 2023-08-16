@@ -37,7 +37,7 @@ def inference_pipeline():
     model_parameters = inference_settings["model_parameters"]
     model_parameters_json = json.dumps(
         model_parameters
-    )  # TODO it seems I can not pass a string to @command_component function
+    )  # TODO it seems I can not pass a dict to @command_component function
     database_parameters = inference_settings['database_parameters']
     database_parameters_json = json.dumps(database_parameters)
 
