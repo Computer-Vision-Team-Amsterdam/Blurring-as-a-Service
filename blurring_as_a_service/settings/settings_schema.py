@@ -16,19 +16,22 @@ class AMLExperimentDetailsSpec(SettingsSpecModel):
 
 
 class MetadataPipelineSpec(SettingsSpecModel):
+    datastore: str
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
 
-    def __init__(self, inputs=None, outputs=None, flags=None, **kwargs):
-        super().__init__(inputs=inputs, outputs=outputs, flags=flags, **kwargs)
+    def __init__(self, datastore=None, inputs=None, outputs=None, flags=None, **kwargs):
+        super().__init__(
+            datastore=datastore, inputs=inputs, outputs=outputs, flags=flags, **kwargs
+        )
 
         # Get paths from inputs and outputs
-        images_path = self.inputs.get("images_path", "")
+        images = self.inputs.get("images", "")
         yolo_annotations = self.outputs.get("yolo_annotations", "")
 
-        # Check images_path and labels_path for the required structure
-        if not images_path.endswith("images/val"):
+        # Check images and yolo_annotations for the required structure
+        if not images.endswith("images/val"):
             raise ValueError(
                 "The image files must be stored in the dataset_name/images/val structure."
             )
@@ -38,7 +41,7 @@ class MetadataPipelineSpec(SettingsSpecModel):
             )
 
         # Check if images and labels share the same root folder
-        if images_path.split("/")[-3] != yolo_annotations.split("/")[-3]:
+        if images.split("/")[-3] != yolo_annotations.split("/")[-3]:
             raise ValueError(
                 "The images and the labels are not under the same root folder, as expected in yolov5."
             )

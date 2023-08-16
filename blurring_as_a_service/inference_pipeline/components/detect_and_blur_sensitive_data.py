@@ -34,7 +34,7 @@ def detect_and_blur_sensitive_data(
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
     model_parameters_json: str,
-    database_parameters_json: str
+    database_parameters_json: str,
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -43,9 +43,8 @@ def detect_and_blur_sensitive_data(
     ----------
     mounted_root_folder:
         Path of the mounted folder containing the images.
-    batch_file_txt:
-        Text file containing multiple rows where each row has a relative path,
-        taking folder as root and the path to the image.
+    batches_files_path:
+        TODO: Chris can you explain this? it was not updated
     results_path:
         Where to store the results.
     yolo_yaml_path:
