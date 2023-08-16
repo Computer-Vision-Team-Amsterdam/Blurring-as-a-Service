@@ -31,14 +31,13 @@ training_pipeline:
     # Possible values: NONE (in case no flag is needed), STORE_MODEL
     - NONE
 
-workload_distribution_pipeline:
+
+pre_inference_pipeline:
+  customers:
+    - example-customer
   inputs:
-    data_folder: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    date_folders:
-      - "2023-08-08"
     number_of_batches: 1
-  outputs:
-    results_folder: "azureml://FOLDER_PATH_WHERE_STORE_WORKLOAD_FILES"
+
 
 inference_pipeline:
   customer_name: data_office
@@ -49,10 +48,10 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
-
-move_data_pipeline:
-  customers:
-    - example-customer
+  database_parameters:
+    db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
+    db_username: "aml-compute-cvo-p"
+    db_name: "blur"
 
 performance_evaluation_pipeline:
   inputs:

@@ -1,4 +1,5 @@
 import json
+import os
 
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
@@ -14,10 +15,12 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def inference_pipeline():
-    customer_name = inference_settings['customer_name']
+    customer_name = inference_settings["customer_name"]
 
     # Format the root path of the Blob Storage Container in Azure using placeholders
-    blob_container_path = aml_interface.get_azureml_path(f"{customer_name}_input_structured")
+    blob_container_path = aml_interface.get_azureml_path(
+        f"{customer_name}_input_structured"
+    )
 
     input_root_folder = Input(
         type=AssetTypes.URI_FOLDER,
@@ -26,27 +29,32 @@ def inference_pipeline():
     )
 
     # Get the txt file that contains all paths of the files to run inference on
-    files_to_blur_path = aml_interface.get_azureml_path(f"{customer_name}_input_structured")
-
-    files_to_blur_path = os.path.join(files_to_blur_path, "batch_0.txt")
-
-    files_to_blur_txt = Input(
-        type=AssetTypes.URI_FILE,
-        path=files_to_blur_path,
-        description="Data to be blurred",
+    batches_files_path = os.path.join(
+        aml_interface.get_azureml_path(f"{customer_name}_input_structured"),
+        "inference_queue",
     )
 
-    model_parameters = inference_settings['model_parameters']
-    model_parameters_json = json.dumps(model_parameters)  # TODO it seems I can not pass a string to @command_component function
+    model_parameters = inference_settings["model_parameters"]
+    model_parameters_json = json.dumps(
+        model_parameters
+    )  # TODO it seems I can not pass a dict to @command_component function
+    database_parameters = inference_settings['database_parameters']
+    database_parameters_json = json.dumps(database_parameters)
 
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         mounted_root_folder=input_root_folder,
-        relative_paths_files_to_blur=files_to_blur_txt,
         customer_name=customer_name,
-        model_parameters_json=model_parameters_json
+        model_parameters_json=model_parameters_json,
+        database_parameters_json=database_parameters_json
     )
 
-    azureml_outputs_formatted = aml_interface.get_azureml_path(f"{customer_name}_output")
+    azureml_outputs_formatted = aml_interface.get_azureml_path(
+        f"{customer_name}_output"
+    )
+
+    detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
+        type="uri_folder", mode="rw_mount", path=batches_files_path
+    )
 
     detect_and_blur_sensitive_data_step.outputs.results_path = Output(
         type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted

@@ -76,14 +76,13 @@ class TrainingPipelineSpec(SettingsSpecModel):
     flags: List[str] = []
 
 
-class WorkloadDistributionPipelineInputs(SettingsSpecModel):
-    data_folder: str
-    date_folders: List[str]
+class PreInferencePipelineInputs(SettingsSpecModel):
     number_of_batches: int
 
 
-class WorkloadDistributionPipelineSpec(SettingsSpecModel):
-    inputs: WorkloadDistributionPipelineInputs
+class PreInferencePipelineSpec(SettingsSpecModel):
+    customers: List[str] = None
+    inputs: PreInferencePipelineInputs
     outputs: Dict[str, str] = None
 
 
@@ -96,6 +95,12 @@ class InferenceModelParameters(SettingsSpecModel):
     batch_size: int = 1
 
 
+class InferenceDatabaseCredentials(SettingsSpecModel):
+    db_username: str
+    db_hostname: str
+    db_name: str
+
+
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
     model_parameters: InferenceModelParameters
@@ -103,6 +108,7 @@ class InferenceCustomerPipelineSpec(SettingsSpecModel):
 
 class MoveDataSpec(SettingsSpecModel):
     customers: List[str] = None
+    database_parameters: InferenceDatabaseCredentials
 
 
 class LoggingSpec(SettingsSpecModel):
@@ -127,7 +133,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     metadata_pipeline: MetadataPipelineSpec = None
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
-    workload_distribution_pipeline: WorkloadDistributionPipelineSpec = None
+    pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: InferenceCustomerPipelineSpec = None
-    move_data_pipeline: MoveDataSpec = None
     logging: LoggingSpec = LoggingSpec()
