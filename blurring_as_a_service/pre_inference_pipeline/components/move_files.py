@@ -1,7 +1,6 @@
 import os
 import shutil
 import sys
-from datetime import date
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Output, command_component
@@ -16,7 +15,19 @@ config_path = os.path.abspath(
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
-IMG_FORMATS = ('bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp', 'pfm')  # image suffixes defined in YOLOv5
+IMG_FORMATS = (
+    "bmp",
+    "dng",
+    "jpeg",
+    "jpg",
+    "mpo",
+    "png",
+    "tif",
+    "tiff",
+    "webp",
+    "pfm",
+)  # image suffixes defined in YOLOv5
+
 
 @command_component(
     name="move_files",
@@ -26,6 +37,7 @@ IMG_FORMATS = ('bmp', 'dng', 'jpeg', 'jpg', 'mpo', 'png', 'tif', 'tiff', 'webp',
     is_deterministic=False,
 )
 def move_files(
+    execution_time: str,
     input_container: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     output_container: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
@@ -34,6 +46,8 @@ def move_files(
 
     Parameters
     ----------
+    execution_time:
+        Datetime containing when the job was executed. Used to name the folder.
     input_container:
         Path of the mounted root folder containing the images.
     output_container:
@@ -47,11 +61,7 @@ def move_files(
         print("No files in the input zone. Aborting...")
         return  # Skip the rest of the code and exit the function
 
-    # Get today's date
-    today = date.today()
-    date_prefix = today.strftime("%Y-%m-%d")
-
-    target_folder_path = os.path.join(output_container, date_prefix)
+    target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
     os.makedirs(target_folder_path, exist_ok=True)
 
