@@ -55,15 +55,22 @@ inference_pipeline:
     db_name: "blur"
 
 performance_evaluation_pipeline:
+  datastore: "nieuw_panorama_beelden_geo360"
   inputs:
-    validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    annotations_for_coco_metrics: "azureml://FILE_PATH_TO_COCO_format_annotations_for_COCO_evaluation"
-    model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
-    annotations_for_custom_metrics: "azureml://FILE_PATH_TO_Azure_COCO_format_tagged_annotations_for_custom_evaluation"
+    yolo_dataset: "selectie_original"
+    coco_annotations: "EXAMPLE/metadata_pipeline_out/coco.json"
+    model: ""
   outputs:
-    yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
-    yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
-  yolo_run_name: "name of the yolo run, type string. More information in the README.md"
+    yolo_validation_output: "EXAMPLE"
+    cvt_metrics: "EXAMPLE/cvt_metrics"
+  model_parameters:
+    imgsz: 2048
+    name: "test"
+    save_blurred_image: True
+  metrics_metadata:
+    image_height: 4000
+    image_width: 8000
+    image_area: 32000000
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

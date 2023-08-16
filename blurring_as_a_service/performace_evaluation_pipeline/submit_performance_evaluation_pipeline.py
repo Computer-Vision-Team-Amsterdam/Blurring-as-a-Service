@@ -1,4 +1,5 @@
 import json
+import os
 
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
@@ -18,24 +19,66 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def performance_evaluation_pipeline(
-    dataset_path,
-    coco_annotations,
-    model,
-    metrics_results,
-    yolo_validation_output,
-    model_parameters_json,
-    metrics_metadata_json,
-):
+def performance_evaluation_pipeline():
+    datastore_name = performance_evaluation_settings["datastore"]
+    inputs = performance_evaluation_settings["inputs"]
+    outputs = performance_evaluation_settings["outputs"]
+    model_parameters = performance_evaluation_settings["model_parameters"]
+    model_parameters_json = json.dumps(model_parameters)
+    metrics_metadata = performance_evaluation_settings["metrics_metadata"]
+    metrics_metadata_json = json.dumps(metrics_metadata)
+
+    yolo_dataset_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        inputs["yolo_dataset"],
+    )
+
+    coco_annotations_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        inputs["coco_annotations"],
+    )
+
+    model_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        inputs["model"],
+    )
+
+    yolo_validation_output_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        outputs["yolo_validation_output"],
+    )
+
+    cvt_metrics_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        outputs["cvt_metrics"],
+    )
+    yolo_dataset = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=yolo_dataset_path,
+        description="Dataset root folder. Must be in yolo format for validation. Contains images/val and labels/val",
+    )
+
+    coco_annotations = Input(
+        type=AssetTypes.URI_FILE,
+        path=coco_annotations_path,
+        description="Corresponds to metadata_pipeline['outputs']['coco_annotations']",
+    )
+
+    model = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=model_path,
+        description="Model to use for the evaluation",
+    )
+
     validate_model_step = validate_model(
-        mounted_dataset=dataset_path,
+        mounted_dataset=yolo_dataset,
         model=model,
-        model_parameters_json=model_parameters_json,  # no outputs here
+        model_parameters_json=model_parameters_json,  # no outputs when calling command_components
     )
     validate_model_step.outputs.yolo_validation_output = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=yolo_validation_output.result(),
+        path=yolo_validation_output_path,
         description="Results of the yolo run",
     )
 
@@ -47,7 +90,7 @@ def performance_evaluation_pipeline(
     )
 
     custom_evaluation_step = evaluate_with_cvt_metrics(  # type: ignore # noqa: F841
-        mounted_dataset=dataset_path,
+        mounted_dataset=yolo_dataset,
         coco_annotations=coco_annotations,
         yolo_validation_output=validate_model_step.outputs.yolo_validation_output,
         model_parameters_json=model_parameters_json,
@@ -57,51 +100,15 @@ def performance_evaluation_pipeline(
     custom_evaluation_step.outputs.metrics_results = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=metrics_results.result(),
-        description="Path to store the md files from tba and fnr metrics.",
+        path=cvt_metrics_path,
+        description="Where to store the md files from tba and fnr metrics.",
     )
 
     return {}
 
 
 def main():
-    aml_interface = AMLInterface()
-    settings = BlurringAsAServiceSettings.get_settings()
-
-    inputs = settings["performance_evaluation_pipeline"]["inputs"]
-    outputs = settings["performance_evaluation_pipeline"]["outputs"]
-    model_parameters = settings["performance_evaluation_pipeline"]["model_parameters"]
-    model_parameters_json = json.dumps(model_parameters)
-    metrics_metadata = settings["performance_evaluation_pipeline"]["metrics_metadata"]
-    metrics_metadata_json = json.dumps(metrics_metadata)
-
-    dataset_path = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=inputs["dataset_path"],
-        description="Dataset root folder. Must be in yolo format for validation. Contains images/val and labels/val",
-    )
-
-    coco_annotations = Input(
-        type=AssetTypes.URI_FILE,
-        path=inputs["coco_annotations"],
-        description="Corresponds to metadata_pipeline['outputs']['coco_annotations']",
-    )
-
-    model = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=inputs["model"],
-        description="Model to use for the blurring",
-    )
-
-    performance_evaluation_pipeline_job = performance_evaluation_pipeline(
-        dataset_path=dataset_path,
-        coco_annotations=coco_annotations,
-        model=model,
-        metrics_results=outputs["metrics_results"],
-        yolo_validation_output=outputs["yolo_validation_output"],
-        model_parameters_json=model_parameters_json,
-        metrics_metadata_json=metrics_metadata_json,
-    )
+    performance_evaluation_pipeline_job = performance_evaluation_pipeline()
     performance_evaluation_pipeline_job.settings.default_compute = settings[
         "aml_experiment_details"
     ]["compute_name"]
@@ -115,4 +122,9 @@ def main():
 
 if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    settings = BlurringAsAServiceSettings.get_settings()
+    performance_evaluation_settings = settings["performance_evaluation_pipeline"]
+
+    aml_interface = AMLInterface()
+
     main()

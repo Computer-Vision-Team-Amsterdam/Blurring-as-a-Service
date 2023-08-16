@@ -60,6 +60,7 @@ class MetricsMetadata(SettingsSpecModel):
 
 
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
+    datastore: str = None
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     metrics_metadata: MetricsMetadata
