@@ -41,7 +41,7 @@ class MetadataPipelineSpec(SettingsSpecModel):
             )
 
         # Check if images and labels share the same root folder
-        if images.split("/")[-3] != yolo_annotations.split("/")[-3]:
+        if images.split("/")[0] != yolo_annotations.split("/")[0]:
             raise ValueError(
                 "The images and the labels are not under the same root folder, as expected in yolov5."
             )
