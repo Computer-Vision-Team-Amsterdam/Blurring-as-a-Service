@@ -5,17 +5,18 @@ aml_experiment_details:
   src_dir: "."
 
 metadata_pipeline:
+  datastore: "nieuw_panorama_beelden_geo360"
   inputs:
-    coco_annotations: "azureml:NAMED_ASSET_URI_CONTAINING_COCO_ANNOTATIONS"
-    images_path: "azureml://FOLDER_PATH_CONTAINING_THE_IMAGES"
+    coco_annotations: "geo30-coco.json"
+    images: "selectie_original/images/val"
   outputs:
-    labels_path: "azureml://FOLDER_PATH_WHERE_STORE_YOLO_LABELS"
-    metadata_path: "azureml://FOLDER_PATH_WHERE_STORE_METADATA"
-    metadata_path_coco_evaluation: "azureml://FOLDER_PATH_WHERE_STORE_COCO_EVAL_FILE"
+    yolo_annotations: "EXAMPLE/selectie_original/labels/val"
+    metadata: "EXAMPLE/metadata_pipeline_out/panorama_metadata.json"
+    coco_annotations: "EXAMPLE/metadata_pipeline_out/coco.json"
   flags:
-    # Possible values: NONE (in case no flag is needed), CONVERT_COCO_TO_YOLO, CREATE_METADATA
-    - CONVERT_COCO_TO_YOLO
-    - CREATE_METADATA
+    # Possible values: NONE, CONVERT_AZURE_COCO_TO_YOLO, CONVERT_AZURE_COCO_TO_COCO, CREATE_METADATA
+    - CONVERT_AZURE_COCO_TO_YOLO
+    - CONVERT_AZURE_COCO_TO_COCO
 
 training_pipeline:
   model_parameters:
