@@ -17,6 +17,7 @@ class AMLExperimentDetailsSpec(SettingsSpecModel):
 
 class MetadataPipelineSpec(SettingsSpecModel):
     datastore: str
+    base_output_folder: str
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
@@ -61,8 +62,8 @@ class MetricsMetadata(SettingsSpecModel):
 
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
     datastore: str = None
+    base_output_folder: str = None
     inputs: Dict[str, str] = None
-    outputs: Dict[str, str] = None
     metrics_metadata: MetricsMetadata
     model_parameters: ValidationModelParameters
 

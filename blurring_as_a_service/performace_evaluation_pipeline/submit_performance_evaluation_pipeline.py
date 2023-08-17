@@ -21,8 +21,8 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def performance_evaluation_pipeline():
     datastore_name = performance_evaluation_settings["datastore"]
+    base_output_folder = performance_evaluation_settings["base_output_folder"]
     inputs = performance_evaluation_settings["inputs"]
-    outputs = performance_evaluation_settings["outputs"]
     model_parameters = performance_evaluation_settings["model_parameters"]
     model_parameters_json = json.dumps(model_parameters)
     metrics_metadata = performance_evaluation_settings["metrics_metadata"]
@@ -38,19 +38,17 @@ def performance_evaluation_pipeline():
         inputs["coco_annotations"],
     )
 
-    model_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
-        inputs["model"],
-    )
+    model_path = aml_interface.get_azureml_path(datastore_name=datastore_name)
 
     yolo_validation_output_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
-        outputs["yolo_validation_output"],
+        base_output_folder,
     )
 
     cvt_metrics_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
-        outputs["cvt_metrics"],
+        base_output_folder,
+        "cvt_metrics",
     )
     yolo_dataset = Input(
         type=AssetTypes.URI_FOLDER,

@@ -21,6 +21,7 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def metadata_pipeline():
     datastore_name = metadata_settings["datastore"]
+    base_output_folder = metadata_settings["base_output_folder"]
     inputs = metadata_settings["inputs"]
     outputs = metadata_settings["outputs"]
     metadata_flags = metadata_settings["flags"]
@@ -41,11 +42,13 @@ def metadata_pipeline():
 
     coco_annotations_out_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
+        base_output_folder,
         outputs["coco_annotations"],
     )
 
     metadata_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
+        base_output_folder,
         outputs["metadata"],
     )
 

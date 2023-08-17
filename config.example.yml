@@ -6,17 +6,35 @@ aml_experiment_details:
 
 metadata_pipeline:
   datastore: "nieuw_panorama_beelden_geo360"
+  base_output_folder: "METADATA_pipeline_run_0"  # change this when running a new experiment
   inputs:
     coco_annotations: "geo30-coco.json"
     images: "selectie_original/images/val"
   outputs:
-    yolo_annotations: "EXAMPLE/selectie_original/labels/val"
-    metadata: "EXAMPLE/metadata_pipeline_out/panorama_metadata.json"
-    coco_annotations: "EXAMPLE/metadata_pipeline_out/coco.json"
+    yolo_annotations: "selectie_original/labels/val"  # yolo labels are overwritten with every new run
+    metadata: "metadata.json"
+    coco_annotations: "coco.json"
   flags:
     # Possible values: NONE, CONVERT_AZURE_COCO_TO_YOLO, CONVERT_AZURE_COCO_TO_COCO, CREATE_METADATA
     - CONVERT_AZURE_COCO_TO_YOLO
     - CONVERT_AZURE_COCO_TO_COCO
+
+performance_evaluation_pipeline:
+  datastore: "nieuw_panorama_beelden_geo360"
+  base_output_folder: "PE_pipeline_run_0"  # change this when running a new experiment
+  inputs:
+    yolo_dataset: "selectie_original"
+    coco_annotations: "metadata-pipeline/selectie_original_coco_labels/coco.json"
+    model_name: "dataoffice_model"
+    model_version: "1"
+  model_parameters:
+    imgsz: 2048
+    name: "yolo_exp_1"
+    save_blurred_image: True
+  metrics_metadata:
+    image_height: 4000
+    image_width: 8000
+    image_area: 32000000
 
 training_pipeline:
   model_parameters:
@@ -53,24 +71,6 @@ inference_pipeline:
     db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"
     db_name: "blur"
-
-performance_evaluation_pipeline:
-  datastore: "nieuw_panorama_beelden_geo360"
-  inputs:
-    yolo_dataset: "selectie_original"
-    coco_annotations: "EXAMPLE/metadata_pipeline_out/coco.json"
-    model: ""
-  outputs:
-    yolo_validation_output: "EXAMPLE"
-    cvt_metrics: "EXAMPLE/cvt_metrics"
-  model_parameters:
-    imgsz: 2048
-    name: "test"
-    save_blurred_image: True
-  metrics_metadata:
-    image_height: 4000
-    image_width: 8000
-    image_area: 32000000
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
