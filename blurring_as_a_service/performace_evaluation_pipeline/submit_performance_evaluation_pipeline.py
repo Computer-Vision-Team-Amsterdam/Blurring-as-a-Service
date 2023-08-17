@@ -62,7 +62,7 @@ def performance_evaluation_pipeline():
 
     model = Input(
         type=AssetTypes.CUSTOM_MODEL,
-        path=f"azureml:{inputs['model_name']}:{inputs['model_version']},",
+        path=f"azureml:{inputs['model_name']}:{inputs['model_version']}",
         description="Model weights for evaluation",
     )
 
