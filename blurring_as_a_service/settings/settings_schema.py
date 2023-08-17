@@ -109,10 +109,6 @@ class InferenceDatabaseCredentials(SettingsSpecModel):
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
     model_parameters: InferenceModelParameters
-
-
-class MoveDataSpec(SettingsSpecModel):
-    customers: List[str] = None
     database_parameters: InferenceDatabaseCredentials
 
 
