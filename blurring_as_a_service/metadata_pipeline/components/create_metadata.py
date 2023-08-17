@@ -28,8 +28,8 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     is_deterministic=False,
 )
 def create_metadata(
-    input_directory: Input(type=AssetTypes.URI_FOLDER), output_file: Output(type=AssetTypes.URI_FILE)  # type: ignore # noqa: F821
+    input_directory: Input(type=AssetTypes.URI_FOLDER), metadata_path: Output(type=AssetTypes.URI_FILE)  # type: ignore # noqa: F821
 ):
     MetadataRetriever(
         images_directory_path=input_directory
-    ).generate_and_store_metadata(output_file)
+    ).generate_and_store_metadata(metadata_path)

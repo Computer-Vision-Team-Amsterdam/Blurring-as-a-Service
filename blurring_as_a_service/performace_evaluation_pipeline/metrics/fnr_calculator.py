@@ -27,7 +27,7 @@ class FalseNegativeRateCalculator:
 
     """
 
-    def __init__(self, tagged_validation_folder, coco_file_with_categories):
+    def __init__(self, tagged_validation_folder, coco_file_with_categories, image_area):
         """
         Parameters
         ----------
@@ -35,8 +35,11 @@ class FalseNegativeRateCalculator:
             Folder containing yolo tagged validation files.
         coco_file_with_categories
             File containing the categories.
+        image_area
+            Number of pixels in image.
         """
 
+        self.image_area = image_area
         self._get_and_prepare_categories(coco_file_with_categories)
         self._calculate_true_positives_and_false_negatives_per_category(
             tagged_validation_folder
@@ -82,7 +85,7 @@ class FalseNegativeRateCalculator:
     def calculate_false_negative_rate_for_all_categories(self) -> List[dict]:
         """
         Using the calculate_false_negative_rate_for_a_category function, it calculates the value for the following categories:
-            - 'grouped_category': Persons or licence plates.
+            - 'grouped_category': Persons or license plates.
             - 'sex'.
             - 'age'.
             - 'skin_color'.
@@ -231,7 +234,7 @@ class FalseNegativeRateCalculator:
 
         """
 
-        def _classify_bbox_area(bbox_area, image_size):
+        def _classify_bbox_area(bbox_area, image_size, image_area):
             for s in image_size:
                 if s[0] <= bbox_area < s[1]:
                     return s
@@ -258,8 +261,10 @@ class FalseNegativeRateCalculator:
                     )
                 ):
                     category_stats = self._statistics_per_category[gt_label]
-                    category_stats["area"] = gt_box[2] * gt_box[3] * 32000000
-                    size = _classify_bbox_area(category_stats["area"], ImageSize)
+                    category_stats["area"] = gt_box[2] * gt_box[3] * self.image_area
+                    size = _classify_bbox_area(
+                        category_stats["area"], ImageSize, self.image_area
+                    )
 
                     if tagged_validation_content["TP_labels"][i]:
                         category_stats["true_positives"] += 1
@@ -351,14 +356,14 @@ class FalseNegativeRateCalculator:
                     "gt_boxes": [],
                     "pred_boxes": [],
                 }
-                if attr_1 == "licence_plate":
+                if attr_1 == "license_plate":
                     self._statistics_per_category[d["id"]].update(
                         {
                             "sex": "",
                             "age": "",
                             "skin_color": "",
-                            "licence_plate_origin": attr_2,
-                            "licence_plate_color": attr_3,
+                            "license_plate_origin": attr_2,
+                            "license_plate_color": attr_3,
                         }
                     )
                 else:
@@ -367,8 +372,8 @@ class FalseNegativeRateCalculator:
                             "sex": attr_1,
                             "age": attr_2,
                             "skin_color": attr_3,
-                            "licence_plate_origin": "",
-                            "licence_plate_color": "",
+                            "license_plate_origin": "",
+                            "license_plate_color": "",
                         }
                     )
 

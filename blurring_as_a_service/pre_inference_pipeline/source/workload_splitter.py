@@ -1,18 +1,14 @@
 import math
 import os
+import sys
 
-IMG_FORMATS = (
-    "bmp",
-    "dng",
-    "jpeg",
-    "jpg",
-    "mpo",
-    "png",
-    "tif",
-    "tiff",
-    "webp",
-    "pfm",
-)  # image suffixes defined in YOLOv5
+# Construct the path to the yolov5 package
+yolov5_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
+)
+# Add the yolov5 path to sys.path
+sys.path.append(yolov5_path)
+from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
 
 
 class WorkloadSplitter:

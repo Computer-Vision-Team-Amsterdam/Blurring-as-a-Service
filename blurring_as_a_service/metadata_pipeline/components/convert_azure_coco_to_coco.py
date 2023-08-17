@@ -27,6 +27,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     code="../../../",
 )
 def convert_azure_coco_to_coco(
-    input_data: Input(type=AssetTypes.URI_FILE), output_file: Output(type=AssetTypes.URI_FILE)  # type: ignore # noqa: F821
+    coco_annotations_in: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
+    coco_annotations_out: Output(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
 ):
-    AzureCocoToCocoConverter(input_data, output_file).convert()
+    AzureCocoToCocoConverter(coco_annotations_in, coco_annotations_out).convert()

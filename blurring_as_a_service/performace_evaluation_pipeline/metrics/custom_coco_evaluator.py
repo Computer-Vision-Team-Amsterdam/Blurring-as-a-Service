@@ -104,6 +104,7 @@ class CustomCOCOeval:
             dts = self.cocoDt.loadAnns(
                 self.cocoDt.getAnnIds(imgIds=p.imgIds, catIds=p.catIds)
             )
+
         else:
             gts = self.cocoGt.loadAnns(self.cocoGt.getAnnIds(imgIds=p.imgIds))
             dts = self.cocoDt.loadAnns(self.cocoDt.getAnnIds(imgIds=p.imgIds))
