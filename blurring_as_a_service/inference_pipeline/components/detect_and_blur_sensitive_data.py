@@ -44,7 +44,9 @@ def detect_and_blur_sensitive_data(
     mounted_root_folder:
         Path of the mounted folder containing the images.
     batches_files_path:
-        TODO: Chris can you explain this? it was not updated
+         Path to folder with multiple text files.
+         One text file contains multiple rows.
+         Each row is a relative path to {customer_name}_input_structured/inference_queue
     results_path:
         Where to store the results.
     yolo_yaml_path:
