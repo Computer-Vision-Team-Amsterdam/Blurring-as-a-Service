@@ -38,8 +38,6 @@ def performance_evaluation_pipeline():
         inputs["coco_annotations"],
     )
 
-    model_path = aml_interface.get_azureml_path(datastore_name=datastore_name)
-
     yolo_validation_output_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
         base_output_folder,
@@ -63,9 +61,9 @@ def performance_evaluation_pipeline():
     )
 
     model = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=model_path,
-        description="Model to use for the evaluation",
+        type=AssetTypes.CUSTOM_MODEL,
+        path=f"azureml:{inputs['model_name']}:{inputs['model_version']},",
+        description="Model weights for evaluation",
     )
 
     validate_model_step = validate_model(

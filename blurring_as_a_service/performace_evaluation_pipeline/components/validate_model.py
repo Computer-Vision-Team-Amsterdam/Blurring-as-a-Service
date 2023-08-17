@@ -28,7 +28,7 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 )
 def validate_model(
     mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    model: Input(type="uri_folder"),  # type: ignore # noqa: F821
+    model: Input(type="uri_file"),  # type: ignore # noqa: F821
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
     model_parameters_json: str,
 ):
@@ -46,7 +46,7 @@ def validate_model(
 
     val.run(
         data=f"{yolo_validation_output}/pano.yaml",
-        weights=f"{model}/last-purple_boot_3l6p24vb.pt",
+        weights=model,
         project=f"{yolo_validation_output}",  # DO NOT CHANGE
         batch_size=1,  # DO NOT CHANGE
         task="val",  # DO NOT CHANGE
