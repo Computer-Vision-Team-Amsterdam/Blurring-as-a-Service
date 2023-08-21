@@ -60,6 +60,8 @@ pre_inference_pipeline:
 
 inference_pipeline:
   customer_name: data_office
+  model_name: "dataoffice_model"
+  model_version: "1"
   model_parameters:
     imgsz: 4000
     save_txt: True
