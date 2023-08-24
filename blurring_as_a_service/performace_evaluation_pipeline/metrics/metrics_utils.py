@@ -10,7 +10,7 @@ from PIL.Image import Image as ImageType
 class ImageSize(Enum):
     small = [0, 5000]
     medium = [5000, 10000]
-    large = [10000, 1000000]
+    large = [10000, 32000000]
 
     def __repr__(self):
         return self.value
@@ -143,8 +143,8 @@ def generate_mask(
     return Image.fromarray(mask)
 
 
-def visualize_mask(mask, image):
+def visualize_mask(image, name="mask.jpg"):
+    plt.figure(name, figsize=(16, 8))
     plt.imshow(np.array(image))
-    plt.imshow(np.array(mask), alpha=0.8)
-    plt.savefig("mask.jpg", dpi=500)
+    plt.savefig(name, dpi=500)
     plt.show()
