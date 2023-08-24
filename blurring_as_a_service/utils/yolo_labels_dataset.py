@@ -1,3 +1,4 @@
+import glob
 import os
 from pathlib import Path
 from typing import Dict
@@ -10,7 +11,7 @@ from torch.utils.data import Dataset
 class YoloLabelsDataset(Dataset):
     def __init__(self, folder_path: str, image_area: int):
         self.folder_path = folder_path
-        self.label_files = os.listdir(folder_path)
+        self.label_files = self.get_txt_files()
         self.image_area = image_area
         self._labels: Dict[str, npt.NDArray] = {}
         self._filtered_labels: Dict[str, npt.NDArray] = {}
@@ -31,6 +32,10 @@ class YoloLabelsDataset(Dataset):
 
         """
         return self._labels
+
+    def get_txt_files(self):
+        txt_files = glob.glob(os.path.join(self.folder_path, "*.txt"))
+        return [os.path.basename(file) for file in txt_files]
 
     def get_filtered_labels(self):
         return self._filtered_labels
