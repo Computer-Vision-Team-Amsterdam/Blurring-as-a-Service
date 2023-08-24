@@ -31,6 +31,7 @@ performance_evaluation_pipeline:
     imgsz: 2048
     name: "yolo_exp_1"
     save_blurred_image: True
+    conf_thres: 0.001
   metrics_metadata:
     image_height: 4000
     image_width: 8000
@@ -69,6 +70,7 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
+    conf_thres: 0.001
   database_parameters:
     db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"
