@@ -46,9 +46,7 @@ class PreInferencePipelineInputs(SettingsSpecModel):
 
 
 class PreInferencePipelineSpec(SettingsSpecModel):
-    customers: List[str] = None
     inputs: PreInferencePipelineInputs
-    outputs: Dict[str, str] = None
 
 
 class InferenceModelParameters(SettingsSpecModel):
@@ -90,6 +88,7 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     class Config:
         extra = "forbid"
 
+    customer: str
     aml_experiment_details: AMLExperimentDetailsSpec
     metadata_pipeline: MetadataPipelineSpec = None
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
