@@ -29,5 +29,12 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 def convert_azure_coco_to_coco(
     coco_annotations_in: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     coco_annotations_out: Output(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
+    image_width: int,
+    image_height: int,
 ):
-    AzureCocoToCocoConverter(coco_annotations_in, coco_annotations_out).convert()
+    AzureCocoToCocoConverter(
+        coco_annotations_in,
+        coco_annotations_out,
+        new_width=image_width,
+        new_height=image_height,
+    ).convert()

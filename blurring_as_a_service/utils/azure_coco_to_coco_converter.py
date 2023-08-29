@@ -3,9 +3,13 @@ import json
 
 
 class AzureCocoToCocoConverter:
-    def __init__(self, azureml_file: str, output_file: str):
+    def __init__(
+        self, azureml_file: str, output_file: str, new_width: float, new_height: float
+    ):
         self._filename = azureml_file
         self._output_file = output_file
+        self.new_width = new_width
+        self.new_height = new_height
 
         with open(azureml_file) as f:
             self._input = json.load(f)
@@ -38,14 +42,12 @@ class AzureCocoToCocoConverter:
         """
         Converts normalized bbox values to absolute values.
         """
-        width = self._input["images"][0]["width"]
-        height = self._input["images"][0]["height"]
 
         for i, ann in enumerate(self._input["annotations"]):
             bbox_absolute_values = []
             for x, y in zip(ann["bbox"][::2], ann["bbox"][1::2]):
-                bbox_absolute_values.append(x * width)
-                bbox_absolute_values.append(y * height)
+                bbox_absolute_values.append(x * self.new_width)
+                bbox_absolute_values.append(y * self.new_height)
             self._input["annotations"][i]["bbox"] = bbox_absolute_values
 
     def _save(self):

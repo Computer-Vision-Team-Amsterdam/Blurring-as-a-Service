@@ -30,5 +30,8 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 def convert_azure_coco_to_yolo(
     coco_annotations_in: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     yolo_annotations: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    tagged_data: bool,
 ):
-    AzureCocoToYoloConverter(coco_annotations_in, yolo_annotations).convert()
+    AzureCocoToYoloConverter(
+        coco_annotations_in, yolo_annotations, tagged_data=tagged_data
+    ).convert()
