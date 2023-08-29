@@ -20,32 +20,33 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 def pre_inference_pipeline(number_of_batches):
     execution_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
 
-    for customer in pre_inference_settings["customers"]:
-        move_data = move_files(execution_time=execution_time)
-        azureml_input_formatted = aml_interface.get_azureml_path(f"{customer}_input")
-        azureml_output_formatted = aml_interface.get_azureml_path(
-            f"{customer}_input_structured"
-        )
+    move_data = move_files(execution_time=execution_time)
+    azureml_input_formatted = aml_interface.get_azureml_path(
+        f"{settings['customer']}_input"
+    )
+    azureml_output_formatted = aml_interface.get_azureml_path(
+        f"{settings['customer']}_input_structured"
+    )
 
-        # NOTE We need to use Output to also delete the files.
-        move_data.outputs.input_container = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_input_formatted
-        )
+    # NOTE We need to use Output to also delete the files.
+    move_data.outputs.input_container = Output(
+        type="uri_folder", mode="rw_mount", path=azureml_input_formatted
+    )
 
-        move_data.outputs.output_container = Output(
-            type="uri_folder", mode="rw_mount", path=azureml_output_formatted
-        )
+    move_data.outputs.output_container = Output(
+        type="uri_folder", mode="rw_mount", path=azureml_output_formatted
+    )
 
-        split_workload_step = split_workload(
-            data_folder=move_data.outputs.output_container,
-            execution_time=execution_time,
-            number_of_batches=number_of_batches,
-        )
-        split_workload_step.outputs.results_folder = Output(
-            type="uri_folder",
-            mode="rw_mount",
-            path=os.path.join(azureml_output_formatted, "inference_queue"),
-        )
+    split_workload_step = split_workload(
+        data_folder=move_data.outputs.output_container,
+        execution_time=execution_time,
+        number_of_batches=number_of_batches,
+    )
+    split_workload_step.outputs.results_folder = Output(
+        type="uri_folder",
+        mode="rw_mount",
+        path=os.path.join(azureml_output_formatted, "inference_queue"),
+    )
 
     return {}
 

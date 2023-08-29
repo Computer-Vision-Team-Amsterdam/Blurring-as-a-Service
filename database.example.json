@@ -1,0 +1,6 @@
+{
+  "hostname": "*.postgres.database.azure.com",
+  "username": "",
+  "database_name": "blur",
+  "client_id": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
