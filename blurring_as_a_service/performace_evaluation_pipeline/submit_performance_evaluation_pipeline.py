@@ -1,5 +1,6 @@
 import json
 import os
+from datetime import datetime
 
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
@@ -21,12 +22,14 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def performance_evaluation_pipeline():
     datastore_name = performance_evaluation_settings["datastore"]
-    base_output_folder = performance_evaluation_settings["base_output_folder"]
     inputs = performance_evaluation_settings["inputs"]
     model_parameters = performance_evaluation_settings["model_parameters"]
     model_parameters_json = json.dumps(model_parameters)
     metrics_metadata = performance_evaluation_settings["metrics_metadata"]
     metrics_metadata_json = json.dumps(metrics_metadata)
+
+    execution_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    base_output_folder = f"performance_evaluation_pipeline/{execution_time}_{model_parameters_json}_{metrics_metadata_json}"
 
     yolo_dataset_path = os.path.join(
         aml_interface.get_azureml_path(datastore_name=datastore_name),
