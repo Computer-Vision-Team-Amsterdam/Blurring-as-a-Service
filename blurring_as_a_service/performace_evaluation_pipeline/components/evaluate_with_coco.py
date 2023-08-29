@@ -33,6 +33,21 @@ def evaluate_with_coco(
     model_parameters_json: str,
     metrics_metadata_json: str,
 ):
+    """
+    Pipeline step to performa COCO evaluation.
+    This evaluation helps us obtain mAP, P, R for different sizes: small medium and large.
+
+    Parameters
+    ----------
+    coco_annotations: Corresponds to metadata_pipeline['outputs']['coco_annotations']
+    yolo_validation_output: yolo run results folder. Contains folders such as labels, labels-tagged
+    model_parameters_json: parameters from the yolo run in json format
+    metrics_metadata_json: extra parameters about images to double check if the calculations are sound.
+
+    Returns
+    -------
+
+    """
     model_parameters = json.loads(model_parameters_json)
     metrics_metadata = json.loads(metrics_metadata_json)
     coco_predictions = (

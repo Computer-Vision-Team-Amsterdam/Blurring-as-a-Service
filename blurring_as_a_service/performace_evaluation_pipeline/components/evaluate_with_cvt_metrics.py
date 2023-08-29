@@ -41,6 +41,22 @@ def evaluate_with_cvt_metrics(
     metrics_metadata_json: str,
     metrics_results: Output(type="uri_folder"),  # type: ignore # noqa: F821
 ):
+    """
+    Pipeline step to run TBA and FNR metrics.
+
+    Parameters
+    ----------
+    mounted_dataset: yolo dataset
+    yolo_validation_output: where we store the yolo run results
+    coco_annotations: coco annotations from the metadata pipeline output
+    model_parameters_json: parameters from the yolo run in json format
+    metrics_metadata_json: extra parameters about images to double check if the calculations are sound.
+    metrics_results: where to store the files with TBA and FNR metrics.
+
+    Returns
+    -------
+
+    """
     model_parameters = json.loads(model_parameters_json)
     metrics_metadata = json.loads(metrics_metadata_json)
     save_dir = f"{yolo_validation_output}/{model_parameters['name']}"
