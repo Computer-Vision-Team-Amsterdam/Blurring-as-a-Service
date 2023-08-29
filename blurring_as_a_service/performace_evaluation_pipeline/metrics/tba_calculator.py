@@ -1,15 +1,20 @@
+import sys
 from typing import Dict
 
 import numpy as np
 import numpy.typing as npt
 from tqdm import tqdm
 
-from blurring_as_a_service.metrics.metrics_utils import (
+sys.path.append("../../..")
+
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (  # noqa: E402
     ImageSize,
     TargetClass,
     generate_binary_mask,
 )
-from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
+from blurring_as_a_service.utils.yolo_labels_dataset import (  # noqa: E402
+    YoloLabelsDataset,
+)
 
 
 class TotalBlurredArea:
@@ -104,7 +109,9 @@ def get_total_blurred_area_statistics(
     return results
 
 
-def collect_tba_results_per_class_and_size(true_path: str, pred_path: str):
+def collect_tba_results_per_class_and_size(
+    true_path: str, pred_path: str, image_area: int
+):
     """
 
     Computes a dict with statistics (tn, tp, fp, fn, precision, recall, f1) for each target class and size.
@@ -113,20 +120,21 @@ def collect_tba_results_per_class_and_size(true_path: str, pred_path: str):
     ----------
     true_path
     pred_path
+    image_area
 
     Returns:
     -------
 
     """
-    predicted_dataset = YoloLabelsDataset(folder_path=pred_path)
+    predicted_dataset = YoloLabelsDataset(folder_path=pred_path, image_area=image_area)
     results = {}
 
     for target_class in TargetClass:
         for size in ImageSize:
             true_target_class_size = (  # i.e. true_person_small
-                YoloLabelsDataset(folder_path=true_path)
-                .filter_by_class(class_to_keep=target_class)
-                .filter_by_size(size_to_keep=size)
+                YoloLabelsDataset(folder_path=true_path, image_area=image_area)
+                .filter_by_class(class_to_keep=target_class.value)
+                .filter_by_size(size_to_keep=size.value)
                 .get_filtered_labels()
             )
             results[
@@ -162,23 +170,26 @@ def store_tba_results(
         f.write("|----- | ----- |  ----- | ----- | ----- | ----- |\n")
         f.write(
             f'| {results["person_small"]["recall"]} | {results["person_medium"]["recall"]} '
-            f'| {results["person_large"]["recall"]}| {results["licence_plate_small"]["recall"]} '
-            f'| {results["licence_plate_medium"]["recall"]} | {results["licence_plate_large"]["recall"]}|\n'
+            f'| {results["person_large"]["recall"]}| {results["license_plate_small"]["recall"]} '
+            f'| {results["license_plate_medium"]["recall"]} | {results["license_plate_large"]["recall"]}|\n'
         )
         f.write(
-            f"Thresholds used for these calculations: Small=`{ImageSize.small}`, Medium=`{ImageSize.medium}` "
-            f"and Large=`{ImageSize.large}`."
+            f"Thresholds used for these calculations: Small=`{ImageSize.small.value}`, Medium=`{ImageSize.medium.value}` "
+            f"and Large=`{ImageSize.large.value}`."
         )
         f.write(
-            f"Thresholds used for these calculations: Small=`{ImageSize.small}`, Medium=`{ImageSize.medium}` "
-            f"and Large=`{ImageSize.large}`."
+            f"Thresholds used for these calculations: Small=`{ImageSize.small.value}`, Medium=`{ImageSize.medium.value}` "
+            f"and Large=`{ImageSize.large.value}`."
         )
 
 
 def collect_and_store_tba_results_per_class_and_size(
-    ground_truth_path: str, predictions_path: str, markdown_output_path: str
+    ground_truth_path: str,
+    predictions_path: str,
+    markdown_output_path: str,
+    image_area: int,
 ):
     results: Dict[str, Dict[str, float]] = collect_tba_results_per_class_and_size(
-        ground_truth_path, predictions_path
+        ground_truth_path, predictions_path, image_area
     )
     store_tba_results(results, markdown_output_path)

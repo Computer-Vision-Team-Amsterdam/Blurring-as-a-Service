@@ -29,6 +29,7 @@ aml_experiment_settings = settings["aml_experiment_details"]
 )
 def detect_and_blur_sensitive_data(
     mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
@@ -43,9 +44,12 @@ def detect_and_blur_sensitive_data(
     ----------
     mounted_root_folder:
         Path of the mounted folder containing the images.
-    batch_file_txt:
-        Text file containing multiple rows where each row has a relative path,
-        taking folder as root and the path to the image.
+    model:
+        Model weights for inference
+    batches_files_path:
+         Path to folder with multiple text files.
+         One text file contains multiple rows.
+         Each row is a relative path to {customer_name}_input_structured/inference_queue
     results_path:
         Where to store the results.
     yolo_yaml_path:
@@ -93,7 +97,7 @@ def detect_and_blur_sensitive_data(
             model_parameters = json.loads(model_parameters_json)
             database_parameters = json.loads(database_parameters_json)
             val.run(
-                weights=f"{mounted_root_folder}/dataoffice_model_v1.0.pt",
+                weights=model,
                 data=f"{yolo_yaml_path}/pano.yaml",
                 project=results_path,
                 device=cuda_device,

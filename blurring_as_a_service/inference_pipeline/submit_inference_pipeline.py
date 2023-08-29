@@ -16,6 +16,8 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 @pipeline()
 def inference_pipeline():
     customer_name = inference_settings["customer_name"]
+    model_name = inference_settings["model_name"]
+    model_version = inference_settings["model_version"]
 
     # Format the root path of the Blob Storage Container in Azure using placeholders
     blob_container_path = aml_interface.get_azureml_path(
@@ -28,6 +30,12 @@ def inference_pipeline():
         description="Data to be blurred",
     )
 
+    model = Input(
+        type=AssetTypes.CUSTOM_MODEL,
+        path=f"azureml:{model_name}:{model_version}",
+        description="Model weights for evaluation",
+    )
+
     # Get the txt file that contains all paths of the files to run inference on
     batches_files_path = os.path.join(
         aml_interface.get_azureml_path(f"{customer_name}_input_structured"),
@@ -38,14 +46,15 @@ def inference_pipeline():
     model_parameters_json = json.dumps(
         model_parameters
     )  # TODO it seems I can not pass a dict to @command_component function
-    database_parameters = inference_settings['database_parameters']
+    database_parameters = inference_settings["database_parameters"]
     database_parameters_json = json.dumps(database_parameters)
 
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         mounted_root_folder=input_root_folder,
+        model=model,
         customer_name=customer_name,
         model_parameters_json=model_parameters_json,
-        database_parameters_json=database_parameters_json
+        database_parameters_json=database_parameters_json,
     )
 
     azureml_outputs_formatted = aml_interface.get_azureml_path(

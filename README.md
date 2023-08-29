@@ -1,6 +1,6 @@
 # Blurring-as-a-Service
 
-This project is about removing personal data, i.e. persons and licence plates from raw panorama images.
+This project is about removing personal data, i.e. persons and license plates from raw panorama images.
 We aim to do this in an inclusive manner, and we select our images based on different types of biases which can occur.
 We create a document with a list of potential biases that we want to minimize and we select 
 the panorama images used for training the model based on this document.

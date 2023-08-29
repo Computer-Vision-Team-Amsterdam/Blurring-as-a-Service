@@ -1,3 +1,5 @@
+import os
+
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -17,57 +19,87 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def metadata_pipeline(
-    coco_annotations,
-    labels_path,
-    images_path,
-    metadata_path,
-    metadata_path_coco_evaluation,
-):
-    metadata_flags = BlurringAsAServiceSettings.get_settings()["metadata_pipeline"][
-        "flags"
-    ]
+def metadata_pipeline():
+    datastore_name = metadata_settings["datastore"]
+    base_output_folder = metadata_settings["base_output_folder"]
+    inputs = metadata_settings["inputs"]
+    outputs = metadata_settings["outputs"]
+    metadata_flags = metadata_settings["flags"]
+
+    coco_annotations_in_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        inputs["coco_annotations"],
+    )
+
+    yolo_annotations_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        outputs["yolo_annotations"],
+    )
+
+    images_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name), inputs["images"]
+    )
+
+    coco_annotations_out_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        base_output_folder,
+        outputs["coco_annotations"],
+    )
+
+    metadata_path = os.path.join(
+        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        base_output_folder,
+        outputs["metadata"],
+    )
+
+    coco_annotations_in = Input(
+        type=AssetTypes.URI_FILE,
+        path=coco_annotations_in_path,
+        description="Path to Data Labeling annotation json file. This is in incorrect/non-standard coco format.",
+    )
+
+    images = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=images_path,
+        description="Path to images folder that correspond to the Data Labeling annotations.",
+    )
+
     if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_YOLO:
         convert_azure_coco_to_yolo_step = convert_azure_coco_to_yolo(
-            input_data=coco_annotations
+            coco_annotations_in=coco_annotations_in
         )
-        convert_azure_coco_to_yolo_step.outputs.output_folder = Output(
-            type=AssetTypes.URI_FOLDER, path=labels_path.result(), mode="rw_mount"
+
+        convert_azure_coco_to_yolo_step.outputs.yolo_annotations = Output(
+            type=AssetTypes.URI_FOLDER,
+            path=yolo_annotations_path,
+            mode="rw_mount",
+            description="Yolo annotations",
         )
 
     if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_COCO:
         convert_azure_coco_to_coco_step = convert_azure_coco_to_coco(
-            input_data=coco_annotations
+            coco_annotations_in=coco_annotations_in
         )
-        convert_azure_coco_to_coco_step.outputs.output_file = Output(
+        convert_azure_coco_to_coco_step.outputs.coco_annotations_out = Output(
             type=AssetTypes.URI_FILE,
-            path=metadata_path_coco_evaluation.result(),
+            path=coco_annotations_out_path,
             mode="rw_mount",
+            description="Standard coco annotation file",
         )
+
     if metadata_flags & PipelineFlag.CREATE_METADATA:
-        metadata_retriever_step = create_metadata(input_directory=images_path)
-        metadata_retriever_step.outputs.output_file = Output(
-            type=AssetTypes.URI_FILE, path=metadata_path.result(), mode="rw_mount"
+        metadata_retriever_step = create_metadata(input_directory=images)
+        metadata_retriever_step.outputs.metadata_path = Output(
+            type=AssetTypes.URI_FILE,
+            path=metadata_path,
+            mode="rw_mount",
+            description="Json file with images metadata gotten via the panorama API.",
         )
     return {}
 
 
 def main():
-    aml_interface = AMLInterface()
-    settings = BlurringAsAServiceSettings.get_settings()
-
-    inputs = settings["metadata_pipeline"]["inputs"]
-    outputs = settings["metadata_pipeline"]["outputs"]
-    coco_annotations = Input(type=AssetTypes.URI_FILE, path=inputs["coco_annotations"])
-    images_path = Input(type=AssetTypes.URI_FOLDER, path=inputs["images_path"])
-
-    metadata_pipeline_job = metadata_pipeline(
-        coco_annotations=coco_annotations,
-        labels_path=outputs["labels_path"],
-        images_path=images_path,
-        metadata_path=outputs["metadata_path"],
-        metadata_path_coco_evaluation=outputs["metadata_path_coco_evaluation"],
-    )
+    metadata_pipeline_job = metadata_pipeline()
     metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
         "compute_name"
     ]
@@ -80,4 +112,9 @@ def main():
 
 if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    settings = BlurringAsAServiceSettings.get_settings()
+    metadata_settings = settings["metadata_pipeline"]
+
+    aml_interface = AMLInterface()
+
     main()

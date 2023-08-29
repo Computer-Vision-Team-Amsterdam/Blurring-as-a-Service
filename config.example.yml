@@ -5,16 +5,36 @@ aml_experiment_details:
   src_dir: "."
 
 metadata_pipeline:
+  datastore: "nieuw_panorama_beelden_geo360"
+  base_output_folder: "METADATA_pipeline_run_0"  # change this when running a new experiment
   inputs:
-    coco_annotations: "azureml:NAMED_ASSET_URI_CONTAINING_COCO_ANNOTATIONS"
-    images_path: "azureml://FOLDER_PATH_CONTAINING_THE_IMAGES"
+    coco_annotations: "geo30-coco.json"
+    images: "selectie_original/images/val"
   outputs:
-    labels_path: "azureml://FOLDER_PATH_WHERE_STORE_YOLO_LABELS"
-    metadata_path: "azureml://FOLDER_PATH_WHERE_STORE_METADATA"
+    yolo_annotations: "selectie_original/labels/val"  # yolo labels are overwritten with every new run
+    metadata: "metadata.json"
+    coco_annotations: "coco.json"
   flags:
-    # Possible values: NONE (in case no flag is needed), CONVERT_COCO_TO_YOLO, CREATE_METADATA
-    - CONVERT_COCO_TO_YOLO
-    - CREATE_METADATA
+    # Possible values: NONE, CONVERT_AZURE_COCO_TO_YOLO, CONVERT_AZURE_COCO_TO_COCO, CREATE_METADATA
+    - CONVERT_AZURE_COCO_TO_YOLO
+    - CONVERT_AZURE_COCO_TO_COCO
+
+performance_evaluation_pipeline:
+  datastore: "nieuw_panorama_beelden_geo360"
+  base_output_folder: "PE_pipeline_run_0"  # change this when running a new experiment
+  inputs:
+    yolo_dataset: "selectie_original"
+    coco_annotations: "metadata-pipeline/selectie_original_coco_labels/coco.json"
+    model_name: "dataoffice_model"
+    model_version: "1"
+  model_parameters:
+    imgsz: 2048
+    name: "yolo_exp_1"
+    save_blurred_image: True
+  metrics_metadata:
+    image_height: 4000
+    image_width: 8000
+    image_area: 32000000
 
 training_pipeline:
   model_parameters:
@@ -40,6 +60,8 @@ pre_inference_pipeline:
 
 inference_pipeline:
   customer_name: data_office
+  model_name: "dataoffice_model"
+  model_version: "1"
   model_parameters:
     imgsz: 4000
     save_txt: True
@@ -51,17 +73,6 @@ inference_pipeline:
     db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"
     db_name: "blur"
-
-performance_evaluation_pipeline:
-  inputs:
-    validation_images_path: "azureml://FOLDER_PATH_TO_IMAGES_FOLDER"
-    annotations_for_coco_metrics: "azureml://FILE_PATH_TO_COCO_format_annotations_for_COCO_evaluation"
-    model: "azureml://NAMED_ASSET_URI_MODEL_WEIGHTS_FILE"
-    annotations_for_custom_metrics: "azureml://FILE_PATH_TO_Azure_COCO_format_tagged_annotations_for_custom_evaluation"
-  outputs:
-    yolo_yaml_file: "azureml://FOLDER_PATH_WHERE_STORE_YAML_FILE_USED_BY_YOLO"
-    yolo_validation_output: "azureml://FOLDER_PATH_WHERE_STORE_VALIDATION_OUTPUT"
-  yolo_run_name: "name of the yolo run, type string. More information in the README.md"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

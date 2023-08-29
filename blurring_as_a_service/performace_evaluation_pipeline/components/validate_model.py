@@ -1,3 +1,4 @@
+import json
 import os
 import sys
 
@@ -27,10 +28,9 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 )
 def validate_model(
     mounted_dataset: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    model: Input(type="uri_folder"),  # type: ignore # noqa: F821
-    yolo_yaml_path: Output(type="uri_folder"),  # type: ignore # noqa: F821
+    model: Input(type="uri_file"),  # type: ignore # noqa: F821
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
-    yolo_run_name: str,
+    model_parameters_json: str,
 ):
     data = dict(
         train=f"{mounted_dataset}/images/train",
@@ -39,19 +39,21 @@ def validate_model(
         nc=2,
         names=["person", "license_plate"],
     )
-    with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
+    with open(f"{yolo_validation_output}/pano.yaml", "w") as outfile:
         yaml.dump(data, outfile, default_flow_style=False)
     os.system("cp Arial.ttf /root/.config/Ultralytics/Arial.ttf")  # nosec
+    model_parameters = json.loads(model_parameters_json)
+
     val.run(
-        data=f"{yolo_yaml_path}/pano.yaml",
-        weights=f"{model}/last-purple_boot_3l6p24vb.pt",
-        imgsz=2048,
-        batch_size=1,
-        project=f"{yolo_validation_output}",
-        task="val",
-        name=yolo_run_name,
-        save_txt=True,
-        save_json=True,
+        data=f"{yolo_validation_output}/pano.yaml",
+        weights=model,
+        project=f"{yolo_validation_output}",  # DO NOT CHANGE
+        batch_size=1,  # DO NOT CHANGE
+        task="val",  # DO NOT CHANGE
+        save_txt=True,  # DO NOT CHANGE
+        save_json=True,  # DO NOT CHANGE
         half=True,
-        tagged_data=True,
+        tagged_data=True,  # DO NOT CHANGE
+        skip_evaluation=False,  # DO NOT CHANGE
+        **model_parameters,
     )

@@ -16,16 +16,56 @@ class AMLExperimentDetailsSpec(SettingsSpecModel):
 
 
 class MetadataPipelineSpec(SettingsSpecModel):
+    datastore: str
+    base_output_folder: str
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
     flags: List[str] = []
+
+    def __init__(self, datastore=None, inputs=None, outputs=None, flags=None, **kwargs):
+        super().__init__(
+            datastore=datastore, inputs=inputs, outputs=outputs, flags=flags, **kwargs
+        )
+
+        # Get paths from inputs and outputs
+        images = self.inputs.get("images", "")
+        yolo_annotations = self.outputs.get("yolo_annotations", "")
+
+        # Check images and yolo_annotations for the required structure
+        if not images.endswith("images/val"):
+            raise ValueError(
+                "The image files must be stored in the dataset_name/images/val structure."
+            )
+        if not yolo_annotations.endswith("labels/val"):
+            raise ValueError(
+                "The yolo labels must be stored in the dataset_name/labels/val structure."
+            )
+
+        # Check if images and labels share the same root folder
+        if images.split("/")[0] != yolo_annotations.split("/")[0]:
+            raise ValueError(
+                "The images and the labels are not under the same root folder, as expected in yolov5."
+            )
+
+
+class ValidationModelParameters(SettingsSpecModel):
+    imgsz: int
+    name: str
+    save_blurred_image: bool
+
+
+class MetricsMetadata(SettingsSpecModel):
+    image_height: int
+    image_width: int
+    image_area: int
 
 
 class PerformanceEvaluationPipelineSpec(SettingsSpecModel):
+    datastore: str = None
+    base_output_folder: str = None
     inputs: Dict[str, str] = None
-    outputs: Dict[str, str] = None
-    yolo_run_name: str = None
-    flags: List[str] = []
+    metrics_metadata: MetricsMetadata
+    model_parameters: ValidationModelParameters
 
 
 class TrainingModelParameters(SettingsSpecModel):
@@ -66,6 +106,8 @@ class InferenceDatabaseCredentials(SettingsSpecModel):
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     customer_name: str
+    model_name: str
+    model_version: str
     model_parameters: InferenceModelParameters
     database_parameters: InferenceDatabaseCredentials
 

@@ -3,7 +3,10 @@ import unittest
 import numpy as np
 from numpy.testing import assert_allclose
 
-from blurring_as_a_service.metrics.metrics_utils import ImageSize, TargetClass
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (
+    ImageSize,
+    TargetClass,
+)
 from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
 
 
@@ -111,9 +114,7 @@ class TestYoloLabelsDataset(unittest.TestCase):
             ), "First column should contain only 0s"
 
     def test_filter_by_size(self):
-        self.dataset.filter_by_size(
-            size_to_keep=ImageSize.small.value, image_area=32000000
-        )
+        self.dataset.filter_by_size(size_to_keep=ImageSize.small.value)
         labels_size_small = self.dataset.get_filtered_labels()
         min_size = ImageSize.small.value[0]
         max_size = ImageSize.small.value[1]
