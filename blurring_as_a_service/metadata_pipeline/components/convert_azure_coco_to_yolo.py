@@ -33,12 +33,12 @@ def convert_azure_coco_to_yolo(
     tagged_data: bool,
 ):
     """
-
+    Pipeline step to convert Azure coco annotations to yolo labels.
     Parameters
     ----------
-    coco_annotations_in
-    yolo_annotations
-    tagged_data
+    coco_annotations_in: json file with Azure coco annotations
+    yolo_annotations: folder to store the txt files
+    tagged_data: whether the yolo labels should contain tagged class id.
 
     Returns
     -------
