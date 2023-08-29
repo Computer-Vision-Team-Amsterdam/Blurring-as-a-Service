@@ -53,7 +53,7 @@ def validate_model(
         save_txt=True,  # DO NOT CHANGE
         save_json=True,  # DO NOT CHANGE
         half=True,
-        tagged_data=True,  # DO NOT CHANGE
+        tagged_data=False,  # DO NOT CHANGE
         skip_evaluation=False,  # DO NOT CHANGE
         **model_parameters,
     )
