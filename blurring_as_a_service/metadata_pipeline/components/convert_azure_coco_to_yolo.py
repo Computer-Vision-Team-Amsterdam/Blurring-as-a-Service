@@ -32,6 +32,18 @@ def convert_azure_coco_to_yolo(
     yolo_annotations: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     tagged_data: bool,
 ):
+    """
+
+    Parameters
+    ----------
+    coco_annotations_in
+    yolo_annotations
+    tagged_data
+
+    Returns
+    -------
+
+    """
     AzureCocoToYoloConverter(
         coco_annotations_in, yolo_annotations, tagged_data=tagged_data
     ).convert()
