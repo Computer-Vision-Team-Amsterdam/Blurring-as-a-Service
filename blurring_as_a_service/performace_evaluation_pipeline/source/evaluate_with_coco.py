@@ -1,5 +1,5 @@
 import json
-import warnings
+import logging
 
 from pycocotools.coco import COCO
 
@@ -46,7 +46,7 @@ def coco_evaluation(
         height != metrics_metadata["image_height"]
         or width != metrics_metadata["image_width"]
     ):
-        warnings.warn(
+        logging.warning(
             f"You're trying to run evaluation on images of size {height} x {width}, "
             "but the coco annotations have been generated from images of size "
             f"{metrics_metadata['image_height']} x {metrics_metadata['image_width']}."

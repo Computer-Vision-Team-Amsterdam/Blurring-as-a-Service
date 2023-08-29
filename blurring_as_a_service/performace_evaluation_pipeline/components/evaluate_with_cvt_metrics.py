@@ -1,7 +1,7 @@
 import json
+import logging
 import os
 import sys
-import warnings
 from pathlib import Path
 
 from mldesigner import Input, Output, command_component  # noqa: E402
@@ -85,7 +85,7 @@ def evaluate_with_cvt_metrics(
             markdown_output_path="fnr_results.md"
         )
     else:
-        warnings.warn(
+        logging.warning(
             "False Negative Rate metrics can only be run with tagged validation. "
             "labels_tagged folder not found. Make sure you run val.py with the --tagged-data "
             "flag in case you want to compute this metric."
