@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
@@ -20,8 +21,10 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 @pipeline()
 def metadata_pipeline():
+    execution_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    base_output_folder = f"metadata_pipeline/{execution_time}"
+
     datastore_name = metadata_settings["datastore"]
-    base_output_folder = metadata_settings["base_output_folder"]
     inputs = metadata_settings["inputs"]
     outputs = metadata_settings["outputs"]
     metadata_flags = metadata_settings["flags"]
@@ -66,7 +69,8 @@ def metadata_pipeline():
 
     if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_YOLO:
         convert_azure_coco_to_yolo_step = convert_azure_coco_to_yolo(
-            coco_annotations_in=coco_annotations_in
+            coco_annotations_in=coco_annotations_in,
+            tagged_data=metadata_settings["tagged_data"],
         )
 
         convert_azure_coco_to_yolo_step.outputs.yolo_annotations = Output(
@@ -78,7 +82,9 @@ def metadata_pipeline():
 
     if metadata_flags & PipelineFlag.CONVERT_AZURE_COCO_TO_COCO:
         convert_azure_coco_to_coco_step = convert_azure_coco_to_coco(
-            coco_annotations_in=coco_annotations_in
+            coco_annotations_in=coco_annotations_in,
+            image_width=outputs["image_width"],
+            image_height=outputs["image_height"],
         )
         convert_azure_coco_to_coco_step.outputs.coco_annotations_out = Output(
             type=AssetTypes.URI_FILE,

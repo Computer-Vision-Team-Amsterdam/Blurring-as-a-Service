@@ -1,4 +1,4 @@
-from blurring_as_a_service.metrics.tba_calculator import (
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (
     collect_and_store_tba_results_per_class_and_size,
 )
 
@@ -25,4 +25,18 @@ def test_custom_metrics_calculator():
 
     collect_and_store_tba_results_per_class_and_size(
         true_path, pred_path, markdown_output_path=markdown_output_path
+    )
+
+
+def test_sample_from_geo360():
+    true_path = "../../local_test_data/debug-geo360/labels/val/"
+    pred_path = "../../local_test_data/debug-geo360/labels-pred/"
+
+    markdown_output_path = "geo360_tba.md"
+
+    collect_and_store_tba_results_per_class_and_size(
+        true_path,
+        pred_path,
+        markdown_output_path=markdown_output_path,
+        image_area=32000000,
     )

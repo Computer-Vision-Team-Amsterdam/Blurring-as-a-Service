@@ -6,12 +6,14 @@ aml_experiment_details:
 
 metadata_pipeline:
   datastore: "nieuw_panorama_beelden_geo360"
-  base_output_folder: "METADATA_pipeline_run_0"  # change this when running a new experiment
+  tagged_data: True
   inputs:
     coco_annotations: "geo30-coco.json"
     images: "selectie_original/images/val"
   outputs:
     yolo_annotations: "selectie_original/labels/val"  # yolo labels are overwritten with every new run
+    image_width: 8000
+    image_height: 40000
     metadata: "metadata.json"
     coco_annotations: "coco.json"
   flags:
@@ -21,7 +23,6 @@ metadata_pipeline:
 
 performance_evaluation_pipeline:
   datastore: "nieuw_panorama_beelden_geo360"
-  base_output_folder: "PE_pipeline_run_0"  # change this when running a new experiment
   inputs:
     yolo_dataset: "selectie_original"
     coco_annotations: "metadata-pipeline/selectie_original_coco_labels/coco.json"
@@ -31,6 +32,7 @@ performance_evaluation_pipeline:
     imgsz: 2048
     name: "yolo_exp_1"
     save_blurred_image: True
+    conf_thres: 0.001
   metrics_metadata:
     image_height: 4000
     image_width: 8000
@@ -69,6 +71,7 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
+    conf_thres: 0.001
   database_parameters:
     db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"

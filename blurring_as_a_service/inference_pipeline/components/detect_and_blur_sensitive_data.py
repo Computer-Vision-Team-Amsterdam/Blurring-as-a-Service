@@ -38,7 +38,7 @@ def detect_and_blur_sensitive_data(
     database_parameters_json: str,
 ):
     """
-    Pipeline step to detect the areas to blur.
+    Pipeline step to detect the areas to blur and blur those areas.
 
     Parameters
     ----------

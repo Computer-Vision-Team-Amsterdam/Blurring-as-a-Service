@@ -30,6 +30,18 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
 def create_metadata(
     input_directory: Input(type=AssetTypes.URI_FOLDER), metadata_path: Output(type=AssetTypes.URI_FILE)  # type: ignore # noqa: F821
 ):
+    """
+    Pipeline step to create metadata file from panorama images. Only works for panorama ids that exist in the API.
+
+    Parameters
+    ----------
+    input_directory: panorama images
+    metadata_path: json with images metadata
+
+    Returns
+    -------
+
+    """
     MetadataRetriever(
         images_directory_path=input_directory
     ).generate_and_store_metadata(metadata_path)

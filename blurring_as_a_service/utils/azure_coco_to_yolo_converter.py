@@ -11,7 +11,7 @@ class AzureCocoToYoloConverter:
     - It generates one file per image.
     """
 
-    def __init__(self, coco_file: str, yolo_folder: str):
+    def __init__(self, coco_file: str, yolo_folder: str, tagged_data: bool = False):
         """
         Parameters
         ----------
@@ -19,8 +19,11 @@ class AzureCocoToYoloConverter:
             path to input coco file
         yolo_folder
             path to folder where to store all .txt files
+        tagged_data
+            if yolo annotations must contain tagged classes ids.
         """
         self._output_dir = yolo_folder
+        self.tagged_data = tagged_data
 
         with open(coco_file) as f:
             self._input = json.load(f)
@@ -46,10 +49,14 @@ class AzureCocoToYoloConverter:
             x, y, width, height = annotation["bbox"]
             xc = x + width / 2
             yc = y + height / 2
+
             grouped_category = self._bias_category_mapper.get_grouped_category(
                 annotation["category_id"]
             )
-            line = f'{grouped_category} {xc} {yc} {width} {height} {annotation["category_id"]}'
+            if self.tagged_data:
+                line = f'{grouped_category} {xc} {yc} {width} {height} {annotation["category_id"]}'
+            else:
+                line = f"{grouped_category} {xc} {yc} {width} {height}"
             lines.append(line)
 
         with open(f"{self._output_dir}/{image_name}.txt", "w") as f:
