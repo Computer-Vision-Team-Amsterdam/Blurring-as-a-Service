@@ -34,7 +34,7 @@ def detect_and_blur_sensitive_data(
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_name: str,
     model_parameters_json: str,
-    database_parameters_json: str
+    database_parameters_json: str,
 ):
     """
     Pipeline step to detect the areas to blur.
@@ -93,7 +93,7 @@ def detect_and_blur_sensitive_data(
             model_parameters = json.loads(model_parameters_json)
             database_parameters = json.loads(database_parameters_json)
             val.run(
-                weights=f"{mounted_root_folder}/best.pt",
+                weights=f"{mounted_root_folder}/dataoffice_model_v1.0.pt",
                 data=f"{yolo_yaml_path}/pano.yaml",
                 project=results_path,
                 device=cuda_device,

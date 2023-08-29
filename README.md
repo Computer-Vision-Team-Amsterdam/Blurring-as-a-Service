@@ -75,3 +75,16 @@ cat yolov5/requirements.txt | grep -o '^[^# ]*' | xargs poetry add
 
 ### Pipelines
 More information about the pipelines can be found [here](docs/performance_evaluation_pipeline.md).
+
+## Database
+
+To access the database is necessary to create a `database.json` file inside the `database` folder.
+An example of the structure can be found in the folder under the name `database.example.json`.
+
+The file contains the following information:
+``` 
+    hostname:       hostname address of the database
+    username:       managed identity name in production
+    database_name
+    client_id:      client id of the managed identity
+```
