@@ -36,6 +36,7 @@ def detect_and_blur_sensitive_data(
     customer_name: str,
     model_parameters_json: str,
     database_parameters_json: str,
+    run_id: str,
 ):
     """
     Pipeline step to detect the areas to blur and blur those areas.
@@ -60,7 +61,8 @@ def detect_and_blur_sensitive_data(
         All parameters used to run YOLOv5 inference in json format
     database_parameters_json
         Database credentials
-
+    run_id
+        The ID of the current experiment run
     """
     # Check if the folder exists
     if not os.path.exists(batches_files_path):
@@ -103,6 +105,7 @@ def detect_and_blur_sensitive_data(
                 device=cuda_device,
                 name="",
                 customer_name=customer_name,  # We want to save this info in a database
+                run_id=run_id,  # We want to save this info in a database
                 **model_parameters,
                 **database_parameters,
             )

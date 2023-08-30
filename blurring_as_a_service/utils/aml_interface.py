@@ -17,10 +17,27 @@ class AMLInterface:
     ----------
     ml_client :
         Instance of :class:`azureml.core.Workspace`
+
+    workspace_name : str
+        The name of the Azure ML workspace.
+
+    subscription_id : str
+        The ID of the Azure subscription associated with the workspace.
+
+    resource_group : str
+        The name of the Azure resource group where the workspace is located.
+
+    azureml_path : str
+        The base path to the Azure ML datastore for accessing data paths.
+
+    run_id : str or None
+        The ID of the current experiment run, or None if not set.
+
     """
 
     def __init__(self):
         """Initiate AMLInterface based on the Azure config.json file."""
+
         self.ml_client = MLClient.from_config(self._connect())
         logger.info(
             f"Retrieved the following workspace: {self.ml_client.workspace_name}"
@@ -31,7 +48,11 @@ class AMLInterface:
         self.subscription_id = self.ml_client.subscription_id
         self.resource_group = self.ml_client.resource_group_name
 
-        self.azureml_path = "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{workspace}/datastores/{datastore_name}/paths/"
+        self.azureml_path = (
+            "azureml://subscriptions/{subscription}/resourcegroups/{resourcegroup}/workspaces/{"
+            "workspace}/datastores/{datastore_name}/paths/ "
+        )
+        self.run_id = None
 
     @staticmethod
     def _connect():
@@ -54,7 +75,7 @@ class AMLInterface:
             subscription=self.subscription_id,
             resourcegroup=self.resource_group,
             workspace=self.ml_client.workspace_name,
-            datastore_name=datastore_name
+            datastore_name=datastore_name,
         )
 
         return full_path
@@ -242,3 +263,9 @@ class AMLInterface:
 
     def wait_until_job_completes(self, job_name):
         self.ml_client.jobs.stream(job_name)
+
+    def set_current_run_id(self, run_id):
+        self.run_id = run_id
+
+    def get_current_run_id(self):
+        return self.run_id

@@ -55,6 +55,7 @@ def inference_pipeline():
         customer_name=customer_name,
         model_parameters_json=model_parameters_json,
         database_parameters_json=database_parameters_json,
+        run_id=aml_interface.get_current_run_id(),
     )
 
     azureml_outputs_formatted = aml_interface.get_azureml_path(
@@ -85,6 +86,8 @@ def main():
     pipeline_job = aml_interface.submit_pipeline_job(
         pipeline_job=inference_pipeline_job, experiment_name="inference_pipeline"
     )
+
+    aml_interface.set_current_run_id(run_id=pipeline_job.id)
     aml_interface.wait_until_job_completes(pipeline_job.name)
 
 
