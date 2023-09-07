@@ -32,22 +32,22 @@ def performance_evaluation_pipeline():
     base_output_folder = f"performance_evaluation_pipeline/{execution_time}_{model_parameters_json}_{metrics_metadata_json}"
 
     yolo_dataset_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         inputs["yolo_dataset"],
     )
 
     coco_annotations_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         inputs["coco_annotations"],
     )
 
     yolo_validation_output_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         base_output_folder,
     )
 
     cvt_metrics_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         base_output_folder,
         "cvt_metrics",
     )
@@ -106,24 +106,15 @@ def performance_evaluation_pipeline():
     return {}
 
 
-def main():
-    performance_evaluation_pipeline_job = performance_evaluation_pipeline()
-    performance_evaluation_pipeline_job.settings.default_compute = settings[
-        "aml_experiment_details"
-    ]["compute_name"]
-
-    pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=performance_evaluation_pipeline_job,
-        experiment_name="performance_evaluation_pipeline",
-    )
-    aml_interface.wait_until_job_completes(pipeline_job.name)
-
-
 if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
     performance_evaluation_settings = settings["performance_evaluation_pipeline"]
 
+    default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
-
-    main()
+    aml_interface.submit_pipeline_experiment(
+        performance_evaluation_pipeline,
+        "performance_evaluation_pipeline",
+        default_compute,
+    )

@@ -28,7 +28,7 @@ aml_experiment_settings = settings["aml_experiment_details"]
     is_deterministic=False,
 )
 def detect_and_blur_sensitive_data(
-    mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
@@ -42,7 +42,7 @@ def detect_and_blur_sensitive_data(
 
     Parameters
     ----------
-    mounted_root_folder:
+    input_structured_folder:
         Path of the mounted folder containing the images.
     model:
         Model weights for inference
@@ -78,8 +78,8 @@ def detect_and_blur_sensitive_data(
             with open(file_path, "r") as src:
                 with open(files_to_blur_full_path, "w") as dest:
                     for line in src:
-                        dest.write(f"{mounted_root_folder}/{line}")
-                        print(f"{mounted_root_folder}/{line}")
+                        dest.write(f"{input_structured_folder}/{line}")
+                        print(f"{input_structured_folder}/{line}")
 
             data = dict(
                 train=f"../{files_to_blur_full_path}",

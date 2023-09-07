@@ -30,27 +30,28 @@ def metadata_pipeline():
     metadata_flags = metadata_settings["flags"]
 
     coco_annotations_in_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         inputs["coco_annotations"],
     )
 
     yolo_annotations_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         outputs["yolo_annotations"],
     )
 
     images_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name), inputs["images"]
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
+        inputs["images"],
     )
 
     coco_annotations_out_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         base_output_folder,
         outputs["coco_annotations"],
     )
 
     metadata_path = os.path.join(
-        aml_interface.get_azureml_path(datastore_name=datastore_name),
+        aml_interface.get_datastore_full_path(datastore_name=datastore_name),
         base_output_folder,
         outputs["metadata"],
     )
@@ -104,23 +105,13 @@ def metadata_pipeline():
     return {}
 
 
-def main():
-    metadata_pipeline_job = metadata_pipeline()
-    metadata_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
-        "compute_name"
-    ]
-
-    pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=metadata_pipeline_job, experiment_name="metadata_pipeline"
-    )
-    aml_interface.wait_until_job_completes(pipeline_job.name)
-
-
 if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
     metadata_settings = settings["metadata_pipeline"]
 
+    default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
-
-    main()
+    aml_interface.submit_pipeline_experiment(
+        metadata_pipeline, "metadata_pipeline", default_compute
+    )

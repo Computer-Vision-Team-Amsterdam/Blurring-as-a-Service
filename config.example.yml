@@ -59,7 +59,6 @@ pre_inference_pipeline:
     number_of_batches: 1
 
 inference_pipeline:
-  customer_name: data_office
   model_name: "dataoffice_model"
   model_version: "1"
   model_parameters:
