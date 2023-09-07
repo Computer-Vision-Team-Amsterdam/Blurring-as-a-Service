@@ -165,4 +165,3 @@ tests/**/*.jpg
 tests/**/*.txt
 tests/**/*.json
 *.DS_Store
-database.json

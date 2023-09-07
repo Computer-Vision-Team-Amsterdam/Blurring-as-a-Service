@@ -83,8 +83,5 @@ An example of the structure can be found in the folder under the name `database.
 
 The file contains the following information:
 ``` 
-    hostname:       hostname address of the database
-    username:       managed identity name in production
-    database_name
     client_id:      client id of the managed identity
 ```

@@ -1,6 +1,8 @@
+customer: dataoffice
+
 aml_experiment_details:
-  compute_name: cvt-compute
-  env_name: cvt_environment
+  compute_name: dataoffice-cluster
+  env_name: baas-environment
   env_version: 1
   src_dir: "."
 
@@ -52,20 +54,16 @@ training_pipeline:
     # Possible values: NONE (in case no flag is needed), STORE_MODEL
     - NONE
 
-
 pre_inference_pipeline:
-  customers:
-    - example-customer
   inputs:
     number_of_batches: 1
-
 
 inference_pipeline:
   customer_name: data_office
   model_name: "dataoffice_model"
   model_version: "1"
   model_parameters:
-    imgsz: 4000
+    imgsz: 2048
     save_txt: True
     exist_ok: True
     skip_evaluation: True
@@ -73,8 +71,8 @@ inference_pipeline:
     batch_size: 4
     conf_thres: 0.001
   database_parameters:
-    db_hostname: "psql-flexi-blur-ont-weu-irs-01.postgres.database.azure.com"
-    db_username: "aml-compute-cvo-p"
+    db_hostname: "psql-flexi-blur-prd-weu-cou-01.postgres.database.azure.com"
+    db_username: "aml-compute-cvp-p"
     db_name: "blur"
 
 logging:
