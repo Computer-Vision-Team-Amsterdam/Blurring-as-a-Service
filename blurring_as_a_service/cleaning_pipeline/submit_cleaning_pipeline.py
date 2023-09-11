@@ -42,6 +42,7 @@ def cleaning_pipeline():
         path=output_path,
     )
     delete_blurred_images_step = delete_blurred_images(
+        _=smart_sampling_step.outputs.customer_cvt_folder,
         output_folder=output_folder_input,
     )
     delete_blurred_images_step.outputs.input_structured_folder = Output(

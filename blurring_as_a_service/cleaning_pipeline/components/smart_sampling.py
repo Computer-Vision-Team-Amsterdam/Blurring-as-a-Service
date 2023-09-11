@@ -41,4 +41,5 @@ def smart_sampling(
     # TODO: Implement the smart sampling. Ticket: BCV-52:
     # For manual inspection keep 10 images of blurred images.
     # Keep the entire sample from raw images.
+    print("Smart sampling.")
     return
