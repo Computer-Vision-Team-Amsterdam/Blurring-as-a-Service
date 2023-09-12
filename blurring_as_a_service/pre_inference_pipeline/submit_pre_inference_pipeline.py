@@ -17,14 +17,17 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()
-def pre_inference_pipeline(number_of_batches):
+def pre_inference_pipeline():
     execution_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    number_of_batches = settings["pre_inference_pipeline"]["inputs"][
+        "number_of_batches"
+    ]
 
     move_data = move_files(execution_time=execution_time)
-    azureml_input_formatted = aml_interface.get_azureml_path(
+    azureml_input_formatted = aml_interface.get_datastore_full_path(
         f"{settings['customer']}_input"
     )
-    azureml_output_formatted = aml_interface.get_azureml_path(
+    azureml_output_formatted = aml_interface.get_datastore_full_path(
         f"{settings['customer']}_input_structured"
     )
 
@@ -51,26 +54,14 @@ def pre_inference_pipeline(number_of_batches):
     return {}
 
 
-def main():
-    pre_inference_pipeline_job = pre_inference_pipeline(
-        number_of_batches=pre_inference_settings["inputs"]["number_of_batches"],
-    )
-    pre_inference_pipeline_job.settings.default_compute = settings[
-        "aml_experiment_details"
-    ]["compute_name"]
-
-    pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=pre_inference_pipeline_job,
-        experiment_name="pre_inference_pipeline",
-    )
-    aml_interface.wait_until_job_completes(pipeline_job.name)
-
-
 if __name__ == "__main__":
     # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
     pre_inference_settings = settings["pre_inference_pipeline"]
 
+    default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
-    main()
+    aml_interface.submit_pipeline_experiment(
+        pre_inference_pipeline, "pre_inference_pipeline", default_compute
+    )
