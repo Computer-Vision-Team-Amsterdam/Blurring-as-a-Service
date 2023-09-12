@@ -1,6 +1,7 @@
 import json
 import os
 import sys
+from datetime import datetime
 
 import torch
 import yaml
@@ -18,6 +19,12 @@ config_path = os.path.abspath(
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
+
+
+def get_current_time():
+    current_time = datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S")  # Format the datetime as a string
+    return current_time_str
 
 
 @command_component(
@@ -103,6 +110,7 @@ def detect_and_blur_sensitive_data(
                 device=cuda_device,
                 name="",
                 customer_name=customer_name,  # We want to save this info in a database
+                start_time=get_current_time(),
                 **model_parameters,
                 **database_parameters,
             )
