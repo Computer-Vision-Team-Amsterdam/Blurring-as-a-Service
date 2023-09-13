@@ -1,5 +1,4 @@
 import os
-import shutil
 import sys
 
 from azure.ai.ml.constants import AssetTypes
@@ -9,20 +8,17 @@ sys.path.append("../../..")
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.utils.generics import (  # noqa: E402
+    IMG_FORMATS,
+    copy_file,
+    delete_file,
+)
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
-
-# Construct the path to the yolov5 package
-yolov5_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
-)
-# Add the yolov5 path to sys.path
-sys.path.append(yolov5_path)
-from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
 
 
 @command_component(
@@ -64,25 +60,7 @@ def move_files(
     # Move each file to the target container
     for file_name in files:
         if file_name.lower().endswith(IMG_FORMATS):
-            source_file_path = os.path.join(input_container, file_name)
-            target_file_path = os.path.join(target_folder_path, file_name)
-
-            # Copy the file to the target directory
-            shutil.copy(source_file_path, target_file_path)
-            # TODO do we also want to check the max file size?
-
-            # Verify successful file copy
-            if not os.path.exists(target_file_path):
-                raise FileNotFoundError(
-                    f"Failed to move file '{file_name}' to the destination: {target_file_path}"
-                )
-
-            # Remove the file from the source folder
-            try:
-                os.remove(source_file_path)
-            except OSError:
-                raise OSError(
-                    f"Failed to remove file '{file_name}' from the source folder: {source_file_path}"
-                )
+            copy_file(file_name, input_container, target_folder_path)
+            delete_file(os.path.join(input_container, file_name))
 
     print("Files moved and removed successfully.")

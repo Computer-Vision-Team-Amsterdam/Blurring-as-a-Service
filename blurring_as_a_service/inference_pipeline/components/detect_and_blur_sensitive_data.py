@@ -7,6 +7,8 @@ import yaml
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
+from blurring_as_a_service.utils.generics import delete_file
+
 sys.path.append("../../..")
 import yolov5.val as val  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
@@ -106,8 +108,4 @@ def detect_and_blur_sensitive_data(
                 **model_parameters,
                 **database_parameters,
             )
-
-            try:
-                os.remove(file_path)
-            except OSError as error:
-                raise OSError(f"Failed to remove file '{file_path}': {error}")
+            delete_file(file_path)

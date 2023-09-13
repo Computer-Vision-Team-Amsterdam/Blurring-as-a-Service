@@ -1,11 +1,12 @@
 import logging
-import os
 from typing import Dict, List
 
 import pkg_resources
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import BuildContext, Environment, ManagedIdentityConfiguration
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
+
+from blurring_as_a_service.utils.generics import delete_file
 
 logger = logging.getLogger(__name__)
 
@@ -163,7 +164,7 @@ class AMLInterface:
         build_context_path: str
             Path that contains the build context.
         """
-        os.remove(f"{build_context_path}/requirements.txt")
+        delete_file(f"{build_context_path}/requirements.txt")
 
     def submit_command_job(self, job):
         """
