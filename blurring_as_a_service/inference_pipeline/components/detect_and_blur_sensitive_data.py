@@ -123,9 +123,9 @@ def detect_and_blur_sensitive_data(
                 project=results_path,
                 device=cuda_device,
                 name="",
-                customer_name=customer_name,  # We want to save this info in a database
+                customer_name=customer_name,
                 start_time=get_current_time(),
-                run_id=generate_unique_string("BaaS_", 10),  # Adjust the length
+                run_id=generate_unique_string("BaaS_", 10),
                 **model_parameters,
                 **database_parameters,
             )
