@@ -22,15 +22,12 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
 
 
-def generate_unique_string(prefix, length):
+def generate_unique_string(length):
     # Define the characters to use in the random part of the string
     characters = string.ascii_letters + string.digits
 
     # Generate a random string of the specified length
-    random_part = ''.join(secrets.choice(characters) for _ in range(length))
-
-    # Combine the prefix and random part to create the unique string
-    unique_string = prefix + random_part
+    unique_string = ''.join(secrets.choice(characters) for _ in range(length))
 
     return unique_string
 
@@ -125,7 +122,7 @@ def detect_and_blur_sensitive_data(
                 name="",
                 customer_name=customer_name,
                 start_time=get_current_time(),
-                run_id=generate_unique_string("BaaS_", 10),
+                run_id=generate_unique_string(10),
                 **model_parameters,
                 **database_parameters,
             )
