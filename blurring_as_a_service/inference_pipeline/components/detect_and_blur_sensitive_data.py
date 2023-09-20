@@ -1,7 +1,9 @@
 import json
 import os
 import sys
-
+from datetime import datetime
+import secrets
+import string
 import torch
 import yaml
 from azure.ai.ml.constants import AssetTypes
@@ -18,6 +20,22 @@ config_path = os.path.abspath(
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
+
+
+def generate_unique_string(length):
+    # Define the characters to use in the random part of the string
+    characters = string.ascii_letters + string.digits
+
+    # Generate a random string of the specified length
+    unique_string = ''.join(secrets.choice(characters) for _ in range(length))
+
+    return unique_string
+
+
+def get_current_time():
+    current_time = datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S")  # Format the datetime as a string
+    return current_time_str
 
 
 @command_component(
@@ -102,7 +120,9 @@ def detect_and_blur_sensitive_data(
                 project=results_path,
                 device=cuda_device,
                 name="",
-                customer_name=customer_name,  # We want to save this info in a database
+                customer_name=customer_name,
+                start_time=get_current_time(),
+                run_id=generate_unique_string(10),
                 **model_parameters,
                 **database_parameters,
             )
