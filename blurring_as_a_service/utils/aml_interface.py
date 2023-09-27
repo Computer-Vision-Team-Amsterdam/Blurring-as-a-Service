@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import pkg_resources
 from azure.ai.ml import MLClient
-from azure.ai.ml.entities import BuildContext, Environment
+from azure.ai.ml.entities import BuildContext, Environment, ManagedIdentityConfiguration
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
 
 logger = logging.getLogger(__name__)
@@ -49,12 +49,12 @@ class AMLInterface:
             credential = InteractiveBrowserCredential()
         return credential
 
-    def get_azureml_path(self, datastore_name):
+    def get_datastore_full_path(self, datastore_name):
         full_path = self.azureml_path.format(
             subscription=self.subscription_id,
             resourcegroup=self.resource_group,
             workspace=self.ml_client.workspace_name,
-            datastore_name=datastore_name
+            datastore_name=datastore_name,
         )
 
         return full_path
@@ -239,6 +239,31 @@ class AMLInterface:
         return self.ml_client.jobs.create_or_update(
             pipeline_job, experiment_name=experiment_name
         )
+
+    def submit_pipeline_experiment(
+        self, pipeline_function, experiment_name, default_compute
+    ):
+        """
+        Submits a pipeline experiment to AzureML.
+
+        Parameters
+        ----------
+        pipeline_function:
+            Function of the pipeline. Decorated with @pipeline.
+        experiment_name:
+            Name to give to the experiment.
+        default_compute:
+            Compute name to use to run the pipeline.
+
+        """
+        pipeline_job = pipeline_function()
+        pipeline_job.identity = ManagedIdentityConfiguration()
+        pipeline_job.settings.default_compute = default_compute
+
+        pipeline_job = self.submit_pipeline_job(
+            pipeline_job=pipeline_job, experiment_name=experiment_name
+        )
+        self.wait_until_job_completes(pipeline_job.name)
 
     def wait_until_job_completes(self, job_name):
         self.ml_client.jobs.stream(job_name)

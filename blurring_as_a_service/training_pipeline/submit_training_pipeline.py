@@ -8,7 +8,16 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 @pipeline()
-def training_pipeline(training_data, model_weights, trained_model):
+def training_pipeline():
+    trained_model = settings["training_pipeline"]["outputs"]["trained_model"]
+    training_data = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=settings["training_pipeline"]["inputs"]["training_data"],
+    )
+    model_weights = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=settings["training_pipeline"]["inputs"]["model_weights"],
+    )
     train_model_step = train_model(
         mounted_dataset=training_data, model_weights=model_weights
     )
@@ -21,33 +30,12 @@ def training_pipeline(training_data, model_weights, trained_model):
     return {}
 
 
-def main():
-    aml_interface = AMLInterface()
-    settings = BlurringAsAServiceSettings.get_settings()
-
-    training_data = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=settings["training_pipeline"]["inputs"]["training_data"],
-    )
-    model_weights = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=settings["training_pipeline"]["inputs"]["model_weights"],
-    )
-    training_pipeline_job = training_pipeline(
-        training_data=training_data,
-        model_weights=model_weights,
-        trained_model=settings["training_pipeline"]["outputs"]["trained_model"],
-    )
-    training_pipeline_job.settings.default_compute = settings["aml_experiment_details"][
-        "compute_name"
-    ]
-
-    pipeline_job = aml_interface.submit_pipeline_job(
-        pipeline_job=training_pipeline_job, experiment_name="training_pipeline"
-    )
-    aml_interface.wait_until_job_completes(pipeline_job.name)
-
-
 if __name__ == "__main__":
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
-    main()
+    settings = BlurringAsAServiceSettings.get_settings()
+
+    default_compute = settings["aml_experiment_details"]["compute_name"]
+    aml_interface = AMLInterface()
+    aml_interface.submit_pipeline_experiment(
+        training_pipeline, "training_pipeline", default_compute
+    )

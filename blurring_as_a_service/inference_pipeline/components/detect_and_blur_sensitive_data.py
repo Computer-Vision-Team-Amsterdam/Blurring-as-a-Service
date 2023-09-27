@@ -1,7 +1,9 @@
 import json
 import os
 import sys
-
+from datetime import datetime
+import secrets
+import string
 import torch
 import yaml
 from azure.ai.ml.constants import AssetTypes
@@ -20,6 +22,22 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
 
 
+def generate_unique_string(length):
+    # Define the characters to use in the random part of the string
+    characters = string.ascii_letters + string.digits
+
+    # Generate a random string of the specified length
+    unique_string = ''.join(secrets.choice(characters) for _ in range(length))
+
+    return unique_string
+
+
+def get_current_time():
+    current_time = datetime.now()
+    current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S")  # Format the datetime as a string
+    return current_time_str
+
+
 @command_component(
     name="detect_and_blur_sensitive_data",
     display_name="Detect and blur sensitive data from images",
@@ -28,7 +46,7 @@ aml_experiment_settings = settings["aml_experiment_details"]
     is_deterministic=False,
 )
 def detect_and_blur_sensitive_data(
-    mounted_root_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
@@ -42,7 +60,7 @@ def detect_and_blur_sensitive_data(
 
     Parameters
     ----------
-    mounted_root_folder:
+    input_structured_folder:
         Path of the mounted folder containing the images.
     model:
         Model weights for inference
@@ -78,8 +96,8 @@ def detect_and_blur_sensitive_data(
             with open(file_path, "r") as src:
                 with open(files_to_blur_full_path, "w") as dest:
                     for line in src:
-                        dest.write(f"{mounted_root_folder}/{line}")
-                        print(f"{mounted_root_folder}/{line}")
+                        dest.write(f"{input_structured_folder}/{line}")
+                        print(f"{input_structured_folder}/{line}")
 
             data = dict(
                 train=f"../{files_to_blur_full_path}",
@@ -102,7 +120,9 @@ def detect_and_blur_sensitive_data(
                 project=results_path,
                 device=cuda_device,
                 name="",
-                customer_name=customer_name,  # We want to save this info in a database
+                customer_name=customer_name,
+                start_time=get_current_time(),
+                run_id=generate_unique_string(10),
                 **model_parameters,
                 **database_parameters,
             )
