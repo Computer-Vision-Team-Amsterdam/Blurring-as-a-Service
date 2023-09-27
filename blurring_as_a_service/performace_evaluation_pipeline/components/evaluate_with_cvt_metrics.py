@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import sys
 from pathlib import Path
@@ -27,9 +26,8 @@ config_path = os.path.abspath(
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
-logging_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
-setup_azure_logging_from_config(logging_settings)
-logger = logging.getLogger("__main__")
+
+logger = setup_azure_logging_from_config()
 
 
 @command_component(
