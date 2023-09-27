@@ -14,11 +14,7 @@ def setup_azure_logging_from_config() -> logging.Logger:
     logging_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 
     logging.basicConfig(**logging_settings["basic_config"])
-    instrumentation_key = (
-        "InstrumentationKey=179725b3-3e51-4191-9070-d7449d34420b;IngestionEndpoint=https"
-        "://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope"
-        ".livediagnostics.monitor.azure.com/ "
-    )
+    instrumentation_key = logging_settings["ai_instrumentation_key"]
     azure_log_handler = AzureLogHandler(connection_string=instrumentation_key)
     for pkg in logging_settings["own_packages"]:
         logging.getLogger(pkg).setLevel(logging_settings["loglevel_own"])

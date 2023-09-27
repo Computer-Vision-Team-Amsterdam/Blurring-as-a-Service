@@ -13,6 +13,7 @@ class AMLExperimentDetailsSpec(SettingsSpecModel):
     env_name: str = None
     env_version: int = None
     src_dir: str = None
+    ai_instrumentation_key: str = None
 
 
 class MetadataPipelineSpec(SettingsSpecModel):
@@ -125,6 +126,7 @@ class LoggingSpec(SettingsSpecModel):
         "format": "%(asctime)s|%(levelname)-8s|%(name)s|%(message)s",
         "datefmt": "%Y-%m-%d %H:%M:%S",
     }
+    ai_instrumentation_key: str = ""
 
 
 class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
