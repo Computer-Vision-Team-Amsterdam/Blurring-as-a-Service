@@ -1,6 +1,7 @@
 import math
 import os
 import sys
+import glob
 
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
@@ -9,6 +10,17 @@ yolov5_path = os.path.abspath(
 # Add the yolov5 path to sys.path
 sys.path.append(yolov5_path)
 from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
+
+
+# Function to get all paths to image files within a directory and its subfolders
+def get_image_paths(directory, formats):
+    image_paths = []
+    pattern = os.path.join(directory, "**/*.*")
+    for file_path in glob.glob(pattern, recursive=True):
+        _, extension = os.path.splitext(file_path)
+        if extension.lstrip(".").lower() in formats:
+            image_paths.append(os.path.relpath(file_path, directory))
+    return image_paths
 
 
 class WorkloadSplitter:
@@ -42,12 +54,8 @@ class WorkloadSplitter:
         execution_time: str
             Datetime containing when the job was executed. Used to prefix the files name.
         """
-        image_files = []
-        for root, dirs, files in os.walk(data_folder):
-            for file in files:
-                if file.lower().endswith(IMG_FORMATS):
-                    relative_path = os.path.relpath(os.path.join(root, file), output_folder)
-                    image_files.append(relative_path)
+        # Get all image paths within the input folder
+        image_files = get_image_paths(data_folder, IMG_FORMATS)
 
         images_per_batch = math.ceil(len(image_files) / number_of_batches)
 
