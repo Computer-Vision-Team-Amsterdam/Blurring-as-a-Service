@@ -25,6 +25,16 @@ sys.path.append(yolov5_path)
 from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
 
 
+def get_all_files_with_relative_paths(directory):
+    # A recursive function to get all files in a directory and its subdirectories
+    all_files = []
+    for root, _, files in os.walk(directory):
+        for file in files:
+            relative_path = os.path.relpath(os.path.join(root, file), directory)
+            all_files.append((os.path.join(directory, relative_path), relative_path))
+    return all_files
+
+
 @command_component(
     name="move_files",
     display_name="Move files",
@@ -50,22 +60,23 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
-    # List all files in the mounted folder
-    files = os.listdir(input_container)
+    # List all files in the mounted folder and their relative paths
+    files = get_all_files_with_relative_paths(input_container)
 
     if len(files) == 0:
         print("No files in the input zone. Aborting...")
-        return  # Skip the rest of the code and exit the function
 
     target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
     os.makedirs(target_folder_path, exist_ok=True)
 
-    # Move each file to the target container
-    for file_name in files:
-        if file_name.lower().endswith(IMG_FORMATS):
-            source_file_path = os.path.join(input_container, file_name)
-            target_file_path = os.path.join(target_folder_path, file_name)
+    # Move each file to the target container while preserving the directory structure
+    for source_file_path, relative_path in files:
+        if source_file_path.lower().endswith(IMG_FORMATS):
+            target_file_path = os.path.join(target_folder_path, relative_path)
+
+            # Create the directory structure in the target folder if it doesn't exist
+            os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
 
             # Copy the file to the target directory
             shutil.copy(source_file_path, target_file_path)
@@ -74,7 +85,7 @@ def move_files(
             # Verify successful file copy
             if not os.path.exists(target_file_path):
                 raise FileNotFoundError(
-                    f"Failed to move file '{file_name}' to the destination: {target_file_path}"
+                    f"Failed to move file '{relative_path}' to the destination: {target_file_path}"
                 )
 
             # Remove the file from the source folder
@@ -82,7 +93,7 @@ def move_files(
                 os.remove(source_file_path)
             except OSError:
                 raise OSError(
-                    f"Failed to remove file '{file_name}' from the source folder: {source_file_path}"
+                    f"Failed to remove file '{relative_path}'."
                 )
 
     print("Files moved and removed successfully.")

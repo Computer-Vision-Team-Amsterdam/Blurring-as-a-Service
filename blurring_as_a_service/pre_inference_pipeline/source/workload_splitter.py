@@ -46,7 +46,8 @@ class WorkloadSplitter:
         for root, dirs, files in os.walk(data_folder):
             for file in files:
                 if file.lower().endswith(IMG_FORMATS):
-                    image_files.append(os.path.join(root, file))
+                    relative_path = os.path.relpath(os.path.join(root, file), output_folder)
+                    image_files.append(relative_path)
 
         images_per_batch = math.ceil(len(image_files) / number_of_batches)
 
@@ -56,9 +57,8 @@ class WorkloadSplitter:
             end_index = min(start_index + images_per_batch, len(image_files))
 
             with open(
-                f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
+                    f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
             ) as batch_file:
                 for j in range(start_index, end_index):
-                    file_name = os.path.basename(image_files[j])
-                    image_path = os.path.join(execution_time, file_name)
+                    image_path = image_files[j]
                     batch_file.write(image_path + "\n")
