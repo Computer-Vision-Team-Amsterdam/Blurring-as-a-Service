@@ -69,4 +69,4 @@ class WorkloadSplitter:
             ) as batch_file:
                 for j in range(start_index, end_index):
                     image_path = image_files[j]
-                    batch_file.write(image_path + "\n")
+                    batch_file.write(os.path.join(execution_time,image_path) + "\n")
