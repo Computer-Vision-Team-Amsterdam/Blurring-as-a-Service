@@ -1,5 +1,4 @@
 import json
-import logging
 import os
 import sys
 from pathlib import Path
@@ -17,6 +16,9 @@ from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
+    setup_azure_logging_from_config,
+)
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -24,6 +26,8 @@ config_path = os.path.abspath(
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
+
+logger = setup_azure_logging_from_config()
 
 
 @command_component(
@@ -85,7 +89,7 @@ def evaluate_with_cvt_metrics(
             markdown_output_path="fnr_results.md"
         )
     else:
-        logging.warning(
+        logger.warning(
             "False Negative Rate metrics can only be run with tagged validation. "
             "labels_tagged folder not found. Make sure you run val.py with the --tagged-data "
             "flag in case you want to compute this metric."
