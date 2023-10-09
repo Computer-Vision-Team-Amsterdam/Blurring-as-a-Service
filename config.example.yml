@@ -69,10 +69,11 @@ inference_pipeline:
     save_blurred_image: True
     batch_size: 4
     conf_thres: 0.001
-  database_parameters:
-    db_hostname: "psql-flexi-blur-prd-weu-cou-01.postgres.database.azure.com"
-    db_username: "aml-compute-cvp-p"
-    db_name: "blur"
+
+database_parameters:
+  db_hostname: "psql-flexi-blur-prd-weu-cou-01.postgres.database.azure.com"
+  db_username: "aml-compute-cvp-p"
+  db_name: "blur"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

@@ -1,3 +1,5 @@
+import json
+
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -24,11 +26,14 @@ def cleaning_pipeline():
         path=input_structured_path,
     )
 
-    customer_in_cvt_path = aml_interface.get_datastore_full_path(
-        f"{customer_name}_in_cvt"
-    )
+    database_parameters = settings["database_parameters"]
+    database_parameters_json = json.dumps(database_parameters)
     smart_sampling_step = smart_sampling(
         input_structured_folder=input_structured_input,
+        database_parameters_json=database_parameters_json,
+    )
+    customer_in_cvt_path = aml_interface.get_datastore_full_path(
+        f"{customer_name}_in_cvt"
     )
     smart_sampling_step.outputs.customer_cvt_folder = Output(
         type=AssetTypes.URI_FOLDER,

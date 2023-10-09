@@ -11,6 +11,16 @@ RUN apt-get -y update \
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
 
-COPY requirements.txt /opt/app/requirements.txt
 WORKDIR /opt/app
-RUN pip install -r requirements.txt
+
+RUN pip install --no-cache-dir --upgrade pip
+
+RUN curl -sSL https://install.python-poetry.org | python3 -
+RUN /root/.local/bin/poetry config virtualenvs.create false
+
+COPY pyproject.toml .
+COPY poetry.lock .
+
+ENV PATH="/opt/venv/bin:$PATH"
+
+RUN /root/.local/bin/poetry install --no-ansi --no-interaction --no-root

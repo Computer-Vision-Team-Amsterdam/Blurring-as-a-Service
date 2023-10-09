@@ -1,4 +1,5 @@
 import logging
+import shutil
 from typing import Dict, List
 
 import pkg_resources
@@ -103,6 +104,8 @@ class AMLInterface:
         self._create_pip_requirements_file(
             project_name, build_context_path, submodules, custom_packages
         )
+        shutil.copyfile("poetry.lock", f"{build_context_path}/poetry.lock")
+        shutil.copyfile("pyproject.toml", f"{build_context_path}/pyproject.toml")
 
         env = Environment(
             name=env_name,

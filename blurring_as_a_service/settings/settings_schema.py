@@ -99,7 +99,7 @@ class InferenceModelParameters(SettingsSpecModel):
     conf_thres: float = 0.001
 
 
-class InferenceDatabaseCredentials(SettingsSpecModel):
+class DatabaseCredentialsSpec(SettingsSpecModel):
     db_username: str
     db_hostname: str
     db_name: str
@@ -109,7 +109,6 @@ class InferenceCustomerPipelineSpec(SettingsSpecModel):
     model_name: str
     model_version: str
     model_parameters: InferenceModelParameters
-    database_parameters: InferenceDatabaseCredentials
 
 
 class LoggingSpec(SettingsSpecModel):
@@ -137,4 +136,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     training_pipeline: TrainingPipelineSpec = None
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: InferenceCustomerPipelineSpec = None
+    database_parameters: DatabaseCredentialsSpec = None
     logging: LoggingSpec = LoggingSpec()
