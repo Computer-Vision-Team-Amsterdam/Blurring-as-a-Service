@@ -1,10 +1,6 @@
 import math
 import os
 
-# Construct the path to the yolov5 package
-yolov5_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
-)
 from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
     get_image_paths
 )
