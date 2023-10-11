@@ -51,9 +51,9 @@ def move_files(
 
     """
     # List all files in the mounted folder and their relative paths
-    source_image_paths, relative_image_paths = get_image_paths(input_container)
+    image_paths = get_image_paths(input_container)
 
-    if len(source_image_paths) == 0:
+    if len(image_paths) == 0:
         print("No files in the input zone. Aborting...")
 
     target_folder_path = os.path.join(output_container, execution_time)
@@ -61,7 +61,7 @@ def move_files(
     os.makedirs(target_folder_path, exist_ok=True)
 
     # Move each file to the target container while preserving the directory structure
-    for source_image_path, relative_image_path in (source_image_paths, relative_image_paths):
+    for source_image_path, relative_image_path in image_paths:
         target_file_path = os.path.join(target_folder_path, relative_image_path)
 
         # Create the directory structure in the target folder if it doesn't exist
