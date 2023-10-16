@@ -20,10 +20,10 @@ aml_experiment_settings = settings["aml_experiment_details"]
 yolov5_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
 )
-# Add the yolov5 path to sys.path
-sys.path.append(yolov5_path)
-from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
 
+from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
+    get_image_paths
+)
 
 @command_component(
     name="move_files",
@@ -50,39 +50,39 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
-    # List all files in the mounted folder
-    files = os.listdir(input_container)
+    # List all files in the mounted folder and their relative paths
+    image_paths = get_image_paths(input_container)
 
-    if len(files) == 0:
+    if len(image_paths) == 0:
         print("No files in the input zone. Aborting...")
-        return  # Skip the rest of the code and exit the function
 
     target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
     os.makedirs(target_folder_path, exist_ok=True)
 
-    # Move each file to the target container
-    for file_name in files:
-        if file_name.lower().endswith(IMG_FORMATS):
-            source_file_path = os.path.join(input_container, file_name)
-            target_file_path = os.path.join(target_folder_path, file_name)
+    # Move each file to the target container while preserving the directory structure
+    for source_image_path, relative_image_path in image_paths:
+        target_file_path = os.path.join(target_folder_path, relative_image_path)
 
-            # Copy the file to the target directory
-            shutil.copy(source_file_path, target_file_path)
-            # TODO do we also want to check the max file size?
+        # Create the directory structure in the target folder if it doesn't exist
+        os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
 
-            # Verify successful file copy
-            if not os.path.exists(target_file_path):
-                raise FileNotFoundError(
-                    f"Failed to move file '{file_name}' to the destination: {target_file_path}"
-                )
+        # Copy the file to the target directory
+        shutil.copy(source_image_path, target_file_path)
+        # TODO do we also want to check the max file size?
 
-            # Remove the file from the source folder
-            try:
-                os.remove(source_file_path)
-            except OSError:
-                raise OSError(
-                    f"Failed to remove file '{file_name}' from the source folder: {source_file_path}"
-                )
+        # Verify successful file copy
+        if not os.path.exists(target_file_path):
+            raise FileNotFoundError(
+                f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
+            )
+
+        # Remove the file from the source folder
+        try:
+            os.remove(source_image_path)
+        except OSError:
+            raise OSError(
+                f"Failed to remove file '{source_image_path}'."
+            )
 
     print("Files moved and removed successfully.")
