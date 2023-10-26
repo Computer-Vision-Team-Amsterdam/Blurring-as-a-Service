@@ -36,9 +36,12 @@ echo "rclone size output: $countOutput"
 
 # Copy from CloudVps to Azure Compute to the current working directory. 
 # It creates the "intermediate" in the current working directory.
+# NOTE we are not able to do rclone config create for the blob container, so we use AZ copy later
 rclone copy raw_objectstore_rclone:intermediate/"$relativePath" intermediate/"$relativePath"
 
 # Copy from Azure Compute to Storage Account
+# NOTE make sure to run "azcopy login" before this line
+echo "!!!!NOTE make sure to run "azcopy login" before this line!!!"
 azcopy copy intermediate/ "$storageAccountUrl" --recursive
 
 # Useful command in case the azcopy does not finish successfully:azcopy jobs show <job-id> --with-status=Failed
