@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 
 from azure.ai.ml.constants import AssetTypes
@@ -8,17 +9,21 @@ sys.path.append("../../..")
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.generics import (  # noqa: E402
-    IMG_FORMATS,
-    copy_file,
-    delete_file,
-)
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
+
+# Construct the path to the yolov5 package
+yolov5_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
+)
+
+from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
+    get_image_paths,
+)
 
 
 @command_component(
@@ -46,21 +51,40 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
-    # List all files in the mounted folder
-    files = os.listdir(input_container)
+    # List all files in the mounted folder and their relative paths
+    image_paths = get_image_paths(input_container)
 
-    if len(files) == 0:
+    if len(image_paths) == 0:
         print("No files in the input zone. Aborting...")
-        return  # Skip the rest of the code and exit the function
 
     target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
     os.makedirs(target_folder_path, exist_ok=True)
 
-    # Move each file to the target container
-    for file_name in files:
-        if file_name.lower().endswith(IMG_FORMATS):
-            copy_file(file_name, input_container, target_folder_path)
-            delete_file(os.path.join(input_container, file_name))
+    # TODO: Refactor this to use the copy_file and delete_file functions.
+    #       copy_file(file_name, input_container, target_folder_path)
+    #       delete_file(os.path.join(input_container, file_name))
+    # Move each file to the target container while preserving the directory structure
+    for source_image_path, relative_image_path in image_paths:
+        target_file_path = os.path.join(target_folder_path, relative_image_path)
+
+        # Create the directory structure in the target folder if it doesn't exist
+        os.makedirs(os.path.dirname(target_file_path), exist_ok=True)
+
+        # Copy the file to the target directory
+        shutil.copy(source_image_path, target_file_path)
+        # TODO do we also want to check the max file size?
+
+        # Verify successful file copy
+        if not os.path.exists(target_file_path):
+            raise FileNotFoundError(
+                f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
+            )
+
+        # Remove the file from the source folder
+        try:
+            os.remove(source_image_path)
+        except OSError:
+            raise OSError(f"Failed to remove file '{source_image_path}'.")
 
     print("Files moved and removed successfully.")

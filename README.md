@@ -13,7 +13,7 @@ the panorama images used for training the model based on this document.
 5. [Miro board with pipelines architecture](https://miro.com/app/board/uXjVPbDfQ9s=/?share_link_id=940866715023)
 ---
 
-## Development
+## Installation
 
 #### 1. Clone the code
 
@@ -60,12 +60,12 @@ setting azure paths of where the data can be located and the flags to enable or 
 ### Pipelines
 More information about the pipelines can be found [here](docs/performance_evaluation_pipeline.md).
 
-## Database
+### Database
 
-To access the database is necessary to create a `database.json` file inside the `database` folder.
+To access a database in Azure Machine Learning it is necessary to create a `database.json` file inside the `database` folder.
 An example of the structure can be found in the folder under the name `database.example.json`.
 
-The file contains the following information:
+This database.json file should include the following information:
 ``` 
-    client_id:      client id of the managed identity
+    client_id:      client id of the managed identity in Azure
 ```

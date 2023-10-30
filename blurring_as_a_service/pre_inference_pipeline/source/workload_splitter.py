@@ -1,7 +1,9 @@
 import math
 import os
 
-from blurring_as_a_service.utils.generics import IMG_FORMATS  # noqa: E402
+from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
+    get_image_paths,
+)
 
 
 class WorkloadSplitter:
@@ -35,23 +37,27 @@ class WorkloadSplitter:
         execution_time: str
             Datetime containing when the job was executed. Used to prefix the files name.
         """
-        image_files = []
-        for root, dirs, files in os.walk(data_folder):
-            for file in files:
-                if file.lower().endswith(IMG_FORMATS):
-                    image_files.append(os.path.join(root, file))
+        # Get all image paths within the input folder
+        image_paths = get_image_paths(data_folder)
 
-        images_per_batch = math.ceil(len(image_files) / number_of_batches)
+        # Ensure number_of_batches is not greater than the number of images
+        if number_of_batches > len(image_paths):
+            print(
+                "Number of batches is greater than the number of images. Setting number_of_batches to 1."
+            )
+            number_of_batches = 1
+
+        images_per_batch = math.ceil(len(image_paths) / number_of_batches)
 
         # Process images and create batches
         for i in range(number_of_batches):
             start_index = i * images_per_batch
-            end_index = min(start_index + images_per_batch, len(image_files))
+            end_index = min(start_index + images_per_batch, len(image_paths))
 
             with open(
                 f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
             ) as batch_file:
                 for j in range(start_index, end_index):
-                    file_name = os.path.basename(image_files[j])
-                    image_path = os.path.join(execution_time, file_name)
-                    batch_file.write(image_path + "\n")
+                    # Only get the relative image paths
+                    image_path = image_paths[j][1]
+                    batch_file.write(os.path.join(execution_time, image_path) + "\n")
