@@ -57,22 +57,6 @@ setting azure paths of where the data can be located and the flags to enable or 
 
 ---
 
-### Update yolov5
-In case the yolov5 package gets updated and we want to fetch the latest version the following code must be run:
-```
-git submodule foreach git pull origin master
-```
-
-It's also necessary to update the poetry packages adding the new ones of yolov5,
-in case there are new ones.
-
-This can be easily done using the following command:
-```bash
-cat yolov5/requirements.txt | grep -o '^[^# ]*' | xargs poetry add
-```
-
----
-
 ### Pipelines
 More information about the pipelines can be found [here](docs/performance_evaluation_pipeline.md).
 

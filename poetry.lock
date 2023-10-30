@@ -1992,7 +1992,7 @@ python-versions = "*"
 
 [[package]]
 name = "jsonschema"
-version = "4.19.1"
+version = "4.19.2"
 description = "An implementation of JSON Schema validation for Python"
 category = "main"
 optional = false
@@ -3209,7 +3209,7 @@ python-versions = "*"
 
 [[package]]
 name = "yolov5"
-version = "0.3.1"
+version = "0.3.2"
 description = ""
 category = "main"
 optional = false
@@ -3240,8 +3240,8 @@ yapf = "^0.32.0"
 [package.source]
 type = "git"
 url = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git"
-reference = "v0.3.1"
-resolved_reference = "2d4b4a8067e1cc697621d1496bb51081ef31f045"
+reference = "v0.3.2"
+resolved_reference = "11fb6e4c39d1347b9a5bc5f829c204b9f505056b"
 
 [[package]]
 name = "zipp"
@@ -3258,7 +3258,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-ena
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.8"
-content-hash = "9262392438c81a8998cd88d208f714a1585cbb179a8c70d2e43f0682727b96ba"
+content-hash = "290df43d99e530e0ea091027b58d11830298a31c836bfed816b9ebd8fb84ef7d"
 
 [metadata.files]
 absl-py = []
