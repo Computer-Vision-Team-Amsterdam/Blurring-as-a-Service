@@ -37,8 +37,8 @@ def delete_file(file_path):
 
 
 def copy_file(relative_path, input_path, output_path):
-    source_path = input_path + relative_path
-    destination_path = output_path + relative_path
+    source_path = os.path.join(input_path, relative_path)
+    destination_path = os.path.join(output_path, relative_path)
 
     print(f"Copying {source_path} to {destination_path}..")
     if os.path.exists(source_path):

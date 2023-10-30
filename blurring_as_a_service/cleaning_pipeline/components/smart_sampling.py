@@ -44,6 +44,7 @@ def smart_sampling(
     input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     customer_cvt_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     database_parameters_json: str,
+    customer_name: str,
 ):
     """
     Pipeline step to smart sample images from input_structured.
@@ -57,6 +58,8 @@ def smart_sampling(
         Path of the customer data inside the CVT storage account.
     database_parameters_json
         Database credentials
+    customer_name
+        Customer name
     """
     image_paths = find_image_paths(input_structured_folder)
     grouped_images_by_date = group_files_by_date(image_paths)
@@ -65,7 +68,7 @@ def smart_sampling(
     )
 
     images_statistics = collect_all_images_statistics_from_db(
-        database_parameters_json, grouped_images_by_date
+        database_parameters_json, grouped_images_by_date, customer_name
     )
     print(images_statistics)
 
@@ -116,7 +119,7 @@ def get_10_random_images_per_date(grouped_images_by_date):
 
 
 def collect_all_images_statistics_from_db(
-    database_parameters_json, grouped_images_by_date
+    database_parameters_json, grouped_images_by_date, customer_name
 ):
     database_parameters = json.loads(database_parameters_json)
     db_username = database_parameters["db_username"]
@@ -132,10 +135,8 @@ def collect_all_images_statistics_from_db(
     # Create the database connection
     db_config.create_connection()
 
-    # TODO: CHANGE THIS
-    customer_name = "data_office"
     images_statistics = {}
-    with db_config.get_session() as session:
+    with db_config.managed_session() as session:
         for upload_date, image_names in grouped_images_by_date.items():
             for image_name in image_names:
                 query = session.query(DetectionInformation).filter(

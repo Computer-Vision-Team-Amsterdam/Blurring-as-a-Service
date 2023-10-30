@@ -101,9 +101,6 @@ class AMLInterface:
         ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
         ws.image_build_compute = build_cluster
 
-        self._create_pip_requirements_file(
-            project_name, build_context_path, submodules, custom_packages
-        )
         shutil.copyfile("poetry.lock", f"{build_context_path}/poetry.lock")
         shutil.copyfile("pyproject.toml", f"{build_context_path}/pyproject.toml")
 
@@ -115,7 +112,6 @@ class AMLInterface:
             ),
         )
         self.ml_client.environments.create_or_update(env)
-        self._delete_pip_requirements_file(build_context_path)
         return env
 
     @staticmethod

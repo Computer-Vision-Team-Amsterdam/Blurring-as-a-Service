@@ -23,4 +23,5 @@ COPY poetry.lock .
 
 ENV PATH="/opt/venv/bin:$PATH"
 
+RUN /root/.local/bin/poetry update --no-ansi --no-interaction
 RUN /root/.local/bin/poetry install --no-ansi --no-interaction --no-root

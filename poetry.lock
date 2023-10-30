@@ -82,7 +82,7 @@ tests-no-zope = ["cloudpickle", "hypothesis", "mypy (>=1.1.1)", "pympler", "pyte
 
 [[package]]
 name = "azure-ai-ml"
-version = "1.11.0"
+version = "1.11.1"
 description = "Microsoft Azure Machine Learning Client Library for Python"
 category = "main"
 optional = false
@@ -101,7 +101,7 @@ jsonschema = ">=4.0.0,<5.0.0"
 marshmallow = ">=3.5,<4.0.0"
 msrest = ">=0.6.18"
 opencensus-ext-azure = "<2.0.0"
-pydash = "<6.0.0"
+pydash = ">=6.0.0,<7.0.6"
 pyjwt = "<3.0.0"
 pyyaml = ">=5.1.0,<7.0.0"
 strictyaml = "<2.0.0"
@@ -299,7 +299,7 @@ python-versions = "*"
 
 [[package]]
 name = "azure-core"
-version = "1.29.4"
+version = "1.29.5"
 description = "Microsoft Azure Core Library for Python"
 category = "main"
 optional = false
@@ -365,7 +365,7 @@ msrestazure = ">=0.4.32,<2.0.0"
 
 [[package]]
 name = "azure-identity"
-version = "1.14.0"
+version = "1.14.1"
 description = "Microsoft Azure Identity Library for Python"
 category = "main"
 optional = false
@@ -1173,7 +1173,7 @@ isodate = ">=0.6.1,<1.0.0"
 
 [[package]]
 name = "azure-mgmt-search"
-version = "9.0.0"
+version = "9.1.0"
 description = "Microsoft Azure Search Management Client Library for Python"
 category = "main"
 optional = false
@@ -1182,7 +1182,7 @@ python-versions = ">=3.7"
 [package.dependencies]
 azure-common = ">=1.1,<2.0"
 azure-mgmt-core = ">=1.3.2,<2.0.0"
-msrest = ">=0.7.1"
+isodate = ">=0.6.1,<1.0.0"
 
 [[package]]
 name = "azure-mgmt-security"
@@ -1366,7 +1366,7 @@ python-versions = "*"
 
 [[package]]
 name = "azure-storage-blob"
-version = "12.18.2"
+version = "12.18.3"
 description = "Microsoft Azure Blob Storage Client Library for Python"
 category = "main"
 optional = false
@@ -1397,7 +1397,7 @@ requests = "*"
 
 [[package]]
 name = "azure-storage-file-datalake"
-version = "12.13.1"
+version = "12.13.2"
 description = "Microsoft Azure File DataLake Storage Client Library for Python"
 category = "main"
 optional = false
@@ -1405,7 +1405,7 @@ python-versions = ">=3.7"
 
 [package.dependencies]
 azure-core = ">=1.28.0,<2.0.0"
-azure-storage-blob = ">=12.18.1,<13.0.0"
+azure-storage-blob = ">=12.18.3,<13.0.0"
 isodate = ">=0.6.1"
 typing-extensions = ">=4.3.0"
 
@@ -1414,7 +1414,7 @@ aio = ["azure-core[aio] (>=1.28.0,<2.0.0)"]
 
 [[package]]
 name = "azure-storage-file-share"
-version = "12.14.1"
+version = "12.14.2"
 description = "Microsoft Azure Azure File Share Storage Client Library for Python"
 category = "main"
 optional = false
@@ -1494,7 +1494,7 @@ typecheck = ["mypy"]
 
 [[package]]
 name = "cachetools"
-version = "5.3.1"
+version = "5.3.2"
 description = "Extensible memoizing collections and decorators"
 category = "main"
 optional = false
@@ -1537,7 +1537,7 @@ python-versions = "*"
 
 [[package]]
 name = "charset-normalizer"
-version = "3.3.0"
+version = "3.3.1"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
 category = "main"
 optional = false
@@ -1675,16 +1675,16 @@ testing = ["mock (>=2.0.0,<3.0)"]
 
 [[package]]
 name = "filelock"
-version = "3.12.4"
+version = "3.13.0"
 description = "A platform independent file lock."
 category = "main"
 optional = false
 python-versions = ">=3.8"
 
 [package.extras]
-docs = ["furo (>=2023.7.26)", "sphinx-autodoc-typehints (>=1.24)", "sphinx (>=7.1.2)"]
-testing = ["covdefaults (>=2.3)", "coverage (>=7.3)", "diff-cover (>=7.7)", "pytest-cov (>=4.1)", "pytest-mock (>=3.11.1)", "pytest-timeout (>=2.1)", "pytest (>=7.4)"]
-typing = ["typing-extensions (>=4.7.1)"]
+docs = ["furo (>=2023.9.10)", "sphinx-autodoc-typehints (>=1.24)", "sphinx (>=7.2.6)"]
+testing = ["covdefaults (>=2.3)", "coverage (>=7.3.2)", "diff-cover (>=8)", "pytest-cov (>=4.1)", "pytest-mock (>=3.12)", "pytest-timeout (>=2.2)", "pytest (>=7.4.3)"]
+typing = ["typing-extensions (>=4.8)"]
 
 [[package]]
 name = "fonttools"
@@ -1710,7 +1710,7 @@ woff = ["zopfli (>=0.1.4)", "brotlicffi (>=0.8.0)", "brotli (>=1.0.1)"]
 
 [[package]]
 name = "gitdb"
-version = "4.0.10"
+version = "4.0.11"
 description = "Git Object Database"
 category = "main"
 optional = false
@@ -1721,7 +1721,7 @@ smmap = ">=3.0.1,<6"
 
 [[package]]
 name = "gitpython"
-version = "3.1.37"
+version = "3.1.40"
 description = "GitPython is a Python library used to interact with Git repositories"
 category = "main"
 optional = false
@@ -1731,7 +1731,7 @@ python-versions = ">=3.7"
 gitdb = ">=4.0.1,<5"
 
 [package.extras]
-test = ["black", "coverage", "ddt (>=1.1.1,!=1.4.3)", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-sugar"]
+test = ["black", "coverage", "ddt (>=1.1.1,!=1.4.3)", "mypy", "pre-commit", "pytest", "pytest-cov", "pytest-instafail", "pytest-subtests", "pytest-sugar", "mock"]
 
 [[package]]
 name = "google-api-core"
@@ -1754,7 +1754,7 @@ grpcio-gcp = ["grpcio-gcp (>=0.2.2,<1.0.dev0)"]
 
 [[package]]
 name = "google-auth"
-version = "2.23.2"
+version = "2.23.3"
 description = "Google Authentication Library"
 category = "main"
 optional = false
@@ -1789,7 +1789,7 @@ tool = ["click (>=6.0.0)"]
 
 [[package]]
 name = "googleapis-common-protos"
-version = "1.60.0"
+version = "1.61.0"
 description = "Common protobufs used in Google APIs"
 category = "main"
 optional = false
@@ -1803,7 +1803,7 @@ grpc = ["grpcio (>=1.44.0,<2.0.0.dev0)"]
 
 [[package]]
 name = "greenlet"
-version = "3.0.0"
+version = "3.0.1"
 description = "Lightweight in-process concurrent programming"
 category = "main"
 optional = false
@@ -1880,7 +1880,7 @@ pyreadline3 = {version = "*", markers = "sys_platform == \"win32\" and python_ve
 
 [[package]]
 name = "identify"
-version = "2.5.30"
+version = "2.5.31"
 description = "File identification library for Python"
 category = "main"
 optional = false
@@ -2138,7 +2138,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "mldesigner"
-version = "0.1.0b15"
+version = "0.1.0b16"
 description = "Azure Machine Learning Designer SDK"
 category = "main"
 optional = false
@@ -2151,7 +2151,7 @@ typing-extensions = "<5.0.0"
 
 [package.extras]
 pipeline = ["azure-ai-ml", "azure-identity", "jinja2 (==3.0.0)", "tqdm", "omegaconf (>=2.0.5,<2.2)"]
-promptflow = ["promptflow"]
+promptflow = ["promptflow (>=0.1.0b6)", "promptflow-tools"]
 
 [[package]]
 name = "msal"
@@ -2307,7 +2307,7 @@ python-versions = "*"
 
 [[package]]
 name = "opencensus-ext-azure"
-version = "1.1.10"
+version = "1.1.11"
 description = "OpenCensus Azure Monitor Exporter"
 category = "main"
 optional = false
@@ -2484,7 +2484,7 @@ tests = ["pytest (>=5.4.1)", "pytest-cov (>=2.8.1)", "pytest-timeout (>=2.1.0)",
 
 [[package]]
 name = "pre-commit"
-version = "3.4.0"
+version = "3.5.0"
 description = "A framework for managing and maintaining multi-language pre-commit hooks."
 category = "main"
 optional = false
@@ -2507,14 +2507,14 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "psutil"
-version = "5.9.5"
+version = "5.9.6"
 description = "Cross-platform lib for process and system monitoring in Python."
 category = "main"
 optional = false
-python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, !=3.5.*"
 
 [package.extras]
-test = ["ipaddress", "mock", "enum34", "pywin32", "wmi"]
+test = ["enum34", "ipaddress", "mock", "pywin32", "wmi"]
 
 [[package]]
 name = "psycopg2"
@@ -2580,14 +2580,17 @@ email = ["email-validator (>=1.0.3)"]
 
 [[package]]
 name = "pydash"
-version = "5.1.2"
+version = "7.0.5"
 description = "The kitchen sink of Python utility libraries for doing \"stuff\" in a functional way. Based on the Lo-Dash Javascript library."
 category = "main"
 optional = false
-python-versions = ">=3.6"
+python-versions = ">=3.7"
+
+[package.dependencies]
+typing-extensions = ">=3.10,<4.6.0 || >4.6.0"
 
 [package.extras]
-dev = ["black", "build", "coverage", "docformatter", "flake8", "flake8-black", "flake8-bugbear", "flake8-isort", "invoke", "isort", "pylint", "pytest", "pytest-cov", "sphinx", "sphinx-rtd-theme", "tox", "twine", "wheel"]
+dev = ["black", "build", "coverage", "docformatter", "flake8", "flake8-black", "flake8-bugbear", "flake8-isort", "furo", "invoke", "isort", "mypy", "pylint", "pytest", "pytest-mypy-testing", "pytest-cov", "sphinx", "tox", "twine", "wheel", "sphinx-autodoc-typehints", "importlib-metadata (<5)"]
 
 [[package]]
 name = "pygithub"
@@ -2633,7 +2636,7 @@ tests = ["pytest (>=6.0.0,<7.0.0)", "coverage[toml] (==5.0.4)"]
 
 [[package]]
 name = "pymsalruntime"
-version = "0.13.12"
+version = "0.13.13"
 description = "The MSALRuntime Python Interop Package"
 category = "main"
 optional = false
@@ -2698,7 +2701,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pytest"
-version = "7.4.2"
+version = "7.4.3"
 description = "pytest: simple powerful testing with Python"
 category = "main"
 optional = false
@@ -2820,7 +2823,7 @@ idna2008 = ["idna"]
 
 [[package]]
 name = "rpds-py"
-version = "0.10.4"
+version = "0.10.6"
 description = "Python bindings to Rust's persistent data structures (rpds)"
 category = "main"
 optional = false
@@ -2934,7 +2937,7 @@ python-versions = ">=3.7"
 
 [[package]]
 name = "sqlalchemy"
-version = "2.0.21"
+version = "2.0.22"
 description = "Database Abstraction Library"
 category = "main"
 optional = false
@@ -3028,7 +3031,7 @@ werkzeug = ">=1.0.1"
 
 [[package]]
 name = "tensorboard-data-server"
-version = "0.7.1"
+version = "0.7.2"
 description = "Fast data loading for TensorBoard"
 category = "main"
 optional = false
@@ -3124,7 +3127,7 @@ python-versions = ">=3.8"
 
 [[package]]
 name = "urllib3"
-version = "2.0.6"
+version = "2.0.7"
 description = "HTTP library with thread-safe connection pooling, file post, and more."
 category = "main"
 optional = false
@@ -3138,7 +3141,7 @@ zstd = ["zstandard (>=0.18.0)"]
 
 [[package]]
 name = "virtualenv"
-version = "20.24.5"
+version = "20.24.6"
 description = "Virtual Python Environment builder"
 category = "main"
 optional = false
@@ -3168,7 +3171,7 @@ test = ["websockets"]
 
 [[package]]
 name = "werkzeug"
-version = "3.0.0"
+version = "3.0.1"
 description = "The comprehensive WSGI web application library."
 category = "main"
 optional = false
@@ -3206,7 +3209,7 @@ python-versions = "*"
 
 [[package]]
 name = "yolov5"
-version = "0.2.0"
+version = "0.3.1"
 description = ""
 category = "main"
 optional = false
@@ -3237,8 +3240,8 @@ yapf = "^0.32.0"
 [package.source]
 type = "git"
 url = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git"
-reference = "v0.2.0"
-resolved_reference = "01105d28bf7adf5587362aa5e076258135585983"
+reference = "v0.3.1"
+resolved_reference = "2d4b4a8067e1cc697621d1496bb51081ef31f045"
 
 [[package]]
 name = "zipp"
@@ -3255,7 +3258,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-ena
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.8"
-content-hash = "08d9a082d42d1da2d6c5ddd7f143b41a65b6a473ca9f99ad8a277d0349c27b8b"
+content-hash = "9262392438c81a8998cd88d208f714a1585cbb179a8c70d2e43f0682727b96ba"
 
 [metadata.files]
 absl-py = []

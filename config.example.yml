@@ -68,7 +68,7 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
-    conf_thres: 0.001
+    conf_thres: 0.0001
 
 database_parameters:
   db_hostname: "psql-flexi-blur-prd-weu-cou-01.postgres.database.azure.com"

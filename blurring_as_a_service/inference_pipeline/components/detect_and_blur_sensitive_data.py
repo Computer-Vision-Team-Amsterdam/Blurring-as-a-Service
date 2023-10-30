@@ -10,14 +10,13 @@ import yaml
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
-from blurring_as_a_service.utils.generics import delete_file
-
 sys.path.append("../../..")
 import yolov5.val as val  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -97,7 +96,7 @@ def detect_and_blur_sensitive_data(
             print(f"Creating inference step: {file_path}")
 
             files_to_blur_full_path = os.path.join(
-                "outputs", batch_file_txt
+                yolo_yaml_path, batch_file_txt
             )  # use outputs folder as Azure expects outputs there
             with open(file_path, "r") as src:
                 with open(files_to_blur_full_path, "w") as dest:
@@ -106,9 +105,9 @@ def detect_and_blur_sensitive_data(
                         print(f"{input_structured_folder}/{line}")
 
             data = dict(
-                train=f"../{files_to_blur_full_path}",
-                val=f"../{files_to_blur_full_path}",
-                test=f"../{files_to_blur_full_path}",
+                train=f"{files_to_blur_full_path}",
+                val=f"{files_to_blur_full_path}",
+                test=f"{files_to_blur_full_path}",
                 nc=2,
                 names=["person", "license_plate"],
             )
@@ -133,3 +132,5 @@ def detect_and_blur_sensitive_data(
                 **database_parameters,
             )
             delete_file(file_path)
+            # delete_file(files_to_blur_full_path)
+            # delete_file(f"{yolo_yaml_path}/pano.yaml")
