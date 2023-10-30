@@ -1,11 +1,13 @@
 import logging
-import os
+import shutil
 from typing import Dict, List
 
 import pkg_resources
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import BuildContext, Environment, ManagedIdentityConfiguration
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
+
+from blurring_as_a_service.utils.generics import delete_file
 
 logger = logging.getLogger(__name__)
 
@@ -99,9 +101,8 @@ class AMLInterface:
         ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
         ws.image_build_compute = build_cluster
 
-        self._create_pip_requirements_file(
-            project_name, build_context_path, submodules, custom_packages
-        )
+        shutil.copyfile("poetry.lock", f"{build_context_path}/poetry.lock")
+        shutil.copyfile("pyproject.toml", f"{build_context_path}/pyproject.toml")
 
         env = Environment(
             name=env_name,
@@ -111,7 +112,6 @@ class AMLInterface:
             ),
         )
         self.ml_client.environments.create_or_update(env)
-        self._delete_pip_requirements_file(build_context_path)
         return env
 
     @staticmethod
@@ -163,7 +163,7 @@ class AMLInterface:
         build_context_path: str
             Path that contains the build context.
         """
-        os.remove(f"{build_context_path}/requirements.txt")
+        delete_file(f"{build_context_path}/requirements.txt")
 
     def submit_command_job(self, job):
         """

@@ -2,7 +2,7 @@ import math
 import os
 
 from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
-    get_image_paths
+    get_image_paths,
 )
 
 
@@ -42,7 +42,9 @@ class WorkloadSplitter:
 
         # Ensure number_of_batches is not greater than the number of images
         if number_of_batches > len(image_paths):
-            print("Number of batches is greater than the number of images. Setting number_of_batches to 1.")
+            print(
+                "Number of batches is greater than the number of images. Setting number_of_batches to 1."
+            )
             number_of_batches = 1
 
         images_per_batch = math.ceil(len(image_paths) / number_of_batches)
@@ -53,9 +55,9 @@ class WorkloadSplitter:
             end_index = min(start_index + images_per_batch, len(image_paths))
 
             with open(
-                    f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
+                f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
             ) as batch_file:
                 for j in range(start_index, end_index):
                     # Only get the relative image paths
                     image_path = image_paths[j][1]
-                    batch_file.write(os.path.join(execution_time,image_path) + "\n")
+                    batch_file.write(os.path.join(execution_time, image_path) + "\n")

@@ -1,10 +1,12 @@
+import json
+
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.cleaning_pipeline.components.delete_blurred_images import (
-    delete_blurred_images,
-)
+# from blurring_as_a_service.cleaning_pipeline.components.delete_blurred_images import (
+#     delete_blurred_images,
+# )
 from blurring_as_a_service.cleaning_pipeline.components.smart_sampling import (
     smart_sampling,
 )
@@ -24,11 +26,15 @@ def cleaning_pipeline():
         path=input_structured_path,
     )
 
-    customer_in_cvt_path = aml_interface.get_datastore_full_path(
-        f"{customer_name}_in_cvt"
-    )
+    database_parameters = settings["database_parameters"]
+    database_parameters_json = json.dumps(database_parameters)
     smart_sampling_step = smart_sampling(
         input_structured_folder=input_structured_input,
+        database_parameters_json=database_parameters_json,
+        customer_name=customer_name,
+    )
+    customer_in_cvt_path = aml_interface.get_datastore_full_path(
+        f"{customer_name}_in_cvt"
     )
     smart_sampling_step.outputs.customer_cvt_folder = Output(
         type=AssetTypes.URI_FOLDER,
@@ -36,20 +42,20 @@ def cleaning_pipeline():
         path=customer_in_cvt_path,
     )
 
-    output_path = aml_interface.get_datastore_full_path(f"{customer_name}_output")
-    output_folder_input = Input(
-        type=AssetTypes.URI_FOLDER,
-        path=output_path,
-    )
-    delete_blurred_images_step = delete_blurred_images(
-        _=smart_sampling_step.outputs.customer_cvt_folder,
-        output_folder=output_folder_input,
-    )
-    delete_blurred_images_step.outputs.input_structured_folder = Output(
-        type=AssetTypes.URI_FOLDER,
-        mode="rw_mount",
-        path=input_structured_path,
-    )
+    # output_path = aml_interface.get_datastore_full_path(f"{customer_name}_output")
+    # output_folder_input = Input(
+    #     type=AssetTypes.URI_FOLDER,
+    #     path=output_path,
+    # )
+    # delete_blurred_images_step = delete_blurred_images(
+    #     _=smart_sampling_step.outputs.customer_cvt_folder,
+    #     output_folder=output_folder_input,
+    # )
+    # delete_blurred_images_step.outputs.input_structured_folder = Output(
+    #     type=AssetTypes.URI_FOLDER,
+    #     mode="rw_mount",
+    #     path=input_structured_path,
+    # )
 
     return {}
 

@@ -1,9 +1,10 @@
 import json
 import os
-import sys
-from datetime import datetime
 import secrets
 import string
+import sys
+from datetime import datetime
+
 import torch
 import yaml
 from azure.ai.ml.constants import AssetTypes
@@ -11,9 +12,11 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 import yolov5.val as val  # noqa: E402
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -27,14 +30,16 @@ def generate_unique_string(length):
     characters = string.ascii_letters + string.digits
 
     # Generate a random string of the specified length
-    unique_string = ''.join(secrets.choice(characters) for _ in range(length))
+    unique_string = "".join(secrets.choice(characters) for _ in range(length))
 
     return unique_string
 
 
 def get_current_time():
     current_time = datetime.now()
-    current_time_str = current_time.strftime("%Y-%m-%d %H:%M:%S")  # Format the datetime as a string
+    current_time_str = current_time.strftime(
+        "%Y-%m-%d %H:%M:%S"
+    )  # Format the datetime as a string
     return current_time_str
 
 
@@ -91,7 +96,7 @@ def detect_and_blur_sensitive_data(
             print(f"Creating inference step: {file_path}")
 
             files_to_blur_full_path = os.path.join(
-                "outputs", batch_file_txt
+                yolo_yaml_path, batch_file_txt
             )  # use outputs folder as Azure expects outputs there
             with open(file_path, "r") as src:
                 with open(files_to_blur_full_path, "w") as dest:
@@ -100,9 +105,9 @@ def detect_and_blur_sensitive_data(
                         print(f"{input_structured_folder}/{line}")
 
             data = dict(
-                train=f"../{files_to_blur_full_path}",
-                val=f"../{files_to_blur_full_path}",
-                test=f"../{files_to_blur_full_path}",
+                train=f"{files_to_blur_full_path}",
+                val=f"{files_to_blur_full_path}",
+                test=f"{files_to_blur_full_path}",
                 nc=2,
                 names=["person", "license_plate"],
             )
@@ -126,8 +131,6 @@ def detect_and_blur_sensitive_data(
                 **model_parameters,
                 **database_parameters,
             )
-
-            try:
-                os.remove(file_path)
-            except OSError as error:
-                raise OSError(f"Failed to remove file '{file_path}': {error}")
+            delete_file(file_path)
+            # delete_file(files_to_blur_full_path)
+            # delete_file(f"{yolo_yaml_path}/pano.yaml")

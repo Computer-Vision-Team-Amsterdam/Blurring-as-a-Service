@@ -1,9 +1,9 @@
 customer: dataoffice
 
 aml_experiment_details:
-  compute_name: dataoffice-cluster
+  compute_name: gpu-blurring-model
   env_name: baas-environment
-  env_version: 1
+  env_version: 45
   src_dir: "."
 
 metadata_pipeline:
@@ -68,11 +68,12 @@ inference_pipeline:
     skip_evaluation: True
     save_blurred_image: True
     batch_size: 4
-    conf_thres: 0.001
-  database_parameters:
-    db_hostname: "psql-flexi-blur-prd-weu-cou-01.postgres.database.azure.com"
-    db_username: "aml-compute-cvp-p"
-    db_name: "blur"
+    conf_thres: 0.0001
+
+database_parameters:
+  db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
+  db_username: "aml-compute-cvo-p"
+  db_name: "blur"
 
 logging:
   loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`

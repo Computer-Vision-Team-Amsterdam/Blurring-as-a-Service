@@ -9,14 +9,10 @@ sys.path.append("../../..")
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-
-# Construct the path to the yolov5 package
-yolov5_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
+from blurring_as_a_service.utils.generics import (  # noqa: E402
+    delete_file,
+    find_image_paths,
 )
-# Add the yolov5 path to sys.path
-sys.path.append(yolov5_path)
-from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -54,16 +50,6 @@ def delete_blurred_images(
         delete_output_images_from_input_structured(image_path, input_structured_folder)
 
 
-def find_image_paths(root_folder):
-    image_paths = []
-    for foldername, subfolders, filenames in os.walk(root_folder):
-        for filename in filenames:
-            if any(filename.endswith(ext) for ext in IMG_FORMATS):
-                image_path = os.path.join(foldername, filename)
-                image_paths.append(image_path)
-    return image_paths
-
-
 def delete_output_images_from_input_structured(
     output_image_path, input_structured_folder
 ):
@@ -72,18 +58,6 @@ def delete_output_images_from_input_structured(
     )
     if input_structured_path:
         delete_file(input_structured_path)
-
-
-def delete_file(file_path):
-    try:
-        os.remove(file_path)
-        print(f"{file_path} has been deleted.")
-    except FileNotFoundError as e:
-        print(f"{file_path} does not exist.")
-        raise FileNotFoundError(f"Failed to remove file '{file_path}': {e}")
-    except Exception as e:
-        print(f"Failed to remove file '{file_path}': {str(e)}")
-        raise (f"Failed to remove file '{file_path}': {e}")
 
 
 def replace_azure_uri_folder_path(path, new_uri_folder_path):

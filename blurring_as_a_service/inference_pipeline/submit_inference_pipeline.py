@@ -45,7 +45,7 @@ def inference_pipeline():
     model_parameters_json = json.dumps(
         model_parameters
     )  # TODO it seems I can not pass a dict to @command_component function
-    database_parameters = inference_settings["database_parameters"]
+    database_parameters = settings["database_parameters"]
     database_parameters_json = json.dumps(database_parameters)
 
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(

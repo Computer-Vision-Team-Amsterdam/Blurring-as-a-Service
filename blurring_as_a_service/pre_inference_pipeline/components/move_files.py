@@ -22,8 +22,9 @@ yolov5_path = os.path.abspath(
 )
 
 from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
-    get_image_paths
+    get_image_paths,
 )
+
 
 @command_component(
     name="move_files",
@@ -60,6 +61,9 @@ def move_files(
     # Create the target folder if it doesn't exist
     os.makedirs(target_folder_path, exist_ok=True)
 
+    # TODO: Refactor this to use the copy_file and delete_file functions.
+    #       copy_file(file_name, input_container, target_folder_path)
+    #       delete_file(os.path.join(input_container, file_name))
     # Move each file to the target container while preserving the directory structure
     for source_image_path, relative_image_path in image_paths:
         target_file_path = os.path.join(target_folder_path, relative_image_path)
@@ -81,8 +85,6 @@ def move_files(
         try:
             os.remove(source_image_path)
         except OSError:
-            raise OSError(
-                f"Failed to remove file '{source_image_path}'."
-            )
+            raise OSError(f"Failed to remove file '{source_image_path}'.")
 
     print("Files moved and removed successfully.")
