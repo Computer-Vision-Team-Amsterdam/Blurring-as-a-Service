@@ -132,5 +132,5 @@ def detect_and_blur_sensitive_data(
                 **database_parameters,
             )
             delete_file(file_path)
-            # delete_file(files_to_blur_full_path)
-            # delete_file(f"{yolo_yaml_path}/pano.yaml")
+            delete_file(files_to_blur_full_path)
+            delete_file(f"{yolo_yaml_path}/pano.yaml")
