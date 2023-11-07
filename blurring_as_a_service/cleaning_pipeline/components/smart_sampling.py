@@ -3,6 +3,7 @@ import os
 import random
 import re
 import sys
+from datetime import datetime
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
@@ -63,9 +64,9 @@ def smart_sampling(
     """
     image_paths = find_image_paths(input_structured_folder)
     grouped_images_by_date = group_files_by_date(image_paths)
-    sample_images_for_quality_check(
-        grouped_images_by_date, input_structured_folder, customer_cvt_folder
-    )
+    # sample_images_for_quality_check(
+    #     grouped_images_by_date, input_structured_folder, customer_cvt_folder
+    # )
 
     images_statistics = collect_all_images_statistics_from_db(
         database_parameters_json, grouped_images_by_date, customer_name
@@ -138,16 +139,20 @@ def collect_all_images_statistics_from_db(
     images_statistics = {}
     with db_config.managed_session() as session:
         for upload_date, image_names in grouped_images_by_date.items():
+            upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H:%M:%S")
             for image_name in image_names:
                 query = session.query(DetectionInformation).filter(
                     DetectionInformation.image_customer_name == customer_name,
                     DetectionInformation.image_upload_date == upload_date,
                     DetectionInformation.image_filename == image_name,
                 )
+                results = query.all()
 
-                # Execute the query and fetch the results
-                result = query.all()
-                if upload_date in images_statistics:
-                    images_statistics[upload_date].append(result)
-                else:
-                    images_statistics[upload_date] = [result]
+                if results:
+                    extracted_data = [result.__dict__ for result in results]
+                    if upload_date in images_statistics:
+                        images_statistics[upload_date].extend(extracted_data)
+                    else:
+                        images_statistics[upload_date] = extracted_data
+
+    return images_statistics
