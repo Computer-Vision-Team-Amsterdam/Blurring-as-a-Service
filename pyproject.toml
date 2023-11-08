@@ -46,7 +46,7 @@ sqlalchemy = {version = "^2.0.19", source = "PyPI"}
 azure-cli = {version = "2.51.0", source = "PyPI"}
 msal = {version = "1.24.0b1", source = "PyPI"}
 urllib3 = {version = ">=2.0.6", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  branch = "v0.3.3" }
+yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  tag = "v0.4.4" }
 
 [tool.poetry.dev-dependencies]
 

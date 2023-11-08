@@ -18,7 +18,7 @@ from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 @pipeline()
 def pre_inference_pipeline():
-    execution_time = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+    execution_time = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     number_of_batches = settings["pre_inference_pipeline"]["inputs"][
         "number_of_batches"
     ]
