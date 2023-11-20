@@ -56,19 +56,20 @@ def performance_evaluation_pipeline():
         path=yolo_dataset_path,
         description="Dataset root folder. Must be in yolo format for validation. Contains images/val and labels/val",
     )
-
+    print("Created yolo dataset")
     coco_annotations = Input(
         type=AssetTypes.URI_FILE,
         path=coco_annotations_path,
         description="Corresponds to metadata_pipeline['outputs']['coco_annotations']",
     )
+    print("Created coco annotations")
 
     model = Input(
         type=AssetTypes.CUSTOM_MODEL,
         path=f"azureml:{inputs['model_name']}:{inputs['model_version']}",
         description="Model weights for evaluation",
     )
-
+    print("Created model")
     validate_model_step = validate_model(
         mounted_dataset=yolo_dataset,
         model=model,

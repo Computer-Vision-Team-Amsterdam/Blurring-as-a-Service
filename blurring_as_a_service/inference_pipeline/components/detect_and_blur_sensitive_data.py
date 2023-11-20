@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import secrets
 import string
@@ -11,6 +12,14 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
+
+from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
+    setup_azure_logging_from_config,
+)
+
+logger = setup_azure_logging_from_config()
+logger.info(f"Yolo handler: {logging.getLogger('yolov5').handlers}")
+
 import yolov5.val as val  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402

@@ -157,7 +157,7 @@ local_test_data/
 experiments/**/*.jpg
 experiments/runs/*
 draw-YOLO-box/*
-yolo-configs/*
+../yolov5/yolo-configs/*
 config.json
 config.yml
 /aml-config.yml

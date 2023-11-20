@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 
@@ -6,10 +7,17 @@ import yaml
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-import yolov5.val as val  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
+    setup_azure_logging_from_config,
+)
+
+logger = setup_azure_logging_from_config()
+logger.info(f"Yolo handler: {logging.getLogger('yolov5').handlers}")
+
+import yolov5.val as val  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -53,7 +61,7 @@ def validate_model(
         save_txt=True,  # DO NOT CHANGE
         save_json=True,  # DO NOT CHANGE
         half=True,
-        tagged_data=False,
+        tagged_data=True,
         skip_evaluation=False,
         **model_parameters,
     )
