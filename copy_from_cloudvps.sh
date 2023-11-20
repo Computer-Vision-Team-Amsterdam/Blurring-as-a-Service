@@ -84,6 +84,7 @@ fi
 # Copy from Azure Compute to Storage Account
 # NOTE make sure to run "azcopy login" before this line
 # echo "!!!!NOTE make sure to run "azcopy login" before this line!!!"
+# storageAccountUrl="https://sahistblurontweuesy01.blob.core.windows.net/hist-input"
 # azcopy copy intermediate/ "$storageAccountUrl" --recursive
 
 # Useful command in case the azcopy does not finish successfully:azcopy jobs show <job-id> --with-status=Failed
