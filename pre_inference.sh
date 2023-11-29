@@ -66,6 +66,10 @@ if [ $? -eq 0 ]; then
     done
 
     echo "Files split into batches and uploaded to inference_queue"
+
+#    # Delete files inside source_url
+#    az storage blob delete-batch --source "${source_url}"
+#    echo "Files inside ${source_url} deleted"
 else
     echo "Files failed to move from ${source_url} to ${destination_url}inference_queue/"
 fi
