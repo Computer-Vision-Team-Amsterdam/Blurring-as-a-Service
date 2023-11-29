@@ -7,6 +7,7 @@ execution_time=$(date +'%Y-%m-%d_%H_%M_%S')
 customer="data-office"
 storage_account="todo"
 number_of_batches=5
+subscription="todo
 
 # Define source and destination URLs
 source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/*"
@@ -31,7 +32,7 @@ if [ $? -eq 0 ]; then
     query=${query%|| }  # Remove the trailing " || "
 
     # Use Azure CLI to list files in the specific folder of the destination container with specified extensions
-    file_list=$(az storage blob list --container-name "${customer}-input-structured" --account-name "${storage_account}" --prefix "${execution_time}/" --query "[?(${query})].name" -o tsv)
+    file_list=$(az storage blob list --container-name "${customer}-input-structured" --account-name "${storage_account}" --subscription ${subscription} --prefix "${execution_time}/" --query "[?(${query})].name" --num-results 9999999 -o tsv)
 
     # Count the number of files in file_list
     file_count=$(echo "$file_list" | wc -l)
