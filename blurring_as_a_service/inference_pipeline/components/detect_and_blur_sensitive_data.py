@@ -105,8 +105,9 @@ def detect_and_blur_sensitive_data(
     # Iterate over files in the folder
     for batch_file_txt in os.listdir(batches_files_path):
         file_path = os.path.join(batches_files_path, batch_file_txt)
-        # Check if the path points to a file (not a directory)
-        if os.path.isfile(file_path):
+
+        # Check if the path points to a file (not a directory) and if the file exists
+        if os.path.isfile(file_path) and os.path.exists(file_path):
             logger.info(f"Creating inference step: {file_path}")
 
             files_to_blur_full_path = os.path.join(
