@@ -88,6 +88,7 @@ class PreInferencePipelineInputs(SettingsSpecModel):
 
 
 class PreInferencePipelineSpec(SettingsSpecModel):
+    compute_name: str = None
     inputs: PreInferencePipelineInputs
 
 

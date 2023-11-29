@@ -56,6 +56,7 @@ training_pipeline:
     - NONE
 
 pre_inference_pipeline:
+  compute_name: cpu-blurring-model
   inputs:
     number_of_batches: 1
 
