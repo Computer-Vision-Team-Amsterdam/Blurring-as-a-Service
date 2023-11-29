@@ -3,10 +3,9 @@ name = "blurring_as_a_service"
 version = "0.1.0"
 description = ""
 authors = [
-    "Sebastian Davrieux <s.davrieux@amsterdam.nl>",
-    "Diana Epureanu <d.epureanu@amsterdam.nl>",
-    "Chris Eijgenstein <c.eijgenstein@amsterdam.nl>",
-    "Andrea Lombardo <a.lombardo@amsterdam.nl>"
+    "Sebastian Davrieux",
+    "Diana Epureanu",
+    "Chris Eijgenstein"
 ]
 
 [tool.poetry.dependencies]
