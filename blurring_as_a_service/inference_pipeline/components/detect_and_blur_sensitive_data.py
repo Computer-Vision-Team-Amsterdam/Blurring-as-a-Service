@@ -5,7 +5,7 @@ import secrets
 import string
 import sys
 from datetime import datetime
-
+import shutil
 import torch
 import yaml
 from azure.ai.ml.constants import AssetTypes
@@ -104,7 +104,8 @@ def detect_and_blur_sensitive_data(
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder
     for batch_file_txt in os.listdir(batches_files_path):
-        file_path = os.path.join(batches_files_path, batch_file_txt)
+        if batch_file_txt.endswith('.txt'):
+            file_path = os.path.join(batches_files_path, batch_file_txt)
 
         # Check if the path points to a file (not a directory) and if the file exists
         if os.path.isfile(file_path) and os.path.exists(file_path):
@@ -113,11 +114,24 @@ def detect_and_blur_sensitive_data(
             files_to_blur_full_path = os.path.join(
                 yolo_yaml_path, batch_file_txt
             )  # use outputs folder as Azure expects outputs there
-            with open(file_path, "r") as src:
-                with open(files_to_blur_full_path, "w") as dest:
-                    for line in src:
-                        dest.write(f"{input_structured_folder}/{line}")
-                        logger.debug(f"{input_structured_folder}/{line}")
+
+            # Define the locked file path with ".lock" extension
+            locked_file_path = file_path + ".lock"
+
+            read_success = False
+            try:
+                # Rename the file to add ".lock" extension
+                os.rename(file_path, locked_file_path)
+
+                with open(locked_file_path, "r") as src:
+                    with open(files_to_blur_full_path, "w") as dest:
+                        for line in src:
+                            dest.write(f"{input_structured_folder}/{line}")
+                read_success = True
+            except FileNotFoundError as e:
+                logger.info(f"File {locked_file_path} not found: {e}")
+            except Exception as e:
+                logger.error(f"Error occurred while reading {locked_file_path}: {e}")
 
             data = dict(
                 train=f"{files_to_blur_full_path}",
@@ -127,16 +141,18 @@ def detect_and_blur_sensitive_data(
                 names=["person", "license_plate"],
             )
 
-            # TODO create postgresql string and send to val.py
+            # Remove the extension
+            file_name_without_extension = batch_file_txt.rsplit('.', 1)[0]
+            yaml_name = f"{file_name_without_extension}_pano.yaml"
 
-            with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
+            with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
                 yaml.dump(data, outfile, default_flow_style=False)
             cuda_device = torch.cuda.current_device()
             model_parameters = json.loads(model_parameters_json)
             database_parameters = json.loads(database_parameters_json)
             val.run(
                 weights=model,
-                data=f"{yolo_yaml_path}/pano.yaml",
+                data=f"{yolo_yaml_path}/{yaml_name}",
                 project=results_path,
                 device=cuda_device,
                 name="",
@@ -146,6 +162,6 @@ def detect_and_blur_sensitive_data(
                 **model_parameters,
                 **database_parameters,
             )
-            delete_file(file_path)
+            delete_file(locked_path)
             delete_file(files_to_blur_full_path)
-            delete_file(f"{yolo_yaml_path}/pano.yaml")
+            delete_file(f"{yolo_yaml_path}/{yaml_name}")
