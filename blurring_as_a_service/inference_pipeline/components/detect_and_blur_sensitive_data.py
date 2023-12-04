@@ -20,6 +20,11 @@ from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
     setup_azure_logging,
 )
 
+sys.path.append("../../..")
+from blurring_as_a_service.inference_pipeline.source.lock_file import (  # noqa: E402
+    LockFile,
+)
+
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
@@ -120,18 +125,14 @@ def detect_and_blur_sensitive_data(
 
                 read_success = False
                 try:
-                    # Rename the file to add ".lock" extension
-                    os.rename(file_path, locked_file_path)
-
-                    with open(locked_file_path, "r") as src:
+                    with LockFile(file_path) as src:
                         with open(files_to_blur_full_path, "w") as dest:
                             for line in src:
                                 dest.write(f"{input_structured_folder}/{line}")
                     read_success = True
-                except FileNotFoundError as e:
-                    logger.info(f"File {locked_file_path} not found: {e}")
                 except Exception as e:
-                    logger.error(f"Error occurred while reading {locked_file_path}: {e}")
+                    # Handle the exception here, if needed
+                    print(f"An error occurred: {e}")
 
                 if read_success:
                     data = dict(
