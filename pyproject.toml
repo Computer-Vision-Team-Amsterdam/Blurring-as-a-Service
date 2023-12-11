@@ -46,7 +46,7 @@ sqlalchemy = {version = "^2.0.19", source = "PyPI"}
 azure-cli = {version = "2.51.0", source = "PyPI"}
 msal = {version = "1.24.0b1", source = "PyPI"}
 urllib3 = {version = ">=2.0.6", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  branch = "bug/no-visible-logs"}
+yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  branch = "bug/ignore-datetime-error-in-perf-evaluation"}
 
 
 [tool.poetry.dev-dependencies]
