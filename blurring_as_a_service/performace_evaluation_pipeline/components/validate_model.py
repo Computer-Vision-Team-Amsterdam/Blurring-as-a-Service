@@ -10,14 +10,9 @@ sys.path.append("../../..")
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
-    setup_azure_logging_from_config,
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
-
-logger = setup_azure_logging_from_config()
-logger.info(f"Yolo handler: {logging.getLogger('yolov5').handlers}")
-
-import yolov5.val as val  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -25,6 +20,12 @@ config_path = os.path.abspath(
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
+
+
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
+import yolov5.val as val  # noqa: E402
 
 
 @command_component(
@@ -40,6 +41,8 @@ def validate_model(
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
     model_parameters_json: str,
 ):
+    logger = logging.getLogger("validate_model")
+    logger.info(f"Hello from {__name__}: {logging.getLogger(__name__).handlers}")
     data = dict(
         train=f"{mounted_dataset}/images/train",
         val=f"{mounted_dataset}/images/val",

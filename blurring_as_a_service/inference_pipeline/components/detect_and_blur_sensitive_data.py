@@ -13,25 +13,26 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 
-from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
-    setup_azure_logging_from_config,
-)
-
-logger = setup_azure_logging_from_config()
-logger.info(f"Yolo handler: {logging.getLogger('yolov5').handlers}")
-
-import yolov5.val as val  # noqa: E402
-
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
+
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
 aml_experiment_settings = settings["aml_experiment_details"]
+
+
+import yolov5.val as val  # noqa: E402
 
 
 def generate_unique_string(length):
@@ -95,6 +96,10 @@ def detect_and_blur_sensitive_data(
 
     """
     # Check if the folder exists
+    logger = logging.getLogger("detect_and_blur_sensitive_data")
+    logger.info(
+        f"Hello from {__name__}: {logging.getLogger('detect_and_blur_sensitive_data').handlers}"
+    )
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder

@@ -11,6 +11,9 @@ from blurring_as_a_service.pre_inference_pipeline.source.workload_splitter impor
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
+)
 
 config_path = os.path.abspath(
     os.path.join(
@@ -21,6 +24,9 @@ config_path = os.path.abspath(
         "config.yml",
     )
 )
+
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]

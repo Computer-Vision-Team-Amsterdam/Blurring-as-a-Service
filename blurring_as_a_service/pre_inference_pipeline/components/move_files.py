@@ -6,8 +6,14 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Output, command_component
 
 sys.path.append("../../..")
+from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
+    get_image_paths,
+)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -16,13 +22,13 @@ config_path = os.path.abspath(
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
 
+
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
-)
-
-from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
-    get_image_paths,
 )
 
 
@@ -51,6 +57,7 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
+
     # List all files in the mounted folder and their relative paths
     image_paths = get_image_paths(input_container)
 
