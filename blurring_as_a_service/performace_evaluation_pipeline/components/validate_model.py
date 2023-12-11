@@ -7,6 +7,7 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 import yolov5.val as val  # noqa: E402
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -53,7 +54,7 @@ def validate_model(
         save_txt=True,  # DO NOT CHANGE
         save_json=True,  # DO NOT CHANGE
         half=True,
-        tagged_data=False,
+        tagged_data=True,
         skip_evaluation=False,
         **model_parameters,
     )

@@ -1,8 +1,6 @@
 import logging
 import shutil
-from typing import Dict, List
 
-import pkg_resources
 from azure.ai.ml import MLClient
 from azure.ai.ml.entities import BuildContext, Environment, ManagedIdentityConfiguration
 from azure.identity import DefaultAzureCredential, InteractiveBrowserCredential
@@ -64,12 +62,9 @@ class AMLInterface:
     def create_aml_environment(
         self,
         env_name: str,
-        project_name: str,
         build_context_path: str,
         dockerfile_path: str,
         build_cluster: str = "defaultBuildClusterCvt",
-        submodules: List[str] = [],
-        custom_packages: Dict[str, str] = {},
     ) -> Environment:
         """Creates an AML environment based on the provided dockerfile image.
         Installs the pip packages present in the env where the code is run.
@@ -78,32 +73,23 @@ class AMLInterface:
         ----------
         env_name : str
             Name to give to the new environment.
-        project_name: str
-            Name of the project to be removed from the dependencies in case locally you are using Poetry.
         build_context_path: str
             Path that contains the build context.
         dockerfile_path: str
             Dockerfile path inside the build context.
         build_cluster: str
             Cluster to be used when building environments within Analyse Services.
-        submodules : List[str]
-            Packages that are actually submodules and not pip installed.
-        custom_packages: Dict[str, str]
-            Custom packages to remove from the local dependencies list and install on the AzureML environment.
-            Example: {"panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2"}
 
         Returns
         -------
         : Environment
             Created environment.
         """
-
         ws = self.ml_client.workspaces.get(name=self.ml_client.workspace_name)
         ws.image_build_compute = build_cluster
 
         shutil.copyfile("poetry.lock", f"{build_context_path}/poetry.lock")
         shutil.copyfile("pyproject.toml", f"{build_context_path}/pyproject.toml")
-
         env = Environment(
             name=env_name,
             build=BuildContext(
@@ -112,58 +98,10 @@ class AMLInterface:
             ),
         )
         self.ml_client.environments.create_or_update(env)
+        delete_file(f"{build_context_path}/poetry.lock")
+        delete_file(f"{build_context_path}/pyproject.toml")
+
         return env
-
-    @staticmethod
-    def _create_pip_requirements_file(
-        project_name: str,
-        build_context_path: str = "",
-        submodules: List[str] = [],
-        custom_packages: Dict[str, str] = {},
-    ):
-        """
-        Retrieves all packages currently installed in the local venv used to execute the code,
-        and creates a txt requirements file to be used to install the packages on AzureML env.
-
-        Parameters
-        ----------
-        project_name: str
-            Name of the project to be removed from the dependencies in case locally you are using Poetry.
-        build_context_path: str
-            Path that contains the build context.
-        submodules : List[str]
-            Packages that are actually submodules and not pip installed.
-        custom_packages: Dict[str, str]
-            Custom packages to remove from the local dependencies list and install on the AzureML environment.
-            Example: {"panorama": "git+https://github.com/Computer-Vision-Team-Amsterdam/panorama.git@v0.2.2"}
-        """
-        packages_and_versions_local_env = {
-            ws.key: ws.version for ws in pkg_resources.working_set
-        }
-        packages_and_versions_local_env.pop(project_name, None)
-        for custom_package in custom_packages.keys():
-            packages_and_versions_local_env.pop(custom_package)
-        packages = [
-            f"{key}=={value}" if key not in submodules else f"{key}"
-            for key, value in packages_and_versions_local_env.items()
-        ]
-
-        for custom_package in custom_packages.values():
-            packages.append(f"    - {custom_package}")
-        with open(f"{build_context_path}/requirements.txt", "w") as env_file:
-            env_file.write("\n".join(packages))
-
-    @staticmethod
-    def _delete_pip_requirements_file(build_context_path: str = ""):
-        """
-        Deletes the temporary pip requirements file.
-
-        Parameters
-        ----------
-        build_context_path: str
-            Path that contains the build context.
-        """
-        delete_file(f"{build_context_path}/requirements.txt")
 
     def submit_command_job(self, job):
         """
