@@ -67,7 +67,6 @@ def smart_sampling(
     # sample_images_for_quality_check(
     #     grouped_images_by_date, input_structured_folder, customer_cvt_folder
     # )
-
     images_statistics = collect_all_images_statistics_from_db(
         database_parameters_json, grouped_images_by_date, customer_name
     )
@@ -91,7 +90,7 @@ def group_files_by_date(strings):
 
     for string in strings:
         # Use regex to find the date folder pattern
-        date_match = re.search(r"(\d{4}-\d{2}-\d{2}_\d{2}:\d{2}:\d{2})", string)
+        date_match = re.search(r"(\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2})", string)
         if date_match:
             date_folder = date_match.group(1)
             # Split the string into key and value parts
@@ -139,7 +138,7 @@ def collect_all_images_statistics_from_db(
     images_statistics = {}
     with db_config.managed_session() as session:
         for upload_date, image_names in grouped_images_by_date.items():
-            upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H:%M:%S")
+            upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
             for image_name in image_names:
                 query = session.query(DetectionInformation).filter(
                     DetectionInformation.image_customer_name == customer_name,
