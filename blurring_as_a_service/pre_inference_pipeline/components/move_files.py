@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import sys
@@ -57,12 +58,12 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
-
+    logger = logging.getLogger("move_files")
     # List all files in the mounted folder and their relative paths
     image_paths = get_image_paths(input_container)
 
     if len(image_paths) == 0:
-        print("No files in the input zone. Aborting...")
+        logger.info("No files in the input zone. Aborting...")
 
     target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
@@ -84,14 +85,16 @@ def move_files(
 
         # Verify successful file copy
         if not os.path.exists(target_file_path):
-            raise FileNotFoundError(
-                f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
-            )
+            error_message = f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
+            logger.error(error_message)
+            raise FileNotFoundError(error_message)
 
         # Remove the file from the source folder
         try:
             os.remove(source_image_path)
         except OSError:
-            raise OSError(f"Failed to remove file '{source_image_path}'.")
+            error_message = f"Failed to remove file '{source_image_path}'."
+            logger.error(error_message)
+            raise OSError(error_message)
 
-    print("Files moved and removed successfully.")
+    logger.info("Files moved and removed successfully.")

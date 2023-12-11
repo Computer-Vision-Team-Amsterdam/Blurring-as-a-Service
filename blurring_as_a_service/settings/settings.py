@@ -1,5 +1,3 @@
-import logging
-
 from pydantic import BaseModel
 
 from blurring_as_a_service.settings.flags import PipelineFlag
@@ -11,8 +9,6 @@ from blurring_as_a_service.settings.settings_helper import (
 from blurring_as_a_service.settings.settings_schema import (
     BlurringAsAServiceSettingsSpec,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class BlurringAsAServiceSettings(Settings):  # type: ignore

@@ -97,9 +97,6 @@ def detect_and_blur_sensitive_data(
     """
     # Check if the folder exists
     logger = logging.getLogger("detect_and_blur_sensitive_data")
-    logger.info(
-        f"Hello from {__name__}: {logging.getLogger('detect_and_blur_sensitive_data').handlers}"
-    )
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder
@@ -107,7 +104,7 @@ def detect_and_blur_sensitive_data(
         file_path = os.path.join(batches_files_path, batch_file_txt)
         # Check if the path points to a file (not a directory)
         if os.path.isfile(file_path):
-            print(f"Creating inference step: {file_path}")
+            logger.info(f"Creating inference step: {file_path}")
 
             files_to_blur_full_path = os.path.join(
                 yolo_yaml_path, batch_file_txt
@@ -116,7 +113,7 @@ def detect_and_blur_sensitive_data(
                 with open(files_to_blur_full_path, "w") as dest:
                     for line in src:
                         dest.write(f"{input_structured_folder}/{line}")
-                        print(f"{input_structured_folder}/{line}")
+                        logger.debug(f"{input_structured_folder}/{line}")
 
             data = dict(
                 train=f"{files_to_blur_full_path}",
