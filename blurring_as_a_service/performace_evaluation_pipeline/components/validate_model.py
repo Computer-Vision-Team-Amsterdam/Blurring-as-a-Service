@@ -7,6 +7,7 @@ import yaml
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
