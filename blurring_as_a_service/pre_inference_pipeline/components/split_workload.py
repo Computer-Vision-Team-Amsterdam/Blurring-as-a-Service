@@ -25,6 +25,8 @@ config_path = os.path.abspath(
     )
 )
 
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[

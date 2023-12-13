@@ -9,7 +9,8 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
 )
 from blurring_as_a_service.settings.settings_helper import setup_azure_logging
 
-# Setting the logger before importing rest of the classes
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
 BlurringAsAServiceSettings.set_from_yaml("config.yml")
 settings = BlurringAsAServiceSettings.get_settings()
 setup_azure_logging(settings["logging"], __name__)
