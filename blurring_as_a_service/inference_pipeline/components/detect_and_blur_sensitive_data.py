@@ -20,8 +20,6 @@ from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
     setup_azure_logging,
 )
 
-sys.path.append("../../..")
-
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
