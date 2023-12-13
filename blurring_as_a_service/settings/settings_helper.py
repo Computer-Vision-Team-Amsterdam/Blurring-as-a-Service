@@ -1,10 +1,10 @@
 import logging
-import os
 from enum import IntFlag
 from functools import reduce
 from typing import Any, Dict, List, Optional, Type
 
 import yaml
+from opencensus.ext.azure.log_exporter import AzureLogHandler
 from pydantic import BaseModel
 
 from blurring_as_a_service.settings.attr_dict import AttrDict
@@ -180,24 +180,33 @@ class Settings(GenericSettings):  # type: ignore
 Settings.set_settings(Settings())
 
 
-def setup_logging(cfg: Dict[str, Any]):
-    """Sets up logging according to the configuration.
+def setup_azure_logging(logging_cfg: Dict[str, Any], pkg_name: str = None):
+    """
+    Sets up logging according to the configuration.
 
     Parameters
     ----------
-    cfg:
-        configuration part of the config.yml
+    logging_cfg: logging configuration part of the config.yml
+    pkg_name: package to set up logging for
 
     Returns
     -------
-    None
 
     """
-    logging.basicConfig(**cfg["basic_config"])
-    for pkg in cfg["own_packages"]:
-        logging.getLogger(pkg).setLevel(cfg["loglevel_own"])
-    for logger_, level in cfg["extra_loglevels"].items():
-        logging.getLogger(logger_).setLevel(level)
+    logging.basicConfig(**logging_cfg["basic_config"])
+    instrumentation_key = logging_cfg["ai_instrumentation_key"]
+    azure_log_handler = AzureLogHandler(connection_string=instrumentation_key)
+    azure_log_handler.setLevel(logging_cfg["loglevel_own"])
+
+    packages = logging_cfg["own_packages"] + ([pkg_name] if pkg_name else [])
+
+    for pkg in packages:
+        logger = logging.getLogger(pkg)
+        if logger.handlers:
+            print(f"Handler for {pkg} has been set already.")
+        else:
+            logger.addHandler(azure_log_handler)
+            print(f"pkg {pkg} has the following handlers: {logger.handlers}")
 
 
 def strings2flags(

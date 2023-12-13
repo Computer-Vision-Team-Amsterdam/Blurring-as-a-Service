@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import secrets
 import string
@@ -11,18 +12,30 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-import yolov5.val as val  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
+)
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
+
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+setup_azure_logging(log_settings, __name__)
+
+from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+
 aml_experiment_settings = settings["aml_experiment_details"]
+
+import yolov5.val as val  # noqa: E402
 
 
 def generate_unique_string(length):
@@ -86,6 +99,7 @@ def detect_and_blur_sensitive_data(
 
     """
     # Check if the folder exists
+    logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder
@@ -93,7 +107,7 @@ def detect_and_blur_sensitive_data(
         file_path = os.path.join(batches_files_path, batch_file_txt)
         # Check if the path points to a file (not a directory)
         if os.path.isfile(file_path):
-            print(f"Creating inference step: {file_path}")
+            logger.info(f"Creating inference step: {file_path}")
 
             files_to_blur_full_path = os.path.join(
                 yolo_yaml_path, batch_file_txt
@@ -102,7 +116,7 @@ def detect_and_blur_sensitive_data(
                 with open(files_to_blur_full_path, "w") as dest:
                     for line in src:
                         dest.write(f"{input_structured_folder}/{line}")
-                        print(f"{input_structured_folder}/{line}")
+                        logger.debug(f"{input_structured_folder}/{line}")
 
             data = dict(
                 train=f"{files_to_blur_full_path}",

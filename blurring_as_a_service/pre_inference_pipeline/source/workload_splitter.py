@@ -1,5 +1,8 @@
+import logging
 import math
 import os
+
+logger = logging.getLogger(__name__)
 
 from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
     get_image_paths,
@@ -42,7 +45,7 @@ class WorkloadSplitter:
 
         # Ensure number_of_batches is not greater than the number of images
         if number_of_batches > len(image_paths):
-            print(
+            logger.warning(
                 "Number of batches is greater than the number of images. Setting number_of_batches to 1."
             )
             number_of_batches = 1

@@ -6,17 +6,25 @@ from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_coco import (
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
+from blurring_as_a_service.settings.settings_helper import setup_azure_logging
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
+setup_azure_logging(settings["logging"], __name__)
+
+from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_coco import (  # noqa: E402
     evaluate_with_coco,
 )
-from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_cvt_metrics import (
+from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_cvt_metrics import (  # noqa: E402
     evaluate_with_cvt_metrics,
 )
-from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (
+from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (  # noqa: E402
     validate_model,
 )
-from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.utils.aml_interface import AMLInterface
+from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()
@@ -56,19 +64,16 @@ def performance_evaluation_pipeline():
         path=yolo_dataset_path,
         description="Dataset root folder. Must be in yolo format for validation. Contains images/val and labels/val",
     )
-
     coco_annotations = Input(
         type=AssetTypes.URI_FILE,
         path=coco_annotations_path,
         description="Corresponds to metadata_pipeline['outputs']['coco_annotations']",
     )
-
     model = Input(
         type=AssetTypes.CUSTOM_MODEL,
         path=f"azureml:{inputs['model_name']}:{inputs['model_version']}",
         description="Model weights for evaluation",
     )
-
     validate_model_step = validate_model(
         mounted_dataset=yolo_dataset,
         model=model,
@@ -107,10 +112,7 @@ def performance_evaluation_pipeline():
 
 
 if __name__ == "__main__":
-    BlurringAsAServiceSettings.set_from_yaml("config.yml")
-    settings = BlurringAsAServiceSettings.get_settings()
     performance_evaluation_settings = settings["performance_evaluation_pipeline"]
-
     default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(

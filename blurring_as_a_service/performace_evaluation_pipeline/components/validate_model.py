@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 
@@ -6,10 +7,12 @@ import yaml
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-import yolov5.val as val  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -18,6 +21,13 @@ config_path = os.path.abspath(
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
+import yolov5.val as val  # noqa: E402
 
 
 @command_component(
@@ -33,6 +43,8 @@ def validate_model(
     yolo_validation_output: Output(type="uri_folder"),  # type: ignore # noqa: F821
     model_parameters_json: str,
 ):
+    logger = logging.getLogger("validate_model")
+    logger.info(f"Hello from {__name__}: {logging.getLogger(__name__).handlers}")
     data = dict(
         train=f"{mounted_dataset}/images/train",
         val=f"{mounted_dataset}/images/val",

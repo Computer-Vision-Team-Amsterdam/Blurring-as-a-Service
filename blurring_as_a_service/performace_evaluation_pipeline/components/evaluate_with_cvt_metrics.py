@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import sys
 from pathlib import Path
@@ -7,17 +8,11 @@ from mldesigner import Input, Output, command_component  # noqa: E402
 
 sys.path.append("../../..")
 
-from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator import (  # noqa: E402
-    FalseNegativeRateCalculator,
-)
-from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (  # noqa: E402
-    collect_and_store_tba_results_per_class_and_size,
-)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
-    setup_azure_logging_from_config,
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -27,7 +22,17 @@ aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
 
-logger = setup_azure_logging_from_config()
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator import (  # noqa: E402
+    FalseNegativeRateCalculator,
+)
+from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (  # noqa: E402
+    collect_and_store_tba_results_per_class_and_size,
+)
 
 
 @command_component(
@@ -61,6 +66,8 @@ def evaluate_with_cvt_metrics(
     -------
 
     """
+
+    logger = logging.getLogger(__name__)
     model_parameters = json.loads(model_parameters_json)
     metrics_metadata = json.loads(metrics_metadata_json)
     save_dir = f"{yolo_validation_output}/{model_parameters['name']}"

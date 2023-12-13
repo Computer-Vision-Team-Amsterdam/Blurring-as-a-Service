@@ -54,6 +54,7 @@ class ValidationModelParameters(SettingsSpecModel):
     name: str
     save_blurred_image: bool
     conf_thres: float
+    no_inverted_colors: bool
 
 
 class MetricsMetadata(SettingsSpecModel):

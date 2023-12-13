@@ -1,3 +1,4 @@
+import logging
 import sys
 from typing import Dict
 
@@ -15,6 +16,8 @@ from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils 
 from blurring_as_a_service.utils.yolo_labels_dataset import (  # noqa: E402
     YoloLabelsDataset,
 )
+
+logger = logging.getLogger(__name__)
 
 
 class TotalBlurredArea:

@@ -4,14 +4,22 @@ from datetime import datetime
 from azure.ai.ml import Output
 from azure.ai.ml.dsl import pipeline
 
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import setup_azure_logging
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
+setup_azure_logging(settings["logging"], __name__)
+
 from blurring_as_a_service.pre_inference_pipeline.components.move_files import (  # noqa: E402
     move_files,
 )
-from blurring_as_a_service.pre_inference_pipeline.components.split_workload import (
+from blurring_as_a_service.pre_inference_pipeline.components.split_workload import (  # noqa: E402
     split_workload,
-)
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
 )
 from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
 
@@ -55,11 +63,7 @@ def pre_inference_pipeline():
 
 
 if __name__ == "__main__":
-    # Retrieve values from the YAML
-    BlurringAsAServiceSettings.set_from_yaml("config.yml")
-    settings = BlurringAsAServiceSettings.get_settings()
     pre_inference_settings = settings["pre_inference_pipeline"]
-
     default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(

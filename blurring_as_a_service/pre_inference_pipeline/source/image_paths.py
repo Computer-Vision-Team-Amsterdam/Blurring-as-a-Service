@@ -1,6 +1,6 @@
-import sys
 import glob
 import os
+import sys
 
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
