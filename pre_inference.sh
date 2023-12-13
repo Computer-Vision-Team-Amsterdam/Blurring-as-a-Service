@@ -7,14 +7,20 @@ execution_time=$(date +'%Y-%m-%d_%H_%M_%S')
 customer="data-office"
 storage_account="todo"
 number_of_batches=5
-subscription="todo
+subscription="todo"
+year="todo"
+
 
 # Define source and destination URLs
-source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/*"
 destination_url="https://${storage_account}.blob.core.windows.net/${customer}-input-structured/"
-
-# AzCopy command to copy contents from source to destination with the execution_time folder
-azcopy copy "${source_url}" "${destination_url}${execution_time}/" --recursive=true
+if [ "$customer" = "hist" ]; then
+    source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/${year}/*"
+    # AzCopy command to copy contents from source to destination with the execution_time folder
+    azcopy copy "${source_url}" "${destination_url}${execution_time}/${year}/" --recursive=true
+else
+    source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/*"
+    azcopy copy "${source_url}" "${destination_url}${execution_time}/" --recursive=true
+fi
 
 # Check if the AzCopy operation was successful
 if [ $? -eq 0 ]; then
