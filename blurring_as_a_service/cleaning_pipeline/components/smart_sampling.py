@@ -63,14 +63,22 @@ def smart_sampling(
         Customer name
     """
     image_paths = find_image_paths(input_structured_folder)
+    print(f'Number of images found: {len(image_paths)} \n')
     grouped_images_by_date = group_files_by_date(image_paths)
     # sample_images_for_quality_check(
     #     grouped_images_by_date, input_structured_folder, customer_cvt_folder
     # )
-    images_statistics = collect_all_images_statistics_from_db(
+    
+    # Returns a dictionary with the images grouped by date
+    images_statistics = collect_images_above_threshold_from_db(
         database_parameters_json, grouped_images_by_date, customer_name
     )
-    print(images_statistics)
+    
+    print(f"Images statistics: {images_statistics} \n")
+    
+    # Count how many images there are for each date (key)
+    for key, values in images_statistics.items():
+        print(f"Date: {key} - Number of filtered images: {len(values)}")
 
 
 def sample_images_for_quality_check(
@@ -118,9 +126,15 @@ def get_10_random_images_per_date(grouped_images_by_date):
     return random_result
 
 
-def collect_all_images_statistics_from_db(
+def collect_images_above_threshold_from_db(
     database_parameters_json, grouped_images_by_date, customer_name
 ):
+    
+    # 1. Define the threshold for the confidence score
+    # Probably best to define it in the config.yml/aml_experiment_details
+    conf_score_threshold = 0.0005
+    
+    # 2. Connect to the database
     database_parameters = json.loads(database_parameters_json)
     db_username = database_parameters["db_username"]
     db_name = database_parameters["db_name"]
@@ -136,6 +150,7 @@ def collect_all_images_statistics_from_db(
     db_config.create_connection()
 
     images_statistics = {}
+    
     with db_config.managed_session() as session:
         for upload_date, image_names in grouped_images_by_date.items():
             upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
@@ -144,6 +159,7 @@ def collect_all_images_statistics_from_db(
                     DetectionInformation.image_customer_name == customer_name,
                     DetectionInformation.image_upload_date == upload_date,
                     DetectionInformation.image_filename == image_name,
+                    DetectionInformation.conf_score > conf_score_threshold
                 )
                 results = query.all()
 
