@@ -16,10 +16,10 @@ destination_url="https://${storage_account}.blob.core.windows.net/${customer}-in
 if [ "$customer" = "hist" ]; then
     source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/${year}/*"
     # AzCopy command to copy contents from source to destination with the execution_time folder
-    azcopy copy "${source_url}" "${destination_url}${execution_time}/${year}/" --recursive=true
+    azcopy copy "${source_url}" "${destination_url}${execution_time}/${year}/" --overwrite=ifSourceNewer --recursive
 else
     source_url="https://${storage_account}.blob.core.windows.net/${customer}-input/*"
-    azcopy copy "${source_url}" "${destination_url}${execution_time}/" --recursive=true
+    azcopy copy "${source_url}" "${destination_url}${execution_time}/" --overwrite=ifSourceNewer --recursive
 fi
 
 # Check if the AzCopy operation was successful
