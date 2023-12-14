@@ -62,12 +62,30 @@ def smart_sampling(
     customer_name
         Customer name
     """
+    
+    # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
+    print(f'Input structured folder: {input_structured_folder} \n')
+    print(f'Customer CVT folder: {customer_cvt_folder} \n')
     print(f'Number of images found: {len(image_paths)} \n')
+    print(f'Image paths: {image_paths} \n')
+    
+    # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
-    # sample_images_for_quality_check(
-    #     grouped_images_by_date, input_structured_folder, customer_cvt_folder
-    # )
+    print(f'Number of dates found: {len(grouped_images_by_date)} \n')
+    # Print each date
+    for key, values in grouped_images_by_date.items():
+        print(f"Date: {key} - Number of images: {len(values)}")
+        for value in values:
+            print(f'Relative path: /{key}/{value}/ \n')
+            print(f'Input path: {input_structured_folder} \n')
+            print(f'Output path: {customer_cvt_folder} \n')
+            break
+    
+    # Sample 100 random images for manual quality check
+    sample_images_for_quality_check(
+        grouped_images_by_date, input_structured_folder, customer_cvt_folder
+    )
     
     # Returns a dictionary with the images grouped by date
     images_statistics = collect_images_above_threshold_from_db(
@@ -79,18 +97,40 @@ def smart_sampling(
     # Count how many images there are for each date (key)
     for key, values in images_statistics.items():
         print(f"Date: {key} - Number of filtered images: {len(values)}")
+        for value in values:
+            print(f'/{key}/{value}/{input_structured_folder}/{customer_cvt_folder}')
+            break
+        
+    # Sample .5% of the images for each date
+    # ratio = 0.5
+    # sample_images_for_retraining(
+    #     images_statistics, input_structured_folder, customer_cvt_folder, ratio
+    # )
 
 
 def sample_images_for_quality_check(
     grouped_images_by_date, input_structured_folder, customer_cvt_folder
 ):
     quality_check_images = get_10_random_images_per_date(grouped_images_by_date)
+    
+    print(f'Quality check images: {quality_check_images} \n')
 
     for key, values in quality_check_images.items():
         for value in values:
             copy_file(
-                "/" + key + "/" + value, input_structured_folder, customer_cvt_folder
+                "/" + key + "/" + value, str(input_structured_folder), str(customer_cvt_folder)
             )
+            
+# def sample_images_for_retraining(
+#     images_statistics, input_structured_folder, customer_cvt_folder, ratio
+# ):
+#     retraining_images = get_batch_images_per_date(images_statistics)
+
+#     for key, values in retraining_images.items():
+#         for value in values:
+#             copy_file(
+#                 "/" + key + "/" + value, input_structured_folder, customer_cvt_folder
+#             )
 
 
 def group_files_by_date(strings):
@@ -162,6 +202,7 @@ def collect_images_above_threshold_from_db(
                     DetectionInformation.conf_score > conf_score_threshold
                 )
                 results = query.all()
+                
 
                 if results:
                     extracted_data = [result.__dict__ for result in results]
