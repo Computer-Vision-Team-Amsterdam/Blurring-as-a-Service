@@ -10,6 +10,7 @@ from datetime import datetime
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 from sqlalchemy import func
+from sqlalchemy.exc import SQLAlchemyError
 
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
@@ -59,8 +60,10 @@ def smart_sampling(
     ----------
     input_structured_folder:
         Path of the mounted folder containing the images.
-    customer_cvt_folder:
-        Path of the customer data inside the CVT storage account.
+    customer_quality_check_folder:
+        Path of the customer quality check folder inside the archive storage account.
+    customer_retraining_folder:
+        Path of the customer retraining folder inside the archive storage account.
     database_parameters_json
         Database credentials
     customer_name
@@ -69,15 +72,14 @@ def smart_sampling(
     
     # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
-    print(f'Input structured folder: {input_structured_folder} \n')
-    print(f'Customer Quality Check folder: {customer_quality_check_folder} \n')
-    print(f'Customer Retraining folder: {customer_retraining_folder} \n')
-    print(f'Number of images found: {len(image_paths)} \n')
-    #print(f'Image paths: {image_paths} \n')
+    print(f'Input structured folder: {input_structured_folder}')
+    print(f'Customer Quality Check folder: {customer_quality_check_folder}')
+    print(f'Customer Retraining folder: {customer_retraining_folder}')
+    print(f'Number of images found: {len(image_paths)}')
     
     # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
-    print(f'Number of dates found: {len(grouped_images_by_date)} \n')
+    print(f'Number of dates found: {len(grouped_images_by_date)}')
     # Print each date
     for key, values in grouped_images_by_date.items():
         print(f"Date: {key} - Number of images: {len(values)}")
@@ -86,19 +88,14 @@ def smart_sampling(
     sample_images_for_quality_check(
         grouped_images_by_date, input_structured_folder, customer_quality_check_folder
     )
-    # new_folder = 'test_retraining'
-    # new_folder_path = os.path.join(input_structured_folder, new_folder)
-    # sample_images_for_quality_check(
-    #     grouped_images_by_date, input_structured_folder, new_folder_path
-    # )
     
     # Returns a dictionary with the images grouped by date and a dictionary to count
     # the number of detections per image
+    # TODO: Define the threshold in the config.yml
+    conf_score_threshold = 0.0005
     images_statistics, image_counts = collect_images_above_threshold_from_db(
-        database_parameters_json, grouped_images_by_date, customer_name
+        database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
     )
-    
-    print(f"Images statistics: {images_statistics} \n")
     
     # Calculate and print min and max counts
     if image_counts:
@@ -110,9 +107,9 @@ def smart_sampling(
     else:
         print("No detections found for the given criteria.")
         
-    print(f'Image counts: {image_counts} \n')
+    print(f'Image counts: {image_counts}')
     
-    print(f'Number of unique images found: {len(image_counts)} \n')
+    print(f'Number of unique images found: {len(image_counts)}')
     
     # Determine the range
     detection_range = max_count - min_count
@@ -158,6 +155,7 @@ def smart_sampling(
     
     print(f'Sampled images by date: {sampled_images_by_date} \n')
     
+    # Sample images for retraining
     sample_images_for_retraining(
         sampled_images_by_date, input_structured_folder, customer_retraining_folder
     )
@@ -271,63 +269,80 @@ def get_10_random_images_per_date(grouped_images_by_date):
 
     return random_result
 
+def connect_to_database(database_parameters_json):
+    """
+    Establish a connection to the database.
 
-def collect_images_above_threshold_from_db(
-    database_parameters_json, grouped_images_by_date, customer_name
-):
-    
-    # 1. Define the threshold for the confidence score
-    # Probably best to define it in the config.yml/aml_experiment_details
-    conf_score_threshold = 0.0005
-    
-    # 2. Connect to the database
+    Parameters
+    ----------
+    database_parameters_json : str
+        JSON string containing the database credentials.
+
+    Returns
+    -------
+    db_config : DBConfigSQLAlchemy
+        The database configuration object.
+
+    Raises
+    ------
+    ValueError
+        If database credentials are not provided.
+    """
     database_parameters = json.loads(database_parameters_json)
-    db_username = database_parameters["db_username"]
-    db_name = database_parameters["db_name"]
-    db_hostname = database_parameters["db_hostname"]
+    db_username = database_parameters.get("db_username")
+    db_name = database_parameters.get("db_name")
+    db_hostname = database_parameters.get("db_hostname")
 
-    # Validate if database credentials are provided
     if not db_username or not db_name or not db_hostname:
         raise ValueError("Please provide database credentials.")
 
-    # Create a DBConfigSQLAlchemy object
     db_config = DBConfigSQLAlchemy(db_username, db_hostname, db_name)
-    # Create the database connection
-    db_config.create_connection()
+    return db_config
 
+def collect_images_above_threshold_from_db(
+    database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
+):
+    
     images_statistics = {}
     image_counts = {}
-    
-    # TODO: Optimize this code, because now we query the database for each image. Maybe instead
-    # we can query first and then filter for all images in image_names
-    
-    with db_config.managed_session() as session:
-        for upload_date, image_names in grouped_images_by_date.items():
-            print(f'Upload Date: {upload_date} \n')
-            upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
-            print(f'Formatted Upload Date: {upload_date} \n')
-            for image_name in image_names:
-                query = session.query(DetectionInformation).filter(
-                    DetectionInformation.image_customer_name == customer_name,
-                    DetectionInformation.image_upload_date == upload_date,
-                    DetectionInformation.image_filename == image_name,
-                    DetectionInformation.conf_score > conf_score_threshold
-                )
-                results = query.all()
-                count = len(results)
-                #print(f"Number of results for {image_name} on {upload_date}: {count}")
 
-                # Populating image_counts
-                image_key = (customer_name, upload_date, image_name)
-                image_counts[image_key] = count
+    try:
+        db_config = connect_to_database(database_parameters_json)
+        db_config.create_connection()
+    
+        with db_config.managed_session() as session:
+            for upload_date, image_names in grouped_images_by_date.items():
+                print(f'Upload Date: {upload_date} \n')
+                upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
+                print(f'Formatted Upload Date: {upload_date} \n')
+                for image_name in image_names:
+                    query = session.query(DetectionInformation).filter(
+                        DetectionInformation.image_customer_name == customer_name,
+                        DetectionInformation.image_upload_date == upload_date,
+                        DetectionInformation.image_filename == image_name,
+                        DetectionInformation.conf_score > conf_score_threshold
+                    )
+                    results = query.all()
+                    count = len(results)
+                    #print(f"Number of results for {image_name} on {upload_date}: {count}")
 
-                # Populating images_statistics with detailed information
-                if results:
-                    extracted_data = [result.__dict__ for result in results]
-                    if upload_date in images_statistics:
-                        images_statistics[upload_date].extend(extracted_data)
-                    else:
-                        images_statistics[upload_date] = extracted_data
+                    # Populating image_counts
+                    image_key = (customer_name, upload_date, image_name)
+                    image_counts[image_key] = count
+
+                    # Populating images_statistics with detailed information
+                    if results:
+                        extracted_data = [result.__dict__ for result in results]
+                        if upload_date in images_statistics:
+                            images_statistics[upload_date].extend(extracted_data)
+                        else:
+                            images_statistics[upload_date] = extracted_data
+                            
+    except SQLAlchemyError as e:
+        print(f"Database operation failed: {e}")
+    except ValueError as e:
+        print(f"Configuration error: {e}")
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
 
     return images_statistics, image_counts
-
