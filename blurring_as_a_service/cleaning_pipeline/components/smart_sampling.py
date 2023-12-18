@@ -36,6 +36,7 @@ config_path = os.path.abspath(
 )
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
+sampling_parameters = settings["sampling_parameters"]
 
 
 @command_component(
@@ -84,15 +85,16 @@ def smart_sampling(
     for key, values in grouped_images_by_date.items():
         print(f"Date: {key} - Number of images: {len(values)}")
     
-    # Sample 10 random images for manual quality check
+    # Sample a number of random images for manual quality check
+    # The number is set in config.yml as quality_check_sample_size
+    n_images_to_sample = sampling_parameters["quality_check_sample_size"]
     sample_images_for_quality_check(
-        grouped_images_by_date, input_structured_folder, customer_quality_check_folder
+        grouped_images_by_date, input_structured_folder, customer_quality_check_folder, n_images_to_sample
     )
     
-    # Returns a dictionary with the images grouped by date and a dictionary to count
-    # the number of detections per image
-    # TODO: Define the threshold in the config.yml
-    conf_score_threshold = 0.0005
+    # Collect images above the confidence score threshold from the database
+    # The threshold is set in config.yml as conf_score_threshold
+    conf_score_threshold = sampling_parameters["conf_score_threshold"]
     images_statistics, image_counts = collect_images_above_threshold_from_db(
         database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
     )
@@ -104,8 +106,9 @@ def smart_sampling(
     for bin_label, images in bin_counts.items():
         print(f"Number of images with detections in bin {bin_label}: {len(images)}")
         
-    # Sample .5% of the images for each date
-    ratio = 0.5
+    # Sample a ratio of the images for each date
+    # The ratio is set in config.yml as sampling_ratio
+    ratio = sampling_parameters["sampling_ratio"]
     percentage_ratio = ratio / 100
     
     sampled_images_by_date = sample_images_equally_from_bins(
@@ -167,9 +170,11 @@ def categorize_into_bins(image_counts, bins, bin_labels, bin_counts):
         bin_counts[bin_label].append(image)
 
 def sample_images_for_quality_check(
-    grouped_images_by_date, input_structured_folder, customer_quality_check_folder
+    grouped_images_by_date, input_structured_folder, customer_quality_check_folder, n_images_to_sample
 ):
-    quality_check_images = get_10_random_images_per_date(grouped_images_by_date)
+    print(f'Sampling {n_images_to_sample} images for quality check.. \n')
+    
+    quality_check_images = get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample)
     
     print(f'Quality check images: {quality_check_images} \n')
 
@@ -261,12 +266,12 @@ def group_files_by_date(strings):
 
     return grouped_files
 
-def get_10_random_images_per_date(grouped_images_by_date):
+def get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample):
     random_result = {}
 
     for key, values in grouped_images_by_date.items():
-        if len(values) >= 10:
-            random_values = random.sample(values, 10)
+        if len(values) >= n_images_to_sample:
+            random_values = random.sample(values, n_images_to_sample)
         else:
             random_values = values
         random_result[key] = random_values
