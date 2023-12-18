@@ -97,49 +97,8 @@ def smart_sampling(
         database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
     )
     
-    # Calculate and print min and max counts
-    if image_counts:
-        counts = image_counts.values()
-        min_count = min(counts)
-        max_count = max(counts)
-        print(f"Minimum number of detections for an image: {min_count}")
-        print(f"Maximum number of detections for an image: {max_count}")
-    else:
-        print("No detections found for the given criteria.")
-        
-    print(f'Image counts: {image_counts}')
-    
-    print(f'Number of unique images found: {len(image_counts)}')
-    
-    # Determine the range
-    detection_range = max_count - min_count
-
-    # Define a strategy to determine the number of bins based on the range
-    if detection_range <= 10:
-        bin_size = 3  # For small ranges, fewer bins
-    elif 10 < detection_range <= 50:
-        bin_size = 5  # Medium ranges get moderate bins
-    else:
-        bin_size = 10  # Large ranges get more bins
-
-    # Calculate the bin edges
-    bins = np.linspace(min_count, max_count, bin_size + 1)
-
-    # Initialize a dictionary to hold bin counts
-    bin_counts = {}
-    bin_labels = []
-    for i in range(len(bins) - 1):
-        bin_label = f"{int(bins[i])}-{int(bins[i + 1]) - 1}"
-        bin_labels.append(bin_label)
-        bin_counts[bin_label] = []
-
-    # Categorize images into bins and count them
-    for image, count in image_counts.items():
-        bin_index = np.digitize(count, bins, right=True) - 1
-        bin_label = bin_labels[bin_index]
-
-        # Add the image to the respective bin
-        bin_counts[bin_label].append(image)
+    # Group images into bins
+    bin_counts, bin_labels = categorize_images_into_bins(image_counts)
 
     # Count images in each bin
     for bin_label, images in bin_counts.items():
@@ -160,6 +119,52 @@ def smart_sampling(
         sampled_images_by_date, input_structured_folder, customer_retraining_folder
     )
 
+def categorize_images_into_bins(image_counts):
+    if not image_counts:
+        print("No detections found for the given criteria.")
+        return {}, []
+
+    # Calculate min and max counts
+    counts = image_counts.values()
+    min_count, max_count = min(counts), max(counts)
+    print(f"Minimum number of detections for an image: {min_count}")
+    print(f"Maximum number of detections for an image: {max_count}")
+
+    # Determine the range and define bin size strategy
+    detection_range = max_count - min_count
+    bin_size = determine_bin_size(detection_range)
+
+    # Calculate the bin edges
+    bins = np.linspace(min_count, max_count, bin_size + 1)
+
+    # Initialize a dictionary to hold bin counts
+    bin_counts, bin_labels = initialize_bin_counts(bins)
+
+    # Categorize images into bins
+    categorize_into_bins(image_counts, bins, bin_labels, bin_counts)
+
+    return bin_counts, bin_labels
+
+def determine_bin_size(detection_range):
+    if detection_range <= 10:
+        return 3
+    elif 10 < detection_range <= 50:
+        return 5
+    else:
+        return 10
+
+def initialize_bin_counts(bins):
+    bin_counts = {}
+    bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
+    for label in bin_labels:
+        bin_counts[label] = []
+    return bin_counts, bin_labels
+
+def categorize_into_bins(image_counts, bins, bin_labels, bin_counts):
+    for image, count in image_counts.items():
+        bin_index = np.digitize(count, bins, right=True) - 1
+        bin_label = bin_labels[bin_index]
+        bin_counts[bin_label].append(image)
 
 def sample_images_for_quality_check(
     grouped_images_by_date, input_structured_folder, customer_quality_check_folder
@@ -255,7 +260,6 @@ def group_files_by_date(strings):
                 grouped_files[key] = [value]
 
     return grouped_files
-
 
 def get_10_random_images_per_date(grouped_images_by_date):
     random_result = {}
