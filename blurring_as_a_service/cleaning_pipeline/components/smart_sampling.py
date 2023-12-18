@@ -7,6 +7,7 @@ from datetime import datetime
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
+from sqlalchemy import func
 
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
@@ -89,16 +90,25 @@ def smart_sampling(
     #     grouped_images_by_date, input_structured_folder, new_folder_path
     # )
     
-    # Returns a dictionary with the images grouped by date
-    images_statistics = collect_images_above_threshold_from_db(
+    # Returns a dictionary with the images grouped by date and a dictionary to count
+    # the number of detections per image
+    images_statistics, image_counts = collect_images_above_threshold_from_db(
         database_parameters_json, grouped_images_by_date, customer_name
     )
     
     print(f"Images statistics: {images_statistics} \n")
     
-    # Count how many images there are for each date (key)
-    for key, values in images_statistics.items():
-        print(f"Date: {key} - Number of filtered images: {len(values)}")
+    # Calculate and print min and max counts
+    if image_counts:
+        counts = image_counts.values()
+        min_count = min(counts)
+        max_count = max(counts)
+        print(f"Minimum number of detections for an image: {min_count}")
+        print(f"Maximum number of detections for an image: {max_count}")
+    else:
+        print("No detections found for the given criteria.")
+        
+    print(f'Image counts: {image_counts} \n')
         
     # Sample .5% of the images for each date
     ratio = 0.5
@@ -132,18 +142,20 @@ def sample_images_for_retraining(
 
         # If the calculated number is less than 1, we can choose to sample at least 1 image
         num_images_to_sample = max(1, num_images_to_sample)
+        print(f'Number of images to sample per date: {num_images_to_sample} \n')
 
         # Randomly sample the calculated number of images
         sampled_images = random.sample(images, num_images_to_sample)
 
         # Copy the sampled images
-        for image_name in sampled_images:
+        for image in sampled_images:
             formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
+            image_filename = image['image_filename']
             copy_file(
-                f"/{formatted_upload_date}/{image_name}", str(input_structured_folder), str(customer_retraining_folder)
+                f"/{formatted_upload_date}/{image_filename}", str(input_structured_folder), str(customer_retraining_folder)
             )
             # Optionally, print out the image names being sampled for debugging
-            print(f"Sampled for retraining: /{upload_date}/{image_name}")
+            print(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
 
 
 def group_files_by_date(strings):
@@ -203,6 +215,7 @@ def collect_images_above_threshold_from_db(
     db_config.create_connection()
 
     images_statistics = {}
+    image_counts = {}
     
     # TODO: Optimize this code, because now we query the database for each image. Maybe instead
     # we can query first and then filter for all images in image_names
@@ -218,34 +231,22 @@ def collect_images_above_threshold_from_db(
                     DetectionInformation.image_upload_date == upload_date,
                     DetectionInformation.image_filename == image_name,
                     DetectionInformation.conf_score > conf_score_threshold
-                ).order_by(DetectionInformation.conf_score.desc())
-                
-                highest_confidence_result = query.first()
-                
-                if highest_confidence_result:
-                    # Extract the image filename from the highest confidence result
-                    highest_confidence_image = highest_confidence_result.image_filename
+                )
+                results = query.all()
+                count = len(results)
+                print(f"Number of results for {image_name} on {upload_date}: {count}")
 
-                    # Add the image to the statistics dictionary
+                # Populating image_counts
+                image_key = (customer_name, upload_date, image_name)
+                image_counts[image_key] = count
+
+                # Populating images_statistics with detailed information
+                if results:
+                    extracted_data = [result.__dict__ for result in results]
                     if upload_date in images_statistics:
-                        if highest_confidence_image not in images_statistics[upload_date]:
-                            images_statistics[upload_date].append(highest_confidence_image)
+                        images_statistics[upload_date].extend(extracted_data)
                     else:
-                        images_statistics[upload_date] = [highest_confidence_image]
+                        images_statistics[upload_date] = extracted_data
 
-                    # Optional: Print the image name and its highest confidence score for debugging
-                    print(f"{upload_date} - {highest_confidence_image}: {highest_confidence_result.conf_score}")
-                
-                # results = query.all()
-                # print(f"Number of results for {image_name} on {upload_date}: {len(results)}")
-                
+    return images_statistics, image_counts
 
-                # if results:
-                #     print(f"Sample result for {image_name} on {upload_date}: {results[0].__dict__}")
-                #     extracted_data = [result.__dict__ for result in results]
-                #     if upload_date in images_statistics:
-                #         images_statistics[upload_date].extend(extracted_data)
-                #     else:
-                #         images_statistics[upload_date] = extracted_data
-
-    return images_statistics
