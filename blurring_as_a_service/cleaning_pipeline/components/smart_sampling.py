@@ -150,8 +150,16 @@ def smart_sampling(
         
     # Sample .5% of the images for each date
     ratio = 0.5
+    percentage_ratio = ratio / 100
+    
+    sampled_images_by_date = sample_images_equally_from_bins(
+        image_counts, bin_counts, percentage_ratio
+    )
+    
+    print(f'Sampled images by date: {sampled_images_by_date} \n')
+    
     sample_images_for_retraining(
-        images_statistics, input_structured_folder, customer_retraining_folder, ratio
+        sampled_images_by_date, input_structured_folder, customer_retraining_folder
     )
 
 
@@ -169,32 +177,67 @@ def sample_images_for_quality_check(
             )
             
 def sample_images_for_retraining(
-    images_statistics, input_structured_folder, customer_retraining_folder, ratio
+    sampled_images_by_date, input_structured_folder, customer_retraining_folder
 ):
-    # Ratio should be expressed as a decimal for percentage calculation
-    percentage_ratio = ratio / 100
-
-    for upload_date, images in images_statistics.items():
-        # Calculate the number of images to sample
-        num_images_to_sample = int(len(images) * percentage_ratio)
-
-        # If the calculated number is less than 1, we can choose to sample at least 1 image
-        num_images_to_sample = max(1, num_images_to_sample)
-        print(f'Number of images to sample per date: {num_images_to_sample} \n')
-
-        # Randomly sample the calculated number of images
-        sampled_images = random.sample(images, num_images_to_sample)
-
+    for upload_date, images in sampled_images_by_date.items():
         # Copy the sampled images
-        for image in sampled_images:
+        for image in images:
             formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
-            image_filename = image['image_filename']
+            image_filename = image[2]  # Assuming image is a tuple (customer_name, upload_date, image_name)
             copy_file(
                 f"/{formatted_upload_date}/{image_filename}", str(input_structured_folder), str(customer_retraining_folder)
             )
             # Optionally, print out the image names being sampled for debugging
             print(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
 
+def sample_images_equally_from_bins(
+    image_counts, bin_counts, percentage_ratio
+):
+    sampled_images_by_date = {}
+
+    # Extract all unique upload dates from image_counts
+    unique_dates = {img[1] for img in image_counts.keys()}  # Extracting the upload_date part of the tuple
+    print(f'Unique dates: {unique_dates} \n')
+
+    for upload_date in unique_dates:
+        # Filter image_counts for the current date and count unique images
+        unique_images_on_date = {k for k in image_counts.keys() if k[1] == upload_date}
+        total_images = len(unique_images_on_date)
+        print(f'Total images on date {upload_date}: {total_images} \n')
+        total_images_to_sample = int(total_images * percentage_ratio)
+        
+        # Ensure at least one image is sampled if total_images_to_sample > 0
+        total_images_to_sample = max(total_images_to_sample, 1) if total_images > 0 else 0
+        
+        print(f'Total images to sample on date {upload_date}: {total_images_to_sample} \n')
+
+        # Calculate the number of images to sample per bin
+        images_per_bin = total_images_to_sample // len(bin_counts)
+        print(f'Images per bin: {images_per_bin} \n')
+        remainder = total_images_to_sample % len(bin_counts)
+        print(f'Remainder: {remainder} \n')
+
+        sampled_images = []
+
+        for bin_label, images_in_bin in bin_counts.items():
+            # Extract the unique images for the current bin and date
+            unique_images_in_bin = [img for img in images_in_bin if img[1] == upload_date]
+            
+            # Adjust the number of images to sample from this bin
+            if images_per_bin > 0 or (remainder > 0 and unique_images_in_bin):
+                num_to_sample = min(images_per_bin + (1 if remainder > 0 else 0), len(unique_images_in_bin))
+                remainder -= 1 if remainder > 0 else 0
+            else:
+                # If images_per_bin is 0 and no remainder, skip this bin
+                continue 
+
+            # Sample images
+            sampled_from_bin = random.sample(unique_images_in_bin, num_to_sample) if unique_images_in_bin else []
+            sampled_images.extend(sampled_from_bin)
+
+        sampled_images_by_date[upload_date] = sampled_images
+
+    return sampled_images_by_date
 
 def group_files_by_date(strings):
     grouped_files = {}
