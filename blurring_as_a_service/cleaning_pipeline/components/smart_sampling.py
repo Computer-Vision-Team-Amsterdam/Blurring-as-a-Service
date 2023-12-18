@@ -3,7 +3,9 @@ import os
 import random
 import re
 import sys
+import numpy as np
 from datetime import datetime
+
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
@@ -109,6 +111,42 @@ def smart_sampling(
         print("No detections found for the given criteria.")
         
     print(f'Image counts: {image_counts} \n')
+    
+    print(f'Number of unique images found: {len(image_counts)} \n')
+    
+    # Determine the range
+    detection_range = max_count - min_count
+
+    # Define a strategy to determine the number of bins based on the range
+    if detection_range <= 10:
+        bin_size = 3  # For small ranges, fewer bins
+    elif 10 < detection_range <= 50:
+        bin_size = 5  # Medium ranges get moderate bins
+    else:
+        bin_size = 10  # Large ranges get more bins
+
+    # Calculate the bin edges
+    bins = np.linspace(min_count, max_count, bin_size + 1)
+
+    # Initialize a dictionary to hold bin counts
+    bin_counts = {}
+    bin_labels = []
+    for i in range(len(bins) - 1):
+        bin_label = f"{int(bins[i])}-{int(bins[i + 1]) - 1}"
+        bin_labels.append(bin_label)
+        bin_counts[bin_label] = []
+
+    # Categorize images into bins and count them
+    for image, count in image_counts.items():
+        bin_index = np.digitize(count, bins, right=True) - 1
+        bin_label = bin_labels[bin_index]
+
+        # Add the image to the respective bin
+        bin_counts[bin_label].append(image)
+
+    # Count images in each bin
+    for bin_label, images in bin_counts.items():
+        print(f"Number of images with detections in bin {bin_label}: {len(images)}")
         
     # Sample .5% of the images for each date
     ratio = 0.5
@@ -234,7 +272,7 @@ def collect_images_above_threshold_from_db(
                 )
                 results = query.all()
                 count = len(results)
-                print(f"Number of results for {image_name} on {upload_date}: {count}")
+                #print(f"Number of results for {image_name} on {upload_date}: {count}")
 
                 # Populating image_counts
                 image_key = (customer_name, upload_date, image_name)
