@@ -33,13 +33,31 @@ def cleaning_pipeline():
         database_parameters_json=database_parameters_json,
         customer_name=customer_name,
     )
-    customer_in_cvt_path = aml_interface.get_datastore_full_path(
-        f"{customer_name}_in_cvt"
+    # customer_in_cvt_path = aml_interface.get_datastore_full_path(
+    #     f"{customer_name}_in_cvt"
+    # )
+    customer_quality_check_path = aml_interface.get_datastore_full_path(
+        f"{customer_name}_quality_check"
     )
-    smart_sampling_step.outputs.customer_cvt_folder = Output(
+    
+    print(f'Customer quality check path: {customer_quality_check_path}')
+    
+    smart_sampling_step.outputs.customer_quality_check_folder = Output(
         type=AssetTypes.URI_FOLDER,
         mode="rw_mount",
-        path=customer_in_cvt_path,
+        path=customer_quality_check_path,
+    )
+    
+    customer_retraining_path = aml_interface.get_datastore_full_path(
+        f"{customer_name}_retraining"
+    )
+    
+    print(f'Customer retraining path: {customer_retraining_path}')
+    
+    smart_sampling_step.outputs.customer_retraining_folder = Output(
+        type=AssetTypes.URI_FOLDER,
+        mode="rw_mount",
+        path=customer_retraining_path,
     )
 
     # output_path = aml_interface.get_datastore_full_path(f"{customer_name}_output")

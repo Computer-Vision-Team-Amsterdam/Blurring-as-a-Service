@@ -43,7 +43,8 @@ aml_experiment_settings = settings["aml_experiment_details"]
 )
 def smart_sampling(
     input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    customer_cvt_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    customer_quality_check_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    customer_retraining_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     database_parameters_json: str,
     customer_name: str,
 ):
@@ -66,9 +67,10 @@ def smart_sampling(
     # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
     print(f'Input structured folder: {input_structured_folder} \n')
-    print(f'Customer CVT folder: {customer_cvt_folder} \n')
+    print(f'Customer Quality Check folder: {customer_quality_check_folder} \n')
+    print(f'Customer Retraining folder: {customer_retraining_folder} \n')
     print(f'Number of images found: {len(image_paths)} \n')
-    print(f'Image paths: {image_paths} \n')
+    #print(f'Image paths: {image_paths} \n')
     
     # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
@@ -76,16 +78,16 @@ def smart_sampling(
     # Print each date
     for key, values in grouped_images_by_date.items():
         print(f"Date: {key} - Number of images: {len(values)}")
-        for value in values:
-            print(f'Relative path: /{key}/{value}/ \n')
-            print(f'Input path: {input_structured_folder} \n')
-            print(f'Output path: {customer_cvt_folder} \n')
-            break
     
-    # Sample 100 random images for manual quality check
+    # Sample 10 random images for manual quality check
     sample_images_for_quality_check(
-        grouped_images_by_date, input_structured_folder, customer_cvt_folder
+        grouped_images_by_date, input_structured_folder, customer_quality_check_folder
     )
+    # new_folder = 'test_retraining'
+    # new_folder_path = os.path.join(input_structured_folder, new_folder)
+    # sample_images_for_quality_check(
+    #     grouped_images_by_date, input_structured_folder, new_folder_path
+    # )
     
     # Returns a dictionary with the images grouped by date
     images_statistics = collect_images_above_threshold_from_db(
@@ -97,19 +99,16 @@ def smart_sampling(
     # Count how many images there are for each date (key)
     for key, values in images_statistics.items():
         print(f"Date: {key} - Number of filtered images: {len(values)}")
-        for value in values:
-            print(f'/{key}/{value}/{input_structured_folder}/{customer_cvt_folder}')
-            break
         
     # Sample .5% of the images for each date
-    # ratio = 0.5
-    # sample_images_for_retraining(
-    #     images_statistics, input_structured_folder, customer_cvt_folder, ratio
-    # )
+    ratio = 0.5
+    sample_images_for_retraining(
+        images_statistics, input_structured_folder, customer_retraining_folder, ratio
+    )
 
 
 def sample_images_for_quality_check(
-    grouped_images_by_date, input_structured_folder, customer_cvt_folder
+    grouped_images_by_date, input_structured_folder, customer_quality_check_folder
 ):
     quality_check_images = get_10_random_images_per_date(grouped_images_by_date)
     
@@ -118,19 +117,33 @@ def sample_images_for_quality_check(
     for key, values in quality_check_images.items():
         for value in values:
             copy_file(
-                "/" + key + "/" + value, str(input_structured_folder), str(customer_cvt_folder)
+                "/" + key + "/" + value, str(input_structured_folder), str(customer_quality_check_folder)
             )
             
-# def sample_images_for_retraining(
-#     images_statistics, input_structured_folder, customer_cvt_folder, ratio
-# ):
-#     retraining_images = get_batch_images_per_date(images_statistics)
+def sample_images_for_retraining(
+    images_statistics, input_structured_folder, customer_retraining_folder, ratio
+):
+    # Ratio should be expressed as a decimal for percentage calculation
+    percentage_ratio = ratio / 100
 
-#     for key, values in retraining_images.items():
-#         for value in values:
-#             copy_file(
-#                 "/" + key + "/" + value, input_structured_folder, customer_cvt_folder
-#             )
+    for upload_date, images in images_statistics.items():
+        # Calculate the number of images to sample
+        num_images_to_sample = int(len(images) * percentage_ratio)
+
+        # If the calculated number is less than 1, we can choose to sample at least 1 image
+        num_images_to_sample = max(1, num_images_to_sample)
+
+        # Randomly sample the calculated number of images
+        sampled_images = random.sample(images, num_images_to_sample)
+
+        # Copy the sampled images
+        for image_name in sampled_images:
+            formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
+            copy_file(
+                f"/{formatted_upload_date}/{image_name}", str(input_structured_folder), str(customer_retraining_folder)
+            )
+            # Optionally, print out the image names being sampled for debugging
+            print(f"Sampled for retraining: /{upload_date}/{image_name}")
 
 
 def group_files_by_date(strings):
@@ -191,24 +204,48 @@ def collect_images_above_threshold_from_db(
 
     images_statistics = {}
     
+    # TODO: Optimize this code, because now we query the database for each image. Maybe instead
+    # we can query first and then filter for all images in image_names
+    
     with db_config.managed_session() as session:
         for upload_date, image_names in grouped_images_by_date.items():
+            print(f'Upload Date: {upload_date} \n')
             upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
+            print(f'Formatted Upload Date: {upload_date} \n')
             for image_name in image_names:
                 query = session.query(DetectionInformation).filter(
                     DetectionInformation.image_customer_name == customer_name,
                     DetectionInformation.image_upload_date == upload_date,
                     DetectionInformation.image_filename == image_name,
                     DetectionInformation.conf_score > conf_score_threshold
-                )
-                results = query.all()
+                ).order_by(DetectionInformation.conf_score.desc())
+                
+                highest_confidence_result = query.first()
+                
+                if highest_confidence_result:
+                    # Extract the image filename from the highest confidence result
+                    highest_confidence_image = highest_confidence_result.image_filename
+
+                    # Add the image to the statistics dictionary
+                    if upload_date in images_statistics:
+                        if highest_confidence_image not in images_statistics[upload_date]:
+                            images_statistics[upload_date].append(highest_confidence_image)
+                    else:
+                        images_statistics[upload_date] = [highest_confidence_image]
+
+                    # Optional: Print the image name and its highest confidence score for debugging
+                    print(f"{upload_date} - {highest_confidence_image}: {highest_confidence_result.conf_score}")
+                
+                # results = query.all()
+                # print(f"Number of results for {image_name} on {upload_date}: {len(results)}")
                 
 
-                if results:
-                    extracted_data = [result.__dict__ for result in results]
-                    if upload_date in images_statistics:
-                        images_statistics[upload_date].extend(extracted_data)
-                    else:
-                        images_statistics[upload_date] = extracted_data
+                # if results:
+                #     print(f"Sample result for {image_name} on {upload_date}: {results[0].__dict__}")
+                #     extracted_data = [result.__dict__ for result in results]
+                #     if upload_date in images_statistics:
+                #         images_statistics[upload_date].extend(extracted_data)
+                #     else:
+                #         images_statistics[upload_date] = extracted_data
 
     return images_statistics
