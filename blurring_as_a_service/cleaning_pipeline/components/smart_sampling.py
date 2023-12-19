@@ -4,6 +4,7 @@ import random
 import re
 import sys
 import numpy as np
+import logging
 from datetime import datetime
 
 
@@ -11,6 +12,28 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
+
+sys.path.append("../../..")
+
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
+)
+
+config_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
+)
+settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+aml_experiment_settings = settings["aml_experiment_details"]
+sampling_parameters = settings["sampling_parameters"]
+
+# Configure logging
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
 
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
@@ -22,22 +45,10 @@ sys.path.append(yolov5_path)
 from yolov5.baas_utils.database_handler import DBConfigSQLAlchemy  # noqa: E402
 from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
 
-sys.path.append("../../..")
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
 from blurring_as_a_service.utils.generics import (  # noqa: E402
     copy_file,
     find_image_paths,
 )
-
-config_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
-)
-settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
-aml_experiment_settings = settings["aml_experiment_details"]
-sampling_parameters = settings["sampling_parameters"]
-
 
 @command_component(
     name="smart_sampling",
@@ -71,19 +82,22 @@ def smart_sampling(
         Customer name
     """
     
+    logger = logging.getLogger("smart_sampling")
+    
     # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
-    print(f'Input structured folder: {input_structured_folder}')
-    print(f'Customer Quality Check folder: {customer_quality_check_folder}')
-    print(f'Customer Retraining folder: {customer_retraining_folder}')
-    print(f'Number of images found: {len(image_paths)}')
+    logger.info(f'Input structured folder: {input_structured_folder}')
+    logger.info(f'Customer Quality Check folder: {customer_quality_check_folder}')
+    logger.info(f'Customer Retraining folder: {customer_retraining_folder}')
+    logger.info(f'Number of images found: {len(image_paths)}')
+    logger.info(f'Sampling parameters: {sampling_parameters}')
     
     # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
-    print(f'Number of dates found: {len(grouped_images_by_date)}')
+    logger.info(f'Number of dates (folder) found: {len(grouped_images_by_date)}')
     # Print each date
     for key, values in grouped_images_by_date.items():
-        print(f"Date: {key} - Number of images: {len(values)}")
+        logger.info(f"Date: {key} - Number of images: {len(values)}")
     
     # Sample a number of random images for manual quality check
     # The number is set in config.yml as quality_check_sample_size
@@ -95,16 +109,16 @@ def smart_sampling(
     # Collect images above the confidence score threshold from the database
     # The threshold is set in config.yml as conf_score_threshold
     conf_score_threshold = sampling_parameters["conf_score_threshold"]
-    images_statistics, image_counts = collect_images_above_threshold_from_db(
+    _, image_counts = collect_images_above_threshold_from_db(
         database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
     )
     
     # Group images into bins
-    bin_counts, bin_labels = categorize_images_into_bins(image_counts)
+    bin_counts, _ = categorize_images_into_bins(image_counts)
 
     # Count images in each bin
     for bin_label, images in bin_counts.items():
-        print(f"Number of images with detections in bin {bin_label}: {len(images)}")
+        logger.info(f"Number of images with detections in bin {bin_label}: {len(images)}")
         
     # Sample a ratio of the images for each date
     # The ratio is set in config.yml as sampling_ratio
@@ -115,7 +129,7 @@ def smart_sampling(
         image_counts, bin_counts, percentage_ratio
     )
     
-    print(f'Sampled images by date: {sampled_images_by_date} \n')
+    logger.info(f'Sampled images by date: {sampled_images_by_date} \n')
     
     # Sample images for retraining
     sample_images_for_retraining(
@@ -205,25 +219,25 @@ def sample_images_equally_from_bins(
 
     # Extract all unique upload dates from image_counts
     unique_dates = {img[1] for img in image_counts.keys()}  # Extracting the upload_date part of the tuple
-    print(f'Unique dates: {unique_dates} \n')
+    print(f'Unique dates: {unique_dates}')
 
     for upload_date in unique_dates:
         # Filter image_counts for the current date and count unique images
         unique_images_on_date = {k for k in image_counts.keys() if k[1] == upload_date}
         total_images = len(unique_images_on_date)
-        print(f'Total images on date {upload_date}: {total_images} \n')
+        print(f'Total images on date {upload_date}: {total_images}')
         total_images_to_sample = int(total_images * percentage_ratio)
         
         # Ensure at least one image is sampled if total_images_to_sample > 0
         total_images_to_sample = max(total_images_to_sample, 1) if total_images > 0 else 0
         
-        print(f'Total images to sample on date {upload_date}: {total_images_to_sample} \n')
+        print(f'Total images to sample on date {upload_date}: {total_images_to_sample}')
 
         # Calculate the number of images to sample per bin
         images_per_bin = total_images_to_sample // len(bin_counts)
-        print(f'Images per bin: {images_per_bin} \n')
+        print(f'Images per bin: {images_per_bin}')
         remainder = total_images_to_sample % len(bin_counts)
-        print(f'Remainder: {remainder} \n')
+        print(f'Remainder: {remainder}')
 
         sampled_images = []
 
