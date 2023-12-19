@@ -1,15 +1,13 @@
 import json
+import logging
 
 from pycocotools.coco import COCO
 
 from blurring_as_a_service.performace_evaluation_pipeline.metrics.custom_coco_evaluator import (  # noqa: E402
     CustomCOCOeval,
 )
-from blurring_as_a_service.utils.logging_handler import (  # noqa: E402
-    setup_azure_logging_from_config,
-)
 
-logger = setup_azure_logging_from_config()
+logger = logging.getLogger(__name__)
 
 
 def coco_evaluation(
@@ -28,7 +26,6 @@ def coco_evaluation(
     -------
 
     """
-
     COCO_gt = COCO(coco_annotations_json)  # init annotations api
     try:
         COCO_dt = COCO_gt.loadRes(coco_predictions_json)  # init predictions api

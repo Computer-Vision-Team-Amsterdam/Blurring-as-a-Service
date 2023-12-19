@@ -1,5 +1,8 @@
+import logging
 import os
 import shutil
+
+logger = logging.getLogger(__name__)
 
 IMG_FORMATS = (
     "bmp",
@@ -28,11 +31,11 @@ def find_image_paths(root_folder):
 def delete_file(file_path):
     try:
         os.remove(file_path)
-        print(f"{file_path} has been deleted.")
+        logger.info(f"{file_path} has been deleted.")
     except FileNotFoundError:
-        print(f"{file_path} does not exist.")
+        logger.error(f"{file_path} does not exist.")
     except Exception as e:
-        print(f"Failed to remove file '{file_path}': {str(e)}")
+        logger.error(f"Failed to remove file '{file_path}': {str(e)}")
         raise Exception(f"Failed to remove file '{file_path}': {e}")
 
 
@@ -42,15 +45,15 @@ def copy_file(relative_path, input_path, output_path):
     source_path = input_path + relative_path
     destination_path = output_path + relative_path
 
-    print(f"Copying {source_path} to {destination_path}..")
+    logger.info(f"Copying {source_path} to {destination_path}..")
     if os.path.exists(source_path):
         os.makedirs(os.path.dirname(destination_path), exist_ok=True)
         shutil.copy(source_path, destination_path)
         print(f"File '{source_path}' copied to '{destination_path}'")
 
         if not os.path.exists(destination_path):
-            raise FileNotFoundError(
-                f"Failed to move file '{source_path}' to the destination: {destination_path}"
-            )
+            error_message = f"Failed to move file '{source_path}' to the destination: {destination_path}"
+            logger.error(error_message)
+            raise FileNotFoundError(error_message)
     else:
-        print(f"Source file '{source_path}' does not exist.")
+        logger.info(f"Source file '{source_path}' does not exist.")

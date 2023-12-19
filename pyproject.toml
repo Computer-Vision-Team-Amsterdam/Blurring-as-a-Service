@@ -53,8 +53,7 @@ tqdm = {version = ">=4.64.0", source = "PyPI"}
 urllib3 = {version = ">=2.0.6", source = "PyPI"}
 virtualenv = {version = "20.24.7", source = "PyPI"}
 wheel = {version = "^0.42.0", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  tag = "v0.4.7" }
-
+yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git",  tag = "v0.4.9" }
 
 [tool.poetry.dev-dependencies]
 

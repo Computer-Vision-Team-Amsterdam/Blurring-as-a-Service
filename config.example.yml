@@ -35,6 +35,7 @@ performance_evaluation_pipeline:
     name: "yolo_exp_1"
     save_blurred_image: True
     conf_thres: 0.001
+    no_inverted_colors: True
   metrics_metadata:
     image_height: 4000
     image_width: 8000
@@ -76,11 +77,12 @@ database_parameters:
   db_name: "blur"
 
 logging:
-  loglevel_own: "WARNING"  # override loglevel for packages defined in `own_packages`
-  own_packages: ["__main__", "blurring_as_a_service"]
+  loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
+  own_packages: ["__main__", "blurring_as_a_service", "yolov5", "evaluate_with_cvt_metrics", "validate_model",
+                 "evaluate_with_coco", "detect_and_blur_sensitive_data", "move_files", "split_workload"]
   basic_config:
     # log config as arguments to `logging.basicConfig`
-    level: WARNING
-    format: "%(asctime)s|%(levelname)-8s|%(name)s|%(message)s"
+    level: INFO
+    format: "%(asctime)s|||%(levelname)-8s|%(name)s|%(message)s"
     datefmt: "%Y-%m-%d %H:%M:%S"
   ai_instrumentation_key: "APPLICATION_INSIGHTS_INSTRUMENTATION_KEY"

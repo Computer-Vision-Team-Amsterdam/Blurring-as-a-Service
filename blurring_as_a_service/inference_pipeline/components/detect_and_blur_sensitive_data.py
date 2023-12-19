@@ -1,4 +1,5 @@
 import json
+import logging
 import os
 import secrets
 import string
@@ -11,18 +12,30 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-import yolov5.val as val  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
-from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
+)
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
+
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+setup_azure_logging(log_settings, __name__)
+
+from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+
 aml_experiment_settings = settings["aml_experiment_details"]
+
+import yolov5.val as val  # noqa: E402
 
 
 def generate_unique_string(length):
@@ -86,51 +99,70 @@ def detect_and_blur_sensitive_data(
 
     """
     # Check if the folder exists
+    logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder
     for batch_file_txt in os.listdir(batches_files_path):
-        file_path = os.path.join(batches_files_path, batch_file_txt)
-        # Check if the path points to a file (not a directory)
-        if os.path.isfile(file_path):
-            print(f"Creating inference step: {file_path}")
+        if batch_file_txt.endswith('.txt'):
+            file_path = os.path.join(batches_files_path, batch_file_txt)
 
-            files_to_blur_full_path = os.path.join(
-                yolo_yaml_path, batch_file_txt
-            )  # use outputs folder as Azure expects outputs there
-            with open(file_path, "r") as src:
-                with open(files_to_blur_full_path, "w") as dest:
-                    for line in src:
-                        dest.write(f"{input_structured_folder}/{line}")
-                        print(f"{input_structured_folder}/{line}")
+            # Check if the path points to a file (not a directory) and if the file exists
+            if os.path.isfile(file_path) and os.path.exists(file_path):
+                logger.info(f"Creating inference step: {file_path}")
 
-            data = dict(
-                train=f"{files_to_blur_full_path}",
-                val=f"{files_to_blur_full_path}",
-                test=f"{files_to_blur_full_path}",
-                nc=2,
-                names=["person", "license_plate"],
-            )
+                files_to_blur_full_path = os.path.join(
+                    yolo_yaml_path, batch_file_txt
+                )  # use outputs folder as Azure expects outputs there
 
-            # TODO create postgresql string and send to val.py
+                # Define the locked file path with ".lock" extension
+                locked_file_path = file_path + ".lock"
 
-            with open(f"{yolo_yaml_path}/pano.yaml", "w") as outfile:
-                yaml.dump(data, outfile, default_flow_style=False)
-            cuda_device = torch.cuda.current_device()
-            model_parameters = json.loads(model_parameters_json)
-            database_parameters = json.loads(database_parameters_json)
-            val.run(
-                weights=model,
-                data=f"{yolo_yaml_path}/pano.yaml",
-                project=results_path,
-                device=cuda_device,
-                name="",
-                customer_name=customer_name,
-                start_time=get_current_time(),
-                run_id=generate_unique_string(10),
-                **model_parameters,
-                **database_parameters,
-            )
-            delete_file(file_path)
-            delete_file(files_to_blur_full_path)
-            delete_file(f"{yolo_yaml_path}/pano.yaml")
+                read_success = False
+                try:
+                    # Rename the file to add ".lock" extension
+                    os.rename(file_path, locked_file_path)
+
+                    with open(locked_file_path, "r") as src:
+                        with open(files_to_blur_full_path, "w") as dest:
+                            for line in src:
+                                dest.write(f"{input_structured_folder}/{line}")
+                    read_success = True
+                except FileNotFoundError as e:
+                    logger.info(f"File {locked_file_path} not found: {e}")
+                except Exception as e:
+                    logger.error(f"Error occurred while reading {locked_file_path}: {e}")
+
+                if read_success:
+                    data = dict(
+                        train=f"{files_to_blur_full_path}",
+                        val=f"{files_to_blur_full_path}",
+                        test=f"{files_to_blur_full_path}",
+                        nc=2,
+                        names=["person", "license_plate"],
+                    )
+
+                    # Remove the extension
+                    file_name_without_extension = batch_file_txt.rsplit('.', 1)[0]
+                    yaml_name = f"{file_name_without_extension}_pano.yaml"
+
+                    with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
+                        yaml.dump(data, outfile, default_flow_style=False)
+                    cuda_device = torch.cuda.current_device()
+                    model_parameters = json.loads(model_parameters_json)
+                    database_parameters = json.loads(database_parameters_json)
+                    val.run(
+                        weights=model,
+                        data=f"{yolo_yaml_path}/{yaml_name}",
+                        project=results_path,
+                        device=cuda_device,
+                        name="",
+                        customer_name=customer_name,
+                        start_time=get_current_time(),
+                        run_id=generate_unique_string(10),
+                        **model_parameters,
+                        **database_parameters,
+                    )
+                    delete_file(locked_file_path)
+                    delete_file(files_to_blur_full_path)
+                    delete_file(f"{yolo_yaml_path}/{yaml_name}")

@@ -1,3 +1,4 @@
+import logging
 import os
 import shutil
 import sys
@@ -6,8 +7,14 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Output, command_component
 
 sys.path.append("../../..")
+from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
+    get_image_paths,
+)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -16,13 +23,14 @@ config_path = os.path.abspath(
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 aml_experiment_settings = settings["aml_experiment_details"]
 
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
 # Construct the path to the yolov5 package
 yolov5_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
-)
-
-from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  # noqa: E402
-    get_image_paths,
 )
 
 
@@ -51,11 +59,12 @@ def move_files(
         Where to store the results in a Blob Container.
 
     """
+    logger = logging.getLogger("move_files")
     # List all files in the mounted folder and their relative paths
     image_paths = get_image_paths(input_container)
 
     if len(image_paths) == 0:
-        print("No files in the input zone. Aborting...")
+        logger.info("No files in the input zone. Aborting...")
 
     target_folder_path = os.path.join(output_container, execution_time)
     # Create the target folder if it doesn't exist
@@ -77,14 +86,16 @@ def move_files(
 
         # Verify successful file copy
         if not os.path.exists(target_file_path):
-            raise FileNotFoundError(
-                f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
-            )
+            error_message = f"Failed to move file '{relative_image_path}' to the destination: {target_file_path}"
+            logger.error(error_message)
+            raise FileNotFoundError(error_message)
 
         # Remove the file from the source folder
         try:
             os.remove(source_image_path)
         except OSError:
-            raise OSError(f"Failed to remove file '{source_image_path}'.")
+            error_message = f"Failed to remove file '{source_image_path}'."
+            logger.error(error_message)
+            raise OSError(error_message)
 
-    print("Files moved and removed successfully.")
+    logger.info("Files moved and removed successfully.")

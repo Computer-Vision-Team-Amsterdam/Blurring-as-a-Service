@@ -5,11 +5,12 @@ import sys
 from mldesigner import Input, command_component
 
 sys.path.append("../../..")
-from blurring_as_a_service.performace_evaluation_pipeline.source.evaluate_with_coco import (  # noqa: E402
-    coco_evaluation,
-)
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
+)
+from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
+    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -18,6 +19,15 @@ config_path = os.path.abspath(
 aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
     "aml_experiment_details"
 ]
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
+setup_azure_logging(log_settings, __name__)
+
+from blurring_as_a_service.performace_evaluation_pipeline.source.evaluate_with_coco import (  # noqa: E402
+    coco_evaluation,
+)
 
 
 @command_component(
@@ -48,6 +58,7 @@ def evaluate_with_coco(
     -------
 
     """
+
     model_parameters = json.loads(model_parameters_json)
     metrics_metadata = json.loads(metrics_metadata_json)
     coco_predictions = (
