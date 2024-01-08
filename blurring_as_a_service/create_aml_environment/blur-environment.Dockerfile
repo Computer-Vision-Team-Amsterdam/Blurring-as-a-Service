@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.6-cudnn8-ubuntu20.04 AS base-image
+FROM mcr.microsoft.com/azureml/openmpi4.1.0-cuda11.8-cudnn8-ubuntu22.04 AS base-image
 
 # Upgrade and install system libraries
 RUN apt-get -y update \
@@ -11,17 +11,23 @@ RUN apt-get -y update \
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
 
+
 WORKDIR /opt/app
 
-RUN pip install --no-cache-dir --upgrade pip
+RUN conda create -n env python=3.8
+RUN echo "source activate env" > ~/.bashrc
+ENV PATH="/opt/miniconda/envs/env/bin:$PATH"
 
 RUN curl -sSL https://install.python-poetry.org | python3 -
-RUN /root/.local/bin/poetry config virtualenvs.create false
+ENV PATH="/root/.local/bin:$PATH"
+RUN poetry config virtualenvs.create false
 
 COPY pyproject.toml .
 COPY poetry.lock .
 
-ENV PATH="/opt/venv/bin:$PATH"
-
-RUN /root/.local/bin/poetry update --no-ansi --no-interaction
-RUN /root/.local/bin/poetry install --no-ansi --no-interaction --no-root
+# Initialize Conda, activate environment and install poetry packages
+RUN /opt/miniconda/bin/conda init bash && \
+    . /opt/miniconda/etc/profile.d/conda.sh && \
+    conda activate env && \
+    poetry update --no-ansi --no-interaction && \
+    poetry install --no-ansi --no-interaction --no-root
