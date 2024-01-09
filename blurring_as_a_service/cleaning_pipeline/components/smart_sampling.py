@@ -6,6 +6,7 @@ import sys
 import numpy as np
 import logging
 from datetime import datetime
+from typing import Dict, List, Tuple
 
 
 from azure.ai.ml.constants import AssetTypes
@@ -50,6 +51,9 @@ from blurring_as_a_service.utils.generics import (  # noqa: E402
     find_image_paths,
 )
 
+# Define logger
+logger = logging.getLogger("smart_sampling")
+
 @command_component(
     name="smart_sampling",
     display_name="Smart sample images from input_structured",
@@ -81,8 +85,6 @@ def smart_sampling(
     customer_name
         Customer name
     """
-    
-    logger = logging.getLogger("smart_sampling")
     
     # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
@@ -136,16 +138,34 @@ def smart_sampling(
         sampled_images_by_date, input_structured_folder, customer_retraining_folder
     )
 
-def categorize_images_into_bins(image_counts):
+def categorize_images_into_bins(image_counts: Dict[str, int]) -> Tuple[Dict[str, List[str]], List[str]]:
+    """
+    Categorizes images into bins based on their detection counts.
+
+    Parameters
+    ----------
+    image_counts : Dict[str, int]
+        A dictionary mapping image identifiers to their respective detection counts.
+
+    Returns
+    -------
+    Tuple[Dict[str, List[str]], List[str]]
+        A tuple containing two elements:
+        - A dictionary where keys are bin labels and values are lists of image identifiers in that bin.
+        - A list of bin labels.
+
+    If no detections are found, an empty dictionary and list are returned.
+    """
+    
     if not image_counts:
-        print("No detections found for the given criteria.")
+        logger.info("No detections found for the given criteria.")
         return {}, []
 
     # Calculate min and max counts
     counts = image_counts.values()
     min_count, max_count = min(counts), max(counts)
-    print(f"Minimum number of detections for an image: {min_count}")
-    print(f"Maximum number of detections for an image: {max_count}")
+    logger.info(f"Minimum number of detections for an image: {min_count}")
+    logger.info(f"Maximum number of detections for an image: {max_count}")
 
     # Determine the range and define bin size strategy
     detection_range = max_count - min_count
@@ -162,7 +182,21 @@ def categorize_images_into_bins(image_counts):
 
     return bin_counts, bin_labels
 
-def determine_bin_size(detection_range):
+def determine_bin_size(detection_range: int) -> int:
+    """
+    Determines the bin size for categorization based on the detection range.
+
+    Parameters
+    ----------
+    detection_range : int
+        The range of detection counts across all images.
+
+    Returns
+    -------
+    int
+        The number of bins to be used for categorization.
+    """
+    
     if detection_range <= 10:
         return 3
     elif 10 < detection_range <= 50:
@@ -170,27 +204,81 @@ def determine_bin_size(detection_range):
     else:
         return 10
 
-def initialize_bin_counts(bins):
+def initialize_bin_counts(bins: np.ndarray) -> Tuple[Dict[str, List], List[str]]:
+    """
+    Initializes the counts and labels for bins.
+
+    Parameters
+    ----------
+    bins : np.ndarray
+        The array of bin edges.
+
+    Returns
+    -------
+    Tuple[Dict[str, List], List[str]]
+        A tuple containing two elements:
+        - A dictionary where keys are bin labels and values are empty lists for each bin.
+        - A list of bin labels.
+    """
+    
     bin_counts = {}
     bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
     for label in bin_labels:
         bin_counts[label] = []
     return bin_counts, bin_labels
 
-def categorize_into_bins(image_counts, bins, bin_labels, bin_counts):
+def categorize_into_bins(image_counts: Dict[str, int], bins: np.ndarray, bin_labels: List[str], bin_counts: Dict[str, List[str]]) -> None:
+    """
+    Categorizes each image into a bin based on its detection count.
+
+    Parameters
+    ----------
+    image_counts : Dict[str, int]
+        A dictionary mapping image identifiers to their detection counts.
+    bins : np.ndarray
+        The array of bin edges.
+    bin_labels : List[str]
+        A list of bin labels.
+    bin_counts : Dict[str, List[str]]
+        A dictionary to hold the categorized images, with keys as bin labels and values as lists of images.
+
+    Returns
+    -------
+    None
+        This function modifies the bin_counts dictionary in place.
+    """
+    
     for image, count in image_counts.items():
         bin_index = np.digitize(count, bins, right=True) - 1
         bin_label = bin_labels[bin_index]
         bin_counts[bin_label].append(image)
 
 def sample_images_for_quality_check(
-    grouped_images_by_date, input_structured_folder, customer_quality_check_folder, n_images_to_sample
-):
-    print(f'Sampling {n_images_to_sample} images for quality check.. \n')
+    grouped_images_by_date: Dict[str, List[str]], 
+    input_structured_folder: str, 
+    customer_quality_check_folder: str, 
+    n_images_to_sample: int
+) -> None:
+    """
+    Samples a specified number of images from each date for quality checking.
+
+    Parameters
+    ----------
+    grouped_images_by_date : Dict[str, List[str]]
+        A dictionary where keys are dates and values are lists of image file names from those dates.
+    input_structured_folder : str
+        The path of the input folder containing images.
+    customer_quality_check_folder : str
+        The destination folder path for the quality check images.
+    n_images_to_sample : int
+        Number of images to sample for each date.
+    """
+    
+    logger.info(f'Sampling {n_images_to_sample} images for quality check.. \n')
     
     quality_check_images = get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample)
     
-    print(f'Quality check images: {quality_check_images} \n')
+    logger.info(f'Quality check images: {quality_check_images} \n')
 
     for key, values in quality_check_images.items():
         for value in values:
@@ -199,8 +287,29 @@ def sample_images_for_quality_check(
             )
             
 def sample_images_for_retraining(
-    sampled_images_by_date, input_structured_folder, customer_retraining_folder
-):
+    sampled_images_by_date: Dict[datetime, List[Tuple[str, datetime, str]]], 
+    input_structured_folder: str, 
+    customer_retraining_folder: str
+) -> None:
+    """
+    Copies sampled images to the specified retraining folder.
+
+    Parameters
+    ----------
+    sampled_images_by_date : Dict[datetime, List[Tuple[str, datetime, str]]]
+        A dictionary mapping dates to lists of image tuples for retraining. Each tuple contains customer name, 
+        upload date, and image name.
+    input_structured_folder : str
+        The path of the input folder containing images.
+    customer_retraining_folder : str
+        The destination folder path for the retraining images.
+
+    Returns
+    -------
+    None
+        The function does not return anything. It performs the operation of copying the sampled images.
+    """
+    
     for upload_date, images in sampled_images_by_date.items():
         # Copy the sampled images
         for image in images:
@@ -210,34 +319,55 @@ def sample_images_for_retraining(
                 f"/{formatted_upload_date}/{image_filename}", str(input_structured_folder), str(customer_retraining_folder)
             )
             # Optionally, print out the image names being sampled for debugging
-            print(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
+            logger.info(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
 
 def sample_images_equally_from_bins(
-    image_counts, bin_counts, percentage_ratio
-):
+    image_counts: Dict[Tuple[str, datetime, str], int], 
+    bin_counts: Dict[str, List[Tuple[str, datetime, str]]], 
+    percentage_ratio: float
+) -> Dict[datetime, List[Tuple[str, datetime, str]]]:
+    """
+    Samples a percentage of images equally from each bin for each date.
+
+    Parameters
+    ----------
+    image_counts : Dict[Tuple[str, datetime, str], int]
+        A dictionary mapping image tuples to their detection counts. Each tuple contains customer name, 
+        upload date, and image name.
+    bin_counts : Dict[str, List[Tuple[str, datetime, str]]]
+        A dictionary where keys are bin labels and values are lists of image tuples in that bin.
+    percentage_ratio : float
+        The ratio of total images to sample from each date.
+
+    Returns
+    -------
+    Dict[datetime, List[Tuple[str, datetime, str]]]
+        A dictionary mapping dates to lists of sampled image tuples.
+    """
+    
     sampled_images_by_date = {}
 
     # Extract all unique upload dates from image_counts
     unique_dates = {img[1] for img in image_counts.keys()}  # Extracting the upload_date part of the tuple
-    print(f'Unique dates: {unique_dates}')
+    logger.info(f'Unique dates: {unique_dates}')
 
     for upload_date in unique_dates:
         # Filter image_counts for the current date and count unique images
         unique_images_on_date = {k for k in image_counts.keys() if k[1] == upload_date}
         total_images = len(unique_images_on_date)
-        print(f'Total images on date {upload_date}: {total_images}')
+        logger.info(f'Total images on date {upload_date}: {total_images}')
         total_images_to_sample = int(total_images * percentage_ratio)
         
         # Ensure at least one image is sampled if total_images_to_sample > 0
         total_images_to_sample = max(total_images_to_sample, 1) if total_images > 0 else 0
         
-        print(f'Total images to sample on date {upload_date}: {total_images_to_sample}')
+        logger.info(f'Total images to sample on date {upload_date}: {total_images_to_sample}')
 
         # Calculate the number of images to sample per bin
         images_per_bin = total_images_to_sample // len(bin_counts)
-        print(f'Images per bin: {images_per_bin}')
+        logger.info(f'Images per bin: {images_per_bin}')
         remainder = total_images_to_sample % len(bin_counts)
-        print(f'Remainder: {remainder}')
+        logger.info(f'Remainder: {remainder}')
 
         sampled_images = []
 
@@ -261,7 +391,22 @@ def sample_images_equally_from_bins(
 
     return sampled_images_by_date
 
-def group_files_by_date(strings):
+def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:
+    """
+    Groups files by date based on their filenames.
+
+    Parameters
+    ----------
+    strings : List[str]
+        A list of strings representing file paths or names.
+
+    Returns
+    -------
+    Dict[str, List[str]]
+        A dictionary where keys are date strings extracted from the filenames, 
+        and values are lists of filenames belonging to each date.
+    """
+    
     grouped_files = {}
 
     for string in strings:
@@ -280,7 +425,23 @@ def group_files_by_date(strings):
 
     return grouped_files
 
-def get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample):
+def get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]:
+    """
+    Randomly samples a specified number of images for each date.
+
+    Parameters
+    ----------
+    grouped_images_by_date : Dict[str, List[str]]
+        A dictionary where keys are dates and values are lists of image file names from those dates.
+    n_images_to_sample : int
+        The number of images to randomly sample from each date's list.
+
+    Returns
+    -------
+    Dict[str, List[str]]
+        A dictionary where keys are dates and values are the randomly sampled image file names.
+    """
+    
     random_result = {}
 
     for key, values in grouped_images_by_date.items():
@@ -323,8 +484,41 @@ def connect_to_database(database_parameters_json):
     return db_config
 
 def collect_images_above_threshold_from_db(
-    database_parameters_json, grouped_images_by_date, customer_name, conf_score_threshold
-):
+    database_parameters_json: str, 
+    grouped_images_by_date: Dict[str, List[str]], 
+    customer_name: str, 
+    conf_score_threshold: float
+) -> Tuple[Dict[datetime, List[Dict]], Dict[Tuple[str, datetime, str], int]]:
+    """
+    Collects images with detections above a specified confidence score threshold from the database.
+
+    Parameters
+    ----------
+    database_parameters_json : str
+        JSON string with database connection parameters.
+    grouped_images_by_date : Dict[str, List[str]]
+        A dictionary mapping dates to lists of image filenames.
+    customer_name : str
+        The name of the customer for whom the images belong.
+    conf_score_threshold : float
+        The threshold for the confidence score above which detections are considered.
+
+    Returns
+    -------
+    Tuple[Dict[datetime, List[Dict]], Dict[Tuple[str, datetime, str], int]]
+        A tuple containing two elements:
+        - A dictionary with dates as keys and lists of dictionaries containing detection information as values.
+        - A dictionary mapping tuples of customer name, upload date, and image name to their detection counts.
+
+    Raises
+    ------
+    SQLAlchemyError
+        If there is a failure in database operations, such as a connection issue or a query execution error.
+    ValueError
+        If there is an error in processing or parsing the data.
+    Exception
+        For any other unexpected errors that might occur during the execution of the function.
+    """
     
     images_statistics = {}
     image_counts = {}
@@ -335,9 +529,9 @@ def collect_images_above_threshold_from_db(
     
         with db_config.managed_session() as session:
             for upload_date, image_names in grouped_images_by_date.items():
-                print(f'Upload Date: {upload_date} \n')
+                logger.info(f'Upload Date: {upload_date} \n')
                 upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
-                print(f'Formatted Upload Date: {upload_date} \n')
+                logger.info(f'Formatted Upload Date: {upload_date} \n')
                 for image_name in image_names:
                     query = session.query(DetectionInformation).filter(
                         DetectionInformation.image_customer_name == customer_name,
@@ -347,7 +541,6 @@ def collect_images_above_threshold_from_db(
                     )
                     results = query.all()
                     count = len(results)
-                    #print(f"Number of results for {image_name} on {upload_date}: {count}")
 
                     # Populating image_counts
                     image_key = (customer_name, upload_date, image_name)
@@ -362,10 +555,10 @@ def collect_images_above_threshold_from_db(
                             images_statistics[upload_date] = extracted_data
                             
     except SQLAlchemyError as e:
-        print(f"Database operation failed: {e}")
+        logger.error(f"Database operation failed: {e}")
     except ValueError as e:
-        print(f"Configuration error: {e}")
+        logger.error(f"Configuration error: {e}")
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        logger.error(f"An unexpected error occurred: {e}")
 
     return images_statistics, image_counts
