@@ -95,11 +95,15 @@ def smart_sampling(
     for key, values in grouped_images_by_date.items():
         logger.info(f"Date: {key} - Number of images: {len(values)}")
     
+    # Define the SmartSampling object
+    smartSampling = SmartSampling(input_structured_folder, customer_quality_check_folder, customer_retraining_folder, database_parameters_json,
+                                            customer_name, sampling_parameters)
+    
     # Sample a number of random images for manual quality check
-    SmartSampling.sample_images_for_quality_check(grouped_images_by_date, input_structured_folder, customer_quality_check_folder)
+    smartSampling.sample_images_for_quality_check(grouped_images_by_date, input_structured_folder, customer_quality_check_folder)
 
     # Collect images above the confidence score threshold from the database
-    _, image_counts = SmartSampling.collect_images_above_threshold_from_db(database_parameters_json, grouped_images_by_date, customer_name)
+    _, image_counts = smartSampling.collect_images_above_threshold_from_db(database_parameters_json, grouped_images_by_date, customer_name)
     
     # Group images into bins
     bin_counts, _ = categorize_images_into_bins(image_counts)
@@ -120,9 +124,7 @@ def smart_sampling(
     logger.info(f'Sampled images by date: {sampled_images_by_date} \n')
     
     # Sample images for retraining
-    sample_images_for_retraining(
-        sampled_images_by_date, input_structured_folder, customer_retraining_folder
-    )
+    smartSampling.sample_images_for_retraining(sampled_images_by_date)
 
 def categorize_images_into_bins(image_counts: Dict[str, int]) -> Tuple[Dict[str, List[str]], List[str]]:
     """
@@ -247,41 +249,6 @@ def categorize_into_bins(image_counts: Dict[str, int], bins: np.ndarray, bin_lab
         bin_index = np.digitize(count, bins, right=True) - 1
         bin_label = bin_labels[bin_index]
         bin_counts[bin_label].append(image)
-   
-def sample_images_for_retraining(
-    sampled_images_by_date: Dict[datetime, List[Tuple[str, datetime, str]]], 
-    input_structured_folder: str, 
-    customer_retraining_folder: str
-) -> None:
-    """
-    Copies sampled images to the specified retraining folder.
-
-    Parameters
-    ----------
-    sampled_images_by_date : Dict[datetime, List[Tuple[str, datetime, str]]]
-        A dictionary mapping dates to lists of image tuples for retraining. Each tuple contains customer name, 
-        upload date, and image name.
-    input_structured_folder : str
-        The path of the input folder containing images.
-    customer_retraining_folder : str
-        The destination folder path for the retraining images.
-
-    Returns
-    -------
-    None
-        The function does not return anything. It performs the operation of copying the sampled images.
-    """
-    
-    for upload_date, images in sampled_images_by_date.items():
-        # Copy the sampled images
-        for image in images:
-            formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
-            image_filename = image[2]  # Assuming image is a tuple (customer_name, upload_date, image_name)
-            copy_file(
-                f"/{formatted_upload_date}/{image_filename}", str(input_structured_folder), str(customer_retraining_folder)
-            )
-            # Optionally, print out the image names being sampled for debugging
-            logger.info(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
 
 def sample_images_equally_from_bins(
     image_counts: Dict[Tuple[str, datetime, str], int], 
@@ -386,32 +353,3 @@ def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:
                 grouped_files[key] = [value]
 
     return grouped_files
-
-def get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]:
-    """
-    Randomly samples a specified number of images for each date.
-
-    Parameters
-    ----------
-    grouped_images_by_date : Dict[str, List[str]]
-        A dictionary where keys are dates and values are lists of image file names from those dates.
-    n_images_to_sample : int
-        The number of images to randomly sample from each date's list.
-
-    Returns
-    -------
-    Dict[str, List[str]]
-        A dictionary where keys are dates and values are the randomly sampled image file names.
-    """
-    
-    random_result = {}
-
-    for key, values in grouped_images_by_date.items():
-        if len(values) >= n_images_to_sample:
-            random_values = random.sample(values, n_images_to_sample)
-        else:
-            random_values = values
-        random_result[key] = random_values
-
-    return random_result
-

@@ -22,6 +22,10 @@ sys.path.append(yolov5_path)
 from yolov5.baas_utils.database_handler import DBConfigSQLAlchemy  # noqa: E402
 from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
 
+from blurring_as_a_service.utils.generics import (  # noqa: E402
+    copy_file,
+)
+
 logger = logging.getLogger(__name__)
 
 class SmartSampling:
@@ -58,7 +62,7 @@ class SmartSampling:
         # The number is set in config.yml as quality_check_sample_size
         n_images_to_sample = self.sampling_parameters["quality_check_sample_size"]
         
-        quality_check_images = get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample)
+        quality_check_images = SmartSampling.get_n_random_images_per_date(grouped_images_by_date, n_images_to_sample)
         
         logger.info(f'Quality check images: {quality_check_images} \n')
 
@@ -68,7 +72,39 @@ class SmartSampling:
                     "/" + key + "/" + value, str(input_structured_folder), str(customer_quality_check_folder)
                 )
         
+    def sample_images_for_retraining(
+    self, sampled_images_by_date: Dict[datetime, List[Tuple[str, datetime, str]]]
+    ) -> None:
+        """
+        Copies sampled images to the specified retraining folder.
 
+        Parameters
+        ----------
+        sampled_images_by_date : Dict[datetime, List[Tuple[str, datetime, str]]]
+            A dictionary mapping dates to lists of image tuples for retraining. Each tuple contains customer name, 
+            upload date, and image name.
+        input_structured_folder : str
+            The path of the input folder containing images.
+        customer_retraining_folder : str
+            The destination folder path for the retraining images.
+
+        Returns
+        -------
+        None
+            The function does not return anything. It performs the operation of copying the sampled images.
+        """
+        
+        for upload_date, images in sampled_images_by_date.items():
+            # Copy the sampled images
+            for image in images:
+                formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
+                image_filename = image[2]  # Assuming image is a tuple (customer_name, upload_date, image_name)
+                copy_file(
+                    f"/{formatted_upload_date}/{image_filename}", str(self.input_structured_folder), str(self.customer_retraining_folder)
+                )
+                # Optionally, print out the image names being sampled for debugging
+                logger.info(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
+    
     def collect_images_above_threshold_from_db(self, database_parameters_json: str, grouped_images_by_date: Dict[str, List[str]], 
                                                customer_name: str
     ) -> Tuple[Dict[datetime, List[Dict]], Dict[Tuple[str, datetime, str], int]]:
@@ -159,3 +195,32 @@ class SmartSampling:
             logger.error(f"An unexpected error occurred: {e}")
 
         return images_statistics, image_counts
+    
+    @staticmethod
+    def get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]:
+        """
+        Randomly samples a specified number of images for each date.
+
+        Parameters
+        ----------
+        grouped_images_by_date : Dict[str, List[str]]
+            A dictionary where keys are dates and values are lists of image file names from those dates.
+        n_images_to_sample : int
+            The number of images to randomly sample from each date's list.
+
+        Returns
+        -------
+        Dict[str, List[str]]
+            A dictionary where keys are dates and values are the randomly sampled image file names.
+        """
+        
+        random_result = {}
+
+        for key, values in grouped_images_by_date.items():
+            if len(values) >= n_images_to_sample:
+                random_values = random.sample(values, n_images_to_sample)
+            else:
+                random_values = values
+            random_result[key] = random_values
+
+        return random_result
