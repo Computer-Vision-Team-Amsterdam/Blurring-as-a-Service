@@ -11,6 +11,10 @@ RUN apt-get -y update \
 RUN apt-get update
 RUN apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
 
+RUN wget https://azcopyvnext.azureedge.net/releases/release-10.20.1-20230809/azcopy_linux_amd64_10.20.1.tar.gz \
+    && tar -xf azcopy_linux_amd64_10.20.1.tar.gz \
+    && cp azcopy_linux_amd64_10.20.1/azcopy /usr/bin \
+    && rm -rf azcopy_linux_amd64_10.20.1 azcopy_linux_amd64_10.20.1.tar.gz
 
 WORKDIR /opt/app
 
