@@ -39,8 +39,7 @@ class SmartSampling:
         self.customer_name = customer_name
         self.sampling_parameters = sampling_parameters
         
-    def sample_images_for_quality_check(self, grouped_images_by_date: Dict[str, List[str]],
-                                        input_structured_folder: str, customer_quality_check_folder: str, 
+    def sample_images_for_quality_check(self, grouped_images_by_date: Dict[str, List[str]] 
     ) -> None:
         """
         Samples a specified number of images from each date for quality checking.
@@ -70,16 +69,16 @@ class SmartSampling:
         for key, values in quality_check_images.items():
             for value in values:
                 copy_file(
-                    "/" + key + "/" + value, str(input_structured_folder), str(customer_quality_check_folder)
+                    "/" + key + "/" + value, str(self.input_structured_folder), str(self.customer_quality_check_folder)
                 )
         
     def sample_images_for_retraining(self, grouped_images_by_date: Dict[str, List[str]]) -> None:
         
         # Collect images above the confidence score threshold from the database
-        _, image_counts = SmartSampling.collect_images_above_threshold_from_db(self.database_parameters_json, grouped_images_by_date, self.customer_name)
+        df_images = SmartSampling.collect_images_above_threshold_from_db(self, grouped_images_by_date)
         
         # Group images into bins
-        bin_counts, _ = SmartSampling.categorize_images_into_bins(image_counts)
+        bin_counts, _ = SmartSampling.categorize_images_into_bins(df_images)
 
         # Count images in each bin
         for bin_label, images in bin_counts.items():
@@ -90,26 +89,26 @@ class SmartSampling:
         ratio = self.sampling_parameters["sampling_ratio"]
         percentage_ratio = ratio / 100
         
-        sampled_images_by_date = SmartSampling.sample_images_equally_from_bins(
-            image_counts, bin_counts, percentage_ratio
+        sampled_images_df = SmartSampling.sample_images_equally_from_bins(
+            df_images, percentage_ratio
         )
         
-        logger.info(f'Sampled images by date: {sampled_images_by_date} \n')
-        
-        for upload_date, images in sampled_images_by_date.items():
+        logger.info('Sampled images for retraining:\n')
+    
+        # Iterate over the sampled images DataFrame
+        for _, row in sampled_images_df.iterrows():
+            # Access image details from the row
+            formatted_upload_date = row['image_upload_date'].strftime("%Y-%m-%d_%H_%M_%S")
+            image_filename = row['image_filename']
             # Copy the sampled images
-            for image in images:
-                formatted_upload_date = upload_date.strftime("%Y-%m-%d_%H_%M_%S")
-                image_filename = image[2]  # Assuming image is a tuple (customer_name, upload_date, image_name)
-                copy_file(
-                    f"/{formatted_upload_date}/{image_filename}", str(self.input_structured_folder), str(self.customer_retraining_folder)
-                )
-                # Optionally, print out the image names being sampled for debugging
-                logger.info(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
+            copy_file(
+                f"/{formatted_upload_date}/{image_filename}", str(self.input_structured_folder), str(self.customer_retraining_folder)
+            )
+            logger.info(f"Sampled for retraining: /{formatted_upload_date}/{image_filename}")
     
     @staticmethod
     def collect_images_above_threshold_from_db(self, grouped_images_by_date: Dict[str, List[str]]
-    ) -> Tuple[Dict[datetime, List[Dict]], Dict[Tuple[str, datetime, str], int]]:
+    ) -> pd.DataFrame:
         """
         Collects images with detections above a specified confidence score threshold from the database.
 
@@ -126,10 +125,9 @@ class SmartSampling:
 
         Returns
         -------
-        Tuple[Dict[datetime, List[Dict]], Dict[Tuple[str, datetime, str], int]]
-            A tuple containing two elements:
-            - A dictionary with dates as keys and lists of dictionaries containing detection information as values.
-            - A dictionary mapping tuples of customer name, upload date, and image name to their detection counts.
+        pd.DataFrame
+            A DataFrame containing detailed information about each image detection, 
+            including image name, upload date, customer name, and count of detections.
 
         Raises
         ------
@@ -142,7 +140,6 @@ class SmartSampling:
         """
         
         images_statistics = {}
-        image_counts = {}
 
         try:
             
@@ -161,33 +158,41 @@ class SmartSampling:
             
             # Create the database connection
             db_config.create_connection()
+            
+            conf_score_threshold = self.sampling_parameters["conf_score_threshold"]
         
             with db_config.managed_session() as session:
                 for upload_date, image_names in grouped_images_by_date.items():
                     logger.info(f'Upload Date: {upload_date} \n')
                     upload_date = datetime.strptime(upload_date, "%Y-%m-%d_%H_%M_%S")
                     logger.info(f'Formatted Upload Date: {upload_date} \n')
+                    
                     for image_name in image_names:
                         query = session.query(DetectionInformation).filter(
                             DetectionInformation.image_customer_name == self.customer_name,
                             DetectionInformation.image_upload_date == upload_date,
                             DetectionInformation.image_filename == image_name,
-                            DetectionInformation.conf_score > self.conf_score_threshold
+                            DetectionInformation.conf_score > conf_score_threshold
                         )
                         results = query.all()
                         count = len(results)
 
-                        # Populating image_counts
-                        image_key = (self.customer_name, upload_date, image_name)
-                        image_counts[image_key] = count
-
                         # Populating images_statistics with detailed information
                         if results:
                             extracted_data = [result.__dict__ for result in results]
+                            for data in extracted_data:
+                                data['count'] = count
+                                
                             if upload_date in images_statistics:
                                 images_statistics[upload_date].extend(extracted_data)
                             else:
                                 images_statistics[upload_date] = extracted_data
+                                
+                # Flatten the dictionary to a list of dictionaries
+                flat_list = [item for sublist in images_statistics.values() for item in sublist]
+                # Convert the list of dictionaries to a DataFrame
+                df = pd.DataFrame(flat_list)
+                print(f'DataFrame: {df}')
                                 
         except SQLAlchemyError as e:
             logger.error(f"Database operation failed: {e}")
@@ -196,7 +201,7 @@ class SmartSampling:
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
 
-        return images_statistics, image_counts
+        return df
     
     @staticmethod
     def get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]:
@@ -226,34 +231,31 @@ class SmartSampling:
             random_result[key] = random_values
 
         return random_result
-
+    
     @staticmethod
-    def categorize_images_into_bins(image_counts: Dict[str, int]) -> Tuple[Dict[str, List[str]], List[str]]:
+    def categorize_images_into_bins(df: pd.DataFrame) -> Tuple[Dict[str, pd.DataFrame], List[str]]:
         """
         Categorizes images into bins based on their detection counts.
 
         Parameters
         ----------
-        image_counts : Dict[str, int]
-            A dictionary mapping image identifiers to their respective detection counts.
+        df : pd.DataFrame
+            A DataFrame containing image data with columns for detection counts.
 
         Returns
         -------
-        Tuple[Dict[str, List[str]], List[str]]
+        Tuple[Dict[str, pd.DataFrame], List[str]]
             A tuple containing two elements:
-            - A dictionary where keys are bin labels and values are lists of image identifiers in that bin.
+            - A dictionary where keys are bin labels and values are DataFrames of image identifiers in that bin.
             - A list of bin labels.
-
-        If no detections are found, an empty dictionary and list are returned.
         """
-        
-        if not image_counts:
+
+        if df.empty:
             logger.info("No detections found for the given criteria.")
             return {}, []
 
         # Calculate min and max counts
-        counts = image_counts.values()
-        min_count, max_count = min(counts), max(counts)
+        min_count, max_count = df['count'].min(), df['count'].max()
         logger.info(f"Minimum number of detections for an image: {min_count}")
         logger.info(f"Maximum number of detections for an image: {max_count}")
 
@@ -264,18 +266,25 @@ class SmartSampling:
         # Calculate the bin edges
         bins = np.linspace(min_count, max_count, bin_size + 1)
 
-        # Initialize a dictionary to hold bin counts
-        bin_counts, bin_labels = SmartSampling.initialize_bin_counts(bins)
+        # Initialize a dictionary to hold bin counts and labels
+        bin_counts = {}
+        
+        # Iterate through the given bins array and create a list of bin labels. 
+        # Each label represents a range, formatted as "start-end", 
+        # where "start" is the beginning of a bin and "end" is one less than the start of the next bin.
+        bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
 
         # Categorize images into bins
-        SmartSampling.categorize_into_bins(image_counts, bins, bin_labels, bin_counts)
+        df['bin_label'] = pd.cut(df['count'], bins, labels=bin_labels, include_lowest=True, right=False)
+
+        for label in bin_labels:
+            bin_counts[label] = df[df['bin_label'] == label]
 
         return bin_counts, bin_labels
 
     @staticmethod
     def sample_images_equally_from_bins(
-        image_counts: Dict[Tuple[str, datetime, str], int], 
-        bin_counts: Dict[str, List[Tuple[str, datetime, str]]], 
+        df: pd.DataFrame, 
         percentage_ratio: float
     ) -> Dict[datetime, List[Tuple[str, datetime, str]]]:
         """
@@ -283,31 +292,31 @@ class SmartSampling:
 
         Parameters
         ----------
-        image_counts : Dict[Tuple[str, datetime, str], int]
-            A dictionary mapping image tuples to their detection counts. Each tuple contains customer name, 
-            upload date, and image name.
-        bin_counts : Dict[str, List[Tuple[str, datetime, str]]]
-            A dictionary where keys are bin labels and values are lists of image tuples in that bin.
+        df : pd.DataFrame
+            A DataFrame containing image data with columns 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
         percentage_ratio : float
             The ratio of total images to sample from each date.
 
         Returns
         -------
-        Dict[datetime, List[Tuple[str, datetime, str]]]
-            A dictionary mapping dates to lists of sampled image tuples.
+        pd.DataFrame
+            A DataFrame of sampled images.
         """
         
-        sampled_images_by_date = {}
+        # Initialize the DataFrame to store sampled images
+        sampled_images_df = pd.DataFrame()
 
-        # Extract all unique upload dates from image_counts
-        unique_dates = {img[1] for img in image_counts.keys()}  # Extracting the upload_date part of the tuple
+        # Extract all unique upload dates from the DataFrame
+        unique_dates = df['image_upload_date'].unique()
         logger.info(f'Unique dates: {unique_dates}')
 
         for upload_date in unique_dates:
-            # Filter image_counts for the current date and count unique images
-            unique_images_on_date = {k for k in image_counts.keys() if k[1] == upload_date}
-            total_images = len(unique_images_on_date)
+            # Filter for the current date
+            df_date = df[df['image_upload_date'] == upload_date]
+            total_images = len(df_date)
             logger.info(f'Total images on date {upload_date}: {total_images}')
+            
+            # Calculate the total number of images to sample
             total_images_to_sample = int(total_images * percentage_ratio)
             
             # Ensure at least one image is sampled if total_images_to_sample > 0
@@ -315,33 +324,26 @@ class SmartSampling:
             
             logger.info(f'Total images to sample on date {upload_date}: {total_images_to_sample}')
 
+            # Get the unique bin labels
+            bin_labels = df_date['bin_label'].unique()
+
             # Calculate the number of images to sample per bin
-            images_per_bin = total_images_to_sample // len(bin_counts)
-            logger.info(f'Images per bin: {images_per_bin}')
-            remainder = total_images_to_sample % len(bin_counts)
-            logger.info(f'Remainder: {remainder}')
-
-            sampled_images = []
-
-            for bin_label, images_in_bin in bin_counts.items():
-                # Extract the unique images for the current bin and date
-                unique_images_in_bin = [img for img in images_in_bin if img[1] == upload_date]
+            images_per_bin = total_images_to_sample // len(bin_labels)
+            remainder = total_images_to_sample % len(bin_labels)
+            logger.info(f'Images per bin: {images_per_bin}, Remainder: {remainder}')
+            
+            for bin_label in bin_labels:
+                df_bin = df_date[df_date['bin_label'] == bin_label]
                 
                 # Adjust the number of images to sample from this bin
-                if images_per_bin > 0 or (remainder > 0 and unique_images_in_bin):
-                    num_to_sample = min(images_per_bin + (1 if remainder > 0 else 0), len(unique_images_in_bin))
-                    remainder -= 1 if remainder > 0 else 0
-                else:
-                    # If images_per_bin is 0 and no remainder, skip this bin
-                    continue 
-
+                num_to_sample = min(images_per_bin + (1 if remainder > 0 else 0), len(df_bin))
+                remainder -= 1 if remainder > 0 else 0
+                
                 # Sample images
-                sampled_from_bin = random.sample(unique_images_in_bin, num_to_sample) if unique_images_in_bin else []
-                sampled_images.extend(sampled_from_bin)
-
-            sampled_images_by_date[upload_date] = sampled_images
-
-        return sampled_images_by_date
+                sampled_from_bin = df_bin.sample(n=num_to_sample)
+                sampled_images_df = sampled_images_df.append(sampled_from_bin)
+                
+            return sampled_images_df
     
     @staticmethod
     def determine_bin_size(detection_range: int) -> int:
@@ -365,63 +367,3 @@ class SmartSampling:
             return 5
         else:
             return 10
-
-    @staticmethod
-    def initialize_bin_counts(bins: np.ndarray) -> Tuple[Dict[str, List], List[str]]:
-        """
-        Initializes a dictionary (bin_counts) and a list (bin_labels) that will be used 
-        for categorizing images into bins based on their detection counts. 
-
-        Parameters
-        ----------
-        bins : np.ndarray
-            The array of bin edges.
-
-        Returns
-        -------
-        Tuple[Dict[str, List], List[str]]
-            A tuple containing two elements:
-            - A dictionary where keys are bin labels and values are empty lists for each bin.
-            - A list of bin labels.
-        """
-        
-        bin_counts = {}
-        
-        # Iterate through the given bins array and create a list of bin labels. 
-        # Each label represents a range, formatted as "start-end", 
-        # where "start" is the beginning of a bin and "end" is one less than the start of the next bin.
-        bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
-        
-        # Create a dictionary (bin_counts) with keys being the bin labels and values being empty lists. 
-        # Each list will contain image identifiers that fall within the corresponding bin's range. 
-        for label in bin_labels:
-            bin_counts[label] = []
-            
-        return bin_counts, bin_labels
-
-    @staticmethod
-    def categorize_into_bins(image_counts: Dict[str, int], bins: np.ndarray, bin_labels: List[str], bin_counts: Dict[str, List[str]]) -> None:
-        """
-        Categorizes each image into a bin based on its detection count.
-
-        Parameters
-        ----------
-        image_counts : Dict[str, int]
-            A dictionary mapping image identifiers to their detection counts.
-        bins : np.ndarray
-            The array of bin edges.
-        bin_labels : List[str]
-            A list of bin labels.
-        bin_counts : Dict[str, List[str]]
-            A dictionary to hold the categorized images, with keys as bin labels and values as lists of images.
-
-        Returns
-        -------
-        None
-            This function modifies the bin_counts dictionary in place.
-        """
-        
-        for image, count in image_counts.items():
-            bin_index = np.digitize(count, bins, right=True) - 1
-            bin_label = bin_labels[bin_index]
-            bin_counts[bin_label].append(image)
