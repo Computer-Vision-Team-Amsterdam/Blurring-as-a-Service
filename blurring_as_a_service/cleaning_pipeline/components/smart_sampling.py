@@ -206,7 +206,8 @@ def determine_bin_size(detection_range: int) -> int:
 
 def initialize_bin_counts(bins: np.ndarray) -> Tuple[Dict[str, List], List[str]]:
     """
-    Initializes the counts and labels for bins.
+    Initializes a dictionary (bin_counts) and a list (bin_labels) that will be used 
+    for categorizing images into bins based on their detection counts. 
 
     Parameters
     ----------
@@ -222,9 +223,17 @@ def initialize_bin_counts(bins: np.ndarray) -> Tuple[Dict[str, List], List[str]]
     """
     
     bin_counts = {}
+    
+    # Iterate through the given bins array and creates a list of bin labels. 
+    # Each label represents a range, formatted as "start-end", 
+    # where "start" is the beginning of a bin and "end" is one less than the start of the next bin.
     bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
+    
+    # Create a dictionary (bin_counts) with keys being the bin labels and values being empty lists. 
+    # Each list will contain image identifiers that fall within the corresponding bin's range. 
     for label in bin_labels:
         bin_counts[label] = []
+        
     return bin_counts, bin_labels
 
 def categorize_into_bins(image_counts: Dict[str, int], bins: np.ndarray, bin_labels: List[str], bin_counts: Dict[str, List[str]]) -> None:
