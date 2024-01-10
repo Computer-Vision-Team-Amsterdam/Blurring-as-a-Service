@@ -473,9 +473,9 @@ def connect_to_database(database_parameters_json):
         If database credentials are not provided.
     """
     database_parameters = json.loads(database_parameters_json)
-    db_username = database_parameters.get("db_username")
-    db_name = database_parameters.get("db_name")
-    db_hostname = database_parameters.get("db_hostname")
+    db_username = database_parameters["db_username"]
+    db_name = database_parameters["db_name"]
+    db_hostname = database_parameters["db_hostname"]
 
     if not db_username or not db_name or not db_hostname:
         raise ValueError("Please provide database credentials.")
