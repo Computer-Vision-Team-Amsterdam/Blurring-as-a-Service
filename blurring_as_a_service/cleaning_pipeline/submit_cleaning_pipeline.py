@@ -76,7 +76,6 @@ if __name__ == "__main__":
     # Retrieve values from the YAML
     BlurringAsAServiceSettings.set_from_yaml("config.yml")
     settings = BlurringAsAServiceSettings.get_settings()
-    sampling_settings = settings["sampling_parameters"]
 
     default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()

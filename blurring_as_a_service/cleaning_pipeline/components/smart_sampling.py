@@ -224,7 +224,7 @@ def initialize_bin_counts(bins: np.ndarray) -> Tuple[Dict[str, List], List[str]]
     
     bin_counts = {}
     
-    # Iterate through the given bins array and creates a list of bin labels. 
+    # Iterate through the given bins array and create a list of bin labels. 
     # Each label represents a range, formatted as "start-end", 
     # where "start" is the beginning of a bin and "end" is one less than the start of the next bin.
     bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
