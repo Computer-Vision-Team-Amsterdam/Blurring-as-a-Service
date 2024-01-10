@@ -4,6 +4,7 @@ import random
 import re
 import numpy as np
 import logging
+import pandas as pd
 from datetime import datetime
 from typing import Dict, List, Tuple
 import json
@@ -146,7 +147,7 @@ class SmartSampling:
         try:
             
             # Connect to the database
-            database_parameters = json.loads(database_parameters_json)
+            database_parameters = json.loads(self.database_parameters_json)
             db_username = database_parameters["db_username"]
             db_name = database_parameters["db_name"]
             db_hostname = database_parameters["db_hostname"]
@@ -168,7 +169,7 @@ class SmartSampling:
                     logger.info(f'Formatted Upload Date: {upload_date} \n')
                     for image_name in image_names:
                         query = session.query(DetectionInformation).filter(
-                            DetectionInformation.image_customer_name == customer_name,
+                            DetectionInformation.image_customer_name == self.customer_name,
                             DetectionInformation.image_upload_date == upload_date,
                             DetectionInformation.image_filename == image_name,
                             DetectionInformation.conf_score > self.conf_score_threshold
@@ -177,7 +178,7 @@ class SmartSampling:
                         count = len(results)
 
                         # Populating image_counts
-                        image_key = (customer_name, upload_date, image_name)
+                        image_key = (self.customer_name, upload_date, image_name)
                         image_counts[image_key] = count
 
                         # Populating images_statistics with detailed information
@@ -258,16 +259,16 @@ class SmartSampling:
 
         # Determine the range and define bin size strategy
         detection_range = max_count - min_count
-        bin_size = determine_bin_size(detection_range)
+        bin_size = SmartSampling.determine_bin_size(detection_range)
 
         # Calculate the bin edges
         bins = np.linspace(min_count, max_count, bin_size + 1)
 
         # Initialize a dictionary to hold bin counts
-        bin_counts, bin_labels = initialize_bin_counts(bins)
+        bin_counts, bin_labels = SmartSampling.initialize_bin_counts(bins)
 
         # Categorize images into bins
-        categorize_into_bins(image_counts, bins, bin_labels, bin_counts)
+        SmartSampling.categorize_into_bins(image_counts, bins, bin_labels, bin_counts)
 
         return bin_counts, bin_labels
 

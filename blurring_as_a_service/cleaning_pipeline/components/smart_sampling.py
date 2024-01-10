@@ -8,7 +8,6 @@ import logging
 from datetime import datetime
 from typing import Dict, List, Tuple
 
-
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 from sqlalchemy import func
@@ -40,7 +39,6 @@ log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
 from blurring_as_a_service.utils.generics import (  # noqa: E402
-    copy_file,
     find_image_paths,
 )
 
@@ -89,7 +87,7 @@ def smart_sampling(
     
     # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
-    logger.info(f'Number of dates (folder) found: {len(grouped_images_by_date)}')
+    logger.info(f'Number of dates (folders) found: {len(grouped_images_by_date)}')
     
     # Log each date
     for key, values in grouped_images_by_date.items():
