@@ -37,17 +37,17 @@ def cleaning_pipeline():
     customer_quality_check_path = aml_interface.get_datastore_full_path(
         f"{customer_name}_quality_check"
     )
-    
+
     smart_sampling_step.outputs.customer_quality_check_folder = Output(
         type=AssetTypes.URI_FOLDER,
         mode="rw_mount",
         path=customer_quality_check_path,
     )
-    
+
     customer_retraining_path = aml_interface.get_datastore_full_path(
         f"{customer_name}_retraining"
     )
-    
+
     smart_sampling_step.outputs.customer_retraining_folder = Output(
         type=AssetTypes.URI_FOLDER,
         mode="rw_mount",

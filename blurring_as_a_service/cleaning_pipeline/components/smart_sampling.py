@@ -1,25 +1,19 @@
-import json
+import logging
 import os
-import random
 import re
 import sys
-import numpy as np
-import logging
-from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
-from sqlalchemy import func
-
 
 sys.path.append("../../..")
 
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
 from blurring_as_a_service.cleaning_pipeline.source.sampling_pipeline import (  # noqa: E402
     SmartSampling,
+)
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
 )
 from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
     setup_azure_logging,
@@ -38,12 +32,11 @@ sampling_parameters = settings["sampling_parameters"]
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
-from blurring_as_a_service.utils.generics import (  # noqa: E402
-    find_image_paths,
-)
+from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
 
 # Define logger
 logger = logging.getLogger("smart_sampling")
+
 
 @command_component(
     name="smart_sampling",
@@ -76,32 +69,39 @@ def smart_sampling(
     customer_name
         Customer name
     """
-    
+
     # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
-    logger.info(f'Input structured folder: {input_structured_folder}')
-    logger.info(f'Customer Quality Check folder: {customer_quality_check_folder}')
-    logger.info(f'Customer Retraining folder: {customer_retraining_folder}')
-    logger.info(f'Number of images found: {len(image_paths)}')
-    logger.info(f'Sampling parameters: {sampling_parameters}')
-    
+    logger.info(f"Input structured folder: {input_structured_folder}")
+    logger.info(f"Customer Quality Check folder: {customer_quality_check_folder}")
+    logger.info(f"Customer Retraining folder: {customer_retraining_folder}")
+    logger.info(f"Number of images found: {len(image_paths)}")
+    logger.info(f"Sampling parameters: {sampling_parameters}")
+
     # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
-    logger.info(f'Number of dates (folders) found: {len(grouped_images_by_date)}')
-    
+    logger.info(f"Number of dates (folders) found: {len(grouped_images_by_date)}")
+
     # Log each date
     for key, values in grouped_images_by_date.items():
         logger.info(f"Date: {key} - Number of images: {len(values)}")
-    
+
     # Define the SmartSampling object
-    smartSampling = SmartSampling(input_structured_folder, customer_quality_check_folder, customer_retraining_folder, database_parameters_json,
-                                            customer_name, sampling_parameters)
-    
+    smartSampling = SmartSampling(
+        input_structured_folder,
+        customer_quality_check_folder,
+        customer_retraining_folder,
+        database_parameters_json,
+        customer_name,
+        sampling_parameters,
+    )
+
     # Sample a number of random images for manual quality check
     smartSampling.sample_images_for_quality_check(grouped_images_by_date)
-    
+
     # Sample images for retraining
     smartSampling.sample_images_for_retraining(grouped_images_by_date)
+
 
 def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:
     """
@@ -115,11 +115,11 @@ def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:
     Returns
     -------
     Dict[str, List[str]]
-        A dictionary where keys are date strings extracted from the filenames, 
+        A dictionary where keys are date strings extracted from the filenames,
         and values are lists of filenames belonging to each date.
     """
-    
-    grouped_files = {}
+
+    grouped_files: Dict[str, List[str]] = {}
 
     for string in strings:
         # Use regex to find the date folder pattern
