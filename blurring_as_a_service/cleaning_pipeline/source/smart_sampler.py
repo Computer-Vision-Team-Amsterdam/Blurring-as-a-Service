@@ -386,17 +386,9 @@ class SmartSampler:
             remainder = total_images_to_sample % len(bin_labels)
             logger.info(f"Images per bin: {images_per_bin}, Remainder: {remainder}")
 
-            for bin_label in bin_labels:
-                df_bin = df_date[df_date["bin_label"] == bin_label]
-
-                # Adjust the number of images to sample from this bin
-                num_to_sample = min(
-                    images_per_bin + (1 if remainder > 0 else 0), len(df_bin)
-                )
-                remainder -= 1 if remainder > 0 else 0
-
-                sampled_from_bin = df_bin.sample(n=num_to_sample)
-                sampled_images_df = sampled_images_df.append(sampled_from_bin)
+            sampled_images_df = SmartSampler._calculate_n_of_images_to_sample(
+                sampled_images_df, df_date, bin_labels, images_per_bin, remainder
+            )
 
             logger.debug(
                 f"Sampled images for date {upload_date}: {sampled_images_df.head()}"
@@ -451,3 +443,65 @@ class SmartSampler:
             f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)
         ]
         return bin_labels
+
+    @staticmethod
+    def _calculate_n_of_images_to_sample(
+        sampled_images_df, df_date, bin_labels, images_per_bin, remainder
+    ):
+        """
+        Calculates the number of images to sample from each bin, considering the base number of images per bin and the remainder.
+
+        This method iterates over each bin and determines the number of images to sample from that bin.
+        The calculation is based on a base number of images per bin (`images_per_bin`) and a remainder
+        that accounts for any extra images to be distributed evenly across the bins.
+
+        Parameters
+        ----------
+        samppled_images_df : pd.DataFrame
+            An empty DataFrame to which sampled images are appended.
+        df_date : pd.DataFrame
+            A DataFrame filtered for a specific date, containing image data including 'bin_label'.
+        bin_labels : list
+            A list of unique bin labels indicating different categories or bins.
+        images_per_bin : int
+            The base number of images to sample from each bin, calculated as the total number of images to be sampled divided by the number of bins.
+        remainder : int
+            The number of extra images that need to be distributed evenly across the bins.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame of sampled images, concatenated from each bin.
+
+        Notes
+        -----
+        - For each bin, the method first calculates `num_to_sample` which is the minimum of `images_per_bin + 1` (if there is a remainder) and the total number of images in that bin.
+        - If a remainder exists, it is decreased by 1 after allocating an extra image to a bin, ensuring even distribution of the extra images across bins.
+        - The method samples `num_to_sample` images from each bin and appends them to the resulting DataFrame.
+
+        Example
+        -------
+        # Assuming a DataFrame 'df_date' for a specific date with 'bin_label' column
+        # and an array 'bin_labels' containing unique bin labels, e.g., ['[0-9]', '[10-19]', '[20-29]']
+        df_date = pd.DataFrame({
+            'image_filename': ['image1.jpg', 'image2.jpg', 'image3.jpg', 'image4.jpg', 'image5.jpg'],
+            'bin_label': ['[0-9]', '[0-9]', '[10-19]', '[10-19]', '[20-29]']
+        })
+        bin_labels = ['[0-9]', '[10-19]', '[20-29]']
+        images_per_bin = 1  # base number of images per bin
+        remainder = 2  # extra images to distribute
+
+        sampled_images_df = SmartSampler._calculate_n_of_images_to_sample(df_date, bin_labels, images_per_bin, remainder)
+        print(sampled_images_df)
+        """
+        for bin_label in bin_labels:
+            df_bin = df_date[df_date["bin_label"] == bin_label]
+
+            # Adjust the number of images to sample from this bin
+            num_to_sample = min(
+                images_per_bin + (1 if remainder > 0 else 0), len(df_bin)
+            )
+            remainder -= 1 if remainder > 0 else 0
+
+            sampled_from_bin = df_bin.sample(n=num_to_sample)
+            sampled_images_df = sampled_images_df.append(sampled_from_bin)
