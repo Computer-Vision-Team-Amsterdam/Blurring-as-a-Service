@@ -100,6 +100,10 @@ class SmartSampling:
             The destination folder path for the quality check images.
         n_images_to_sample : int
             Number of images to sample for each date.
+            
+        Returns
+        -------
+        None
         """
         
         # Sample a number of random images for manual quality check
