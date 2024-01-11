@@ -348,7 +348,8 @@ class SmartSampler:
         Parameters
         ----------
         df : pd.DataFrame
-            A DataFrame containing image data with columns including 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
+            A DataFrame containing image data with columns including
+            'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
         percentage_ratio : float
             The ratio of total images to sample from each date.
 
@@ -464,7 +465,8 @@ class SmartSampler:
         bin_labels : list
             A list of unique bin labels indicating different categories or bins.
         images_per_bin : int
-            The base number of images to sample from each bin, calculated as the total number of images to be sampled divided by the number of bins.
+            The base number of images to sample from each bin, calculated as the total
+            number of images to be sampled divided by the number of bins.
         remainder : int
             The number of extra images that need to be distributed evenly across the bins.
 
@@ -475,8 +477,10 @@ class SmartSampler:
 
         Notes
         -----
-        - For each bin, the method first calculates `num_to_sample` which is the minimum of `images_per_bin + 1` (if there is a remainder) and the total number of images in that bin.
-        - If a remainder exists, it is decreased by 1 after allocating an extra image to a bin, ensuring even distribution of the extra images across bins.
+        - For each bin, the method first calculates `num_to_sample` which is the minimum of `images_per_bin + 1`
+        (if there is a remainder) and the total number of images in that bin.
+        - If a remainder exists, it is decreased by 1 after allocating an extra image to a bin,
+        ensuring even distribution of the extra images across bins.
         - The method samples `num_to_sample` images from each bin and appends them to the resulting DataFrame.
 
         Example
