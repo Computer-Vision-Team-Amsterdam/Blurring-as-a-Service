@@ -154,9 +154,7 @@ class SmartSampling:
         """
 
         # Collect images above the confidence score threshold from the database
-        df_images = SmartSampling.collect_images_above_threshold_from_db(
-            self, grouped_images_by_date
-        )
+        df_images = self.collect_images_above_threshold_from_db(grouped_images_by_date)
 
         # Group images into bins
         df_images, bin_counts = SmartSampling.categorize_images_into_bins(df_images)
@@ -191,7 +189,6 @@ class SmartSampling:
                 f"Sampled for retraining: /{formatted_upload_date}/{image_filename}"
             )
 
-    @staticmethod
     def collect_images_above_threshold_from_db(
         self, grouped_images_by_date: Dict[str, List[str]]
     ) -> pd.DataFrame:
