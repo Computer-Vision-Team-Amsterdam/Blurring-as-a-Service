@@ -19,7 +19,6 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
 from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
     setup_azure_logging,
 )
-from blurring_as_a_service.utils.lock_file import LockFile  # noqa: E402
 
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
@@ -33,6 +32,7 @@ log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
 from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+from blurring_as_a_service.utils.lock_file import LockFile  # noqa: E402
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
