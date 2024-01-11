@@ -30,6 +30,52 @@ from blurring_as_a_service.utils.generics import (  # noqa: E402
 logger = logging.getLogger(__name__)
 
 class SmartSampling:
+    """
+    A class designed to facilitate smart sampling of images for quality checks and retraining purposes in a 
+    machine learning pipeline. The class manages the sampling process by interfacing with a database to retrieve 
+    image detection data, categorizing images based on detection counts, and then sampling a subset of these images.
+
+    Attributes
+    ----------
+    input_structured_folder : str
+        The path to the input folder containing image data.
+    customer_quality_check_folder : str
+        The destination folder path where sampled images for quality checks are stored.
+    customer_retraining_folder : str
+        The destination folder path where sampled images for retraining are stored.
+    database_parameters_json : str
+        JSON string with database connection parameters.
+    customer_name : str
+        The name of the customer associated with the images.
+    sampling_parameters : dict
+        A dictionary containing parameters for the sampling process, such as sample size, confidence score 
+        threshold, and sampling ratio.
+
+    Methods
+    -------
+    sample_images_for_quality_check(grouped_images_by_date: Dict[str, List[str]]) -> None
+        Samples a specified number of images from each date for quality checks and stores them in the 
+        designated quality check folder.
+
+    sample_images_for_retraining(grouped_images_by_date: Dict[str, List[str]]) -> None
+        Samples images for retraining based on detection counts and confidence score thresholds, and stores 
+        them in the designated retraining folder.
+
+    collect_images_above_threshold_from_db(grouped_images_by_date: Dict[str, List[str]]) -> pd.DataFrame
+        Collects images with detections above a specified confidence score threshold from the database.
+
+    get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]
+        Randomly samples a specified number of images for each date.
+
+    categorize_images_into_bins(df: pd.DataFrame) -> Tuple[Dict[str, pd.DataFrame], List[str]]
+        Categorizes images into bins based on their detection counts.
+
+    sample_images_equally_from_bins(df: pd.DataFrame, percentage_ratio: float) -> pd.DataFrame
+        Samples a percentage of images equally from each bin for each date.
+
+    determine_bin_size(detection_range: int) -> int
+        Determines the bin size for categorization based on the detection range.
+    """
     def __init__(self, input_structured_folder, customer_quality_check_folder, customer_retraining_folder, 
                  database_parameters_json, customer_name, sampling_parameters):
         self.input_structured_folder = input_structured_folder
@@ -73,12 +119,28 @@ class SmartSampling:
                 )
         
     def sample_images_for_retraining(self, grouped_images_by_date: Dict[str, List[str]]) -> None:
+        """
+        Samples images for retraining purposes from the structured input folder. The function first collects images 
+        from the database that are above a specified confidence score threshold. It then categorizes these images into 
+        bins based on detection counts and samples a specific ratio of images from each bin for every date. The sampled 
+        images are then copied to the customer retraining folder.
+
+        Parameters
+        ----------
+        grouped_images_by_date : Dict[str, List[str]]
+            A dictionary mapping dates (in 'YYYY-MM-DD_HH_MM_SS' string format) to lists of image filenames. 
+            These filenames are used to query the database and collect detection data for the corresponding images.
+            
+        Returns
+        -------
+        None
+        """
         
         # Collect images above the confidence score threshold from the database
         df_images = SmartSampling.collect_images_above_threshold_from_db(self, grouped_images_by_date)
         
         # Group images into bins
-        bin_counts, _ = SmartSampling.categorize_images_into_bins(df_images)
+        df_images, bin_counts, _ = SmartSampling.categorize_images_into_bins(df_images)
 
         # Count images in each bin
         for bin_label, images in bin_counts.items():
@@ -92,13 +154,11 @@ class SmartSampling:
         sampled_images_df = SmartSampling.sample_images_equally_from_bins(
             df_images, percentage_ratio
         )
-        
-        logger.info('Sampled images for retraining:\n')
     
         # Iterate over the sampled images DataFrame
         for _, row in sampled_images_df.iterrows():
             # Access image details from the row
-            formatted_upload_date = row['image_upload_date'].strftime("%Y-%m-%d_%H_%M_%S")
+            formatted_upload_date = row['image_upload_date']
             image_filename = row['image_filename']
             # Copy the sampled images
             copy_file(
@@ -190,9 +250,15 @@ class SmartSampling:
                                 
                 # Flatten the dictionary to a list of dictionaries
                 flat_list = [item for sublist in images_statistics.values() for item in sublist]
+                
                 # Convert the list of dictionaries to a DataFrame
                 df = pd.DataFrame(flat_list)
-                print(f'DataFrame: {df}')
+                
+                # Convert to datetime format
+                df['image_upload_date'] = pd.to_datetime(df['image_upload_date'])
+
+                # Format the date to the desired string format
+                df['image_upload_date'] = df['image_upload_date'].dt.strftime('%Y-%m-%d_%H_%M_%S')
                                 
         except SQLAlchemyError as e:
             logger.error(f"Database operation failed: {e}")
@@ -253,9 +319,18 @@ class SmartSampling:
         if df.empty:
             logger.info("No detections found for the given criteria.")
             return {}, []
+        
+        # Diagnostic log to check the initial DataFrame structure
+        logger.debug(f"Initial DataFrame structure: {df.head()}")
+        
+        # Drop duplicates based on the unique triple and create a copy of the DataFrame
+        unique_df = df.drop_duplicates(subset=['image_upload_date', 'image_customer_name', 'image_filename']).copy()
+        
+        # Log the number of unique images
+        logger.info(f"Number of unique images: {len(unique_df)}")
 
         # Calculate min and max counts
-        min_count, max_count = df['count'].min(), df['count'].max()
+        min_count, max_count = unique_df['count'].min(), unique_df['count'].max()
         logger.info(f"Minimum number of detections for an image: {min_count}")
         logger.info(f"Maximum number of detections for an image: {max_count}")
 
@@ -275,12 +350,12 @@ class SmartSampling:
         bin_labels = [f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)]
 
         # Categorize images into bins
-        df['bin_label'] = pd.cut(df['count'], bins, labels=bin_labels, include_lowest=True, right=False)
+        unique_df['bin_label'] = pd.cut(unique_df['count'], bins, labels=bin_labels, include_lowest=True, right=True)
 
         for label in bin_labels:
-            bin_counts[label] = df[df['bin_label'] == label]
+            bin_counts[label] = unique_df[unique_df['bin_label'] == label]
 
-        return bin_counts, bin_labels
+        return unique_df, bin_counts, bin_labels
 
     @staticmethod
     def sample_images_equally_from_bins(
@@ -293,7 +368,7 @@ class SmartSampling:
         Parameters
         ----------
         df : pd.DataFrame
-            A DataFrame containing image data with columns 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
+            A DataFrame containing image data with columns including 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
         percentage_ratio : float
             The ratio of total images to sample from each date.
 
@@ -323,9 +398,15 @@ class SmartSampling:
             total_images_to_sample = max(total_images_to_sample, 1) if total_images > 0 else 0
             
             logger.info(f'Total images to sample on date {upload_date}: {total_images_to_sample}')
+            
+            # Check if 'bin_label' column exists
+            if 'bin_label' not in df_date.columns:
+                logger.error("bin_label column not found in DataFrame for date: " + str(upload_date))
+                continue  # Skip to next date or handle error as needed
 
             # Get the unique bin labels
             bin_labels = df_date['bin_label'].unique()
+            logger.debug(f'Bin labels for date {upload_date}: {bin_labels}')
 
             # Calculate the number of images to sample per bin
             images_per_bin = total_images_to_sample // len(bin_labels)
@@ -343,7 +424,11 @@ class SmartSampling:
                 sampled_from_bin = df_bin.sample(n=num_to_sample)
                 sampled_images_df = sampled_images_df.append(sampled_from_bin)
                 
-            return sampled_images_df
+            # Print statement for debugging
+            logger.debug(f'Sampled images for date {upload_date}: {sampled_images_df.head()}')
+
+        # Return the full DataFrame after processing all dates
+        return sampled_images_df
     
     @staticmethod
     def determine_bin_size(detection_range: int) -> int:
