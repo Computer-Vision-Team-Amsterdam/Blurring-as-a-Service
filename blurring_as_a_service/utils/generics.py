@@ -1,6 +1,7 @@
 import logging
 import os
 import shutil
+from typing import Dict
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,6 @@ def delete_file(file_path):
 
 
 def copy_file(relative_path, input_path, output_path):
-
     # We don't use os.path.join because it doesn't work with Azure paths
     source_path = input_path + relative_path
     destination_path = output_path + relative_path
@@ -57,3 +57,20 @@ def copy_file(relative_path, input_path, output_path):
             raise FileNotFoundError(error_message)
     else:
         logger.info(f"Source file '{source_path}' does not exist.")
+
+
+def flatten_dict_to_list_of_dicts(dictionary: Dict[str, list]) -> list:
+    """
+    Flattens a dictionary to a list of dictionaries.
+
+    Parameters
+    ----------
+    dictionary : Dict[str, List[Dict[str, list]]]
+        A dictionary containing lists grouped by some key.
+
+    Returns
+    -------
+    list
+        A flattened list of dictionaries.
+    """
+    return [item for sublist in dictionary.values() for item in sublist]

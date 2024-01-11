@@ -22,7 +22,10 @@ sys.path.append(yolov5_path)
 from yolov5.baas_utils.database_handler import DBConfigSQLAlchemy  # noqa: E402
 from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
 
-from blurring_as_a_service.utils.generics import copy_file  # noqa: E402
+from blurring_as_a_service.utils.generics import (  # noqa: E402
+    copy_file,
+    flatten_dict_to_list_of_dicts,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -234,10 +237,7 @@ class SmartSampler:
                             else:
                                 images_statistics[upload_date] = extracted_data
 
-                # Flatten the dictionary to a list of dictionaries
-                flat_list = [
-                    item for sublist in images_statistics.values() for item in sublist
-                ]
+                flat_list = flatten_dict_to_list_of_dicts(images_statistics)
 
                 df = pd.DataFrame(flat_list)
                 df["image_upload_date"] = pd.to_datetime(df["image_upload_date"])
