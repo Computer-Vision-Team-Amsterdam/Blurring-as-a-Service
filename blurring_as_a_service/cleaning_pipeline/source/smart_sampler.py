@@ -88,8 +88,6 @@ class SmartSampler:
         None
         """
 
-        # Sample a number of random images for manual quality check
-        # The number is set in config.yml as quality_check_sample_size
         n_images_to_sample = self.sampling_parameters["quality_check_sample_size"]
 
         logger.info(f"Sampling {n_images_to_sample} images for quality check.. \n")
@@ -128,10 +126,7 @@ class SmartSampler:
         None
         """
 
-        # Collect images above the confidence score threshold from the database
         df_images = self.collect_images_above_threshold_from_db(grouped_images_by_date)
-
-        # Group images into bins
         df_images, bin_counts = SmartSampler.categorize_images_into_bins(df_images)
 
         # Count images in each bin
@@ -141,20 +136,16 @@ class SmartSampler:
             )
 
         # Sample a ratio of the images for each date
-        # The ratio is set in config.yml as sampling_ratio
         ratio = self.sampling_parameters["sampling_ratio"]
         percentage_ratio = ratio / 100
-
         sampled_images_df = SmartSampler.sample_images_equally_from_bins(
             df_images, percentage_ratio
         )
 
-        # Iterate over the sampled images DataFrame
+        # Iterate over the sampled images DataFrame and copy them
         for _, row in sampled_images_df.iterrows():
-            # Access image details from the row
             formatted_upload_date = row["image_upload_date"]
             image_filename = row["image_filename"]
-            # Copy the sampled images
             copy_file(
                 f"/{formatted_upload_date}/{image_filename}",
                 str(self.input_structured_folder),
@@ -206,14 +197,11 @@ class SmartSampler:
             db_name = database_parameters["db_name"]
             db_hostname = database_parameters["db_hostname"]
 
-            # Validate if database credentials are provided
             if not db_username or not db_name or not db_hostname:
                 raise ValueError("Please provide database credentials.")
 
-            # Create a DBConfigSQLAlchemy object
             db_config = DBConfigSQLAlchemy(db_username, db_hostname, db_name)
 
-            # Create the database connection
             db_config.create_connection()
 
             conf_score_threshold = self.sampling_parameters["conf_score_threshold"]
@@ -238,7 +226,6 @@ class SmartSampler:
                         results = query.all()
                         count = len(results)
 
-                        # Populating images_statistics with detailed information
                         if results:
                             extracted_data = [result.__dict__ for result in results]
                             for data in extracted_data:
@@ -254,10 +241,7 @@ class SmartSampler:
                     item for sublist in images_statistics.values() for item in sublist
                 ]
 
-                # Convert the list of dictionaries to a DataFrame
                 df = pd.DataFrame(flat_list)
-
-                # Convert to datetime format
                 df["image_upload_date"] = pd.to_datetime(df["image_upload_date"])
 
                 # Format the date to the desired string format
@@ -329,38 +313,25 @@ class SmartSampler:
             logger.info("No detections found for the given criteria.")
             return {}, {}
 
-        # Diagnostic log to check the initial DataFrame structure
-        logger.debug(f"Initial DataFrame structure: {df.head()}")
-
-        # Drop duplicates based on the unique triple and create a copy of the DataFrame
         unique_df = df.drop_duplicates(
             subset=["image_upload_date", "image_customer_name", "image_filename"]
         ).copy()
 
-        # Log the number of unique images
         logger.info(f"Number of unique images: {len(unique_df)}")
 
-        # Calculate min and max counts
         min_count, max_count = unique_df["count"].min(), unique_df["count"].max()
         logger.info(f"Minimum number of detections for an image: {min_count}")
         logger.info(f"Maximum number of detections for an image: {max_count}")
 
-        # Determine the range and define bin size strategy
         detection_range = max_count - min_count
         bin_size = SmartSampler.determine_bin_size(detection_range)
 
         # Calculate the bin edges
         bins = np.linspace(min_count, max_count, bin_size + 1)
 
-        # Initialize a dictionary to hold bin counts and labels
         bin_counts = {}
 
-        # Iterate through the given bins array and create a list of bin labels.
-        # Each label represents a range, formatted as "start-end",
-        # where "start" is the beginning of a bin and "end" is one less than the start of the next bin.
-        bin_labels = [
-            f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)
-        ]
+        bin_labels = SmartSampler._create_bin_labels(bins)
 
         # Categorize images into bins
         unique_df["bin_label"] = pd.cut(
@@ -371,6 +342,32 @@ class SmartSampler:
             bin_counts[label] = unique_df[unique_df["bin_label"] == label]
 
         return unique_df, bin_counts
+
+    @staticmethod
+    def _create_bin_labels(bins):
+        """
+        Creates bin labels based on the given bins array.
+
+        Parameters
+        ----------
+        bins : np.ndarray
+            An array containing the bin edges.
+
+        Examples
+        --------
+        >>> bins = [0, 5, 10]
+        >>> SmartSampler._create_bin_labels(bins)
+        ['0-4', '5-9']
+
+        Returns
+        -------
+        List[str]
+            A list of bin labels, where each label represents a range in the format "start-end".
+        """
+        bin_labels = [
+            f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)
+        ]
+        return bin_labels
 
     @staticmethod
     def sample_images_equally_from_bins(
