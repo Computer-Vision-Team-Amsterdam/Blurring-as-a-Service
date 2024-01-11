@@ -509,3 +509,5 @@ class SmartSampler:
 
             sampled_from_bin = df_bin.sample(n=num_to_sample)
             sampled_images_df = sampled_images_df.append(sampled_from_bin)
+
+        return sampled_images_df
