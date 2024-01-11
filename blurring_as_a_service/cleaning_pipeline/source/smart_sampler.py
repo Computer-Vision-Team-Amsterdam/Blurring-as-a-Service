@@ -468,9 +468,8 @@ class SmartSampler:
             The number of bins to be used for categorization.
         """
 
-        if detection_range <= 10:
-            return 3
-        elif 10 < detection_range <= 50:
-            return 5
-        else:
+        if detection_range > 50:
             return 10
+        if detection_range > 10:
+            return 5
+        return 3
