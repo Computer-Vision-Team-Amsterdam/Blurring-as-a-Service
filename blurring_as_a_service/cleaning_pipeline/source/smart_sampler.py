@@ -129,7 +129,6 @@ class SmartSampler:
         df_images = self.collect_images_above_threshold_from_db(grouped_images_by_date)
         df_images, bin_counts = SmartSampler.categorize_images_into_bins(df_images)
 
-        # Count images in each bin
         for bin_label, images in bin_counts.items():
             logger.info(
                 f"Number of images with detections in bin {bin_label}: {len(images)}"
@@ -142,7 +141,6 @@ class SmartSampler:
             df_images, percentage_ratio
         )
 
-        # Iterate over the sampled images DataFrame and copy them
         for _, row in sampled_images_df.iterrows():
             formatted_upload_date = row["image_upload_date"]
             image_filename = row["image_filename"]
@@ -243,8 +241,6 @@ class SmartSampler:
 
                 df = pd.DataFrame(flat_list)
                 df["image_upload_date"] = pd.to_datetime(df["image_upload_date"])
-
-                # Format the date to the desired string format
                 df["image_upload_date"] = df["image_upload_date"].dt.strftime(
                     "%Y-%m-%d_%H_%M_%S"
                 )
@@ -344,6 +340,94 @@ class SmartSampler:
         return unique_df, bin_counts
 
     @staticmethod
+    def sample_images_equally_from_bins(
+        df: pd.DataFrame, percentage_ratio: float
+    ) -> pd.DataFrame:
+        """
+        Samples a percentage of images equally from each bin for each date.
+
+        Parameters
+        ----------
+        df : pd.DataFrame
+            A DataFrame containing image data with columns including 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
+        percentage_ratio : float
+            The ratio of total images to sample from each date.
+
+        Returns
+        -------
+        pd.DataFrame
+            A DataFrame of sampled images.
+        """
+
+        sampled_images_df = pd.DataFrame()
+
+        unique_dates = df["image_upload_date"].unique()
+        logger.info(f"Unique dates: {unique_dates}")
+
+        for upload_date in unique_dates:
+            df_date = df[df["image_upload_date"] == upload_date]
+            total_images = len(df_date)
+            logger.info(f"Total images on date {upload_date}: {total_images}")
+
+            total_images_to_sample = int(total_images * percentage_ratio)
+
+            # Ensure at least one image is sampled if total_images_to_sample > 0
+            total_images_to_sample = (
+                max(total_images_to_sample, 1) if total_images > 0 else 0
+            )
+
+            logger.info(
+                f"Total images to sample on date {upload_date}: {total_images_to_sample}"
+            )
+
+            bin_labels = df_date["bin_label"].unique()
+            logger.debug(f"Bin labels for date {upload_date}: {bin_labels}")
+
+            images_per_bin = total_images_to_sample // len(bin_labels)
+            remainder = total_images_to_sample % len(bin_labels)
+            logger.info(f"Images per bin: {images_per_bin}, Remainder: {remainder}")
+
+            for bin_label in bin_labels:
+                df_bin = df_date[df_date["bin_label"] == bin_label]
+
+                # Adjust the number of images to sample from this bin
+                num_to_sample = min(
+                    images_per_bin + (1 if remainder > 0 else 0), len(df_bin)
+                )
+                remainder -= 1 if remainder > 0 else 0
+
+                sampled_from_bin = df_bin.sample(n=num_to_sample)
+                sampled_images_df = sampled_images_df.append(sampled_from_bin)
+
+            logger.debug(
+                f"Sampled images for date {upload_date}: {sampled_images_df.head()}"
+            )
+
+        return sampled_images_df
+
+    @staticmethod
+    def determine_bin_size(detection_range: int) -> int:
+        """
+        Determines the bin size for categorization based on the detection range.
+
+        Parameters
+        ----------
+        detection_range : int
+            The range of detection counts across all images.
+
+        Returns
+        -------
+        int
+            The number of bins to be used for categorization.
+        """
+
+        if detection_range > 50:
+            return 10
+        if detection_range > 10:
+            return 5
+        return 3
+
+    @staticmethod
     def _create_bin_labels(bins):
         """
         Creates bin labels based on the given bins array.
@@ -368,108 +452,3 @@ class SmartSampler:
             f"{int(bins[i])}-{int(bins[i + 1]) - 1}" for i in range(len(bins) - 1)
         ]
         return bin_labels
-
-    @staticmethod
-    def sample_images_equally_from_bins(
-        df: pd.DataFrame, percentage_ratio: float
-    ) -> pd.DataFrame:
-        """
-        Samples a percentage of images equally from each bin for each date.
-
-        Parameters
-        ----------
-        df : pd.DataFrame
-            A DataFrame containing image data with columns including 'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
-        percentage_ratio : float
-            The ratio of total images to sample from each date.
-
-        Returns
-        -------
-        pd.DataFrame
-            A DataFrame of sampled images.
-        """
-
-        # Initialize the DataFrame to store sampled images
-        sampled_images_df = pd.DataFrame()
-
-        # Extract all unique upload dates from the DataFrame
-        unique_dates = df["image_upload_date"].unique()
-        logger.info(f"Unique dates: {unique_dates}")
-
-        for upload_date in unique_dates:
-            # Filter for the current date
-            df_date = df[df["image_upload_date"] == upload_date]
-            total_images = len(df_date)
-            logger.info(f"Total images on date {upload_date}: {total_images}")
-
-            # Calculate the total number of images to sample
-            total_images_to_sample = int(total_images * percentage_ratio)
-
-            # Ensure at least one image is sampled if total_images_to_sample > 0
-            total_images_to_sample = (
-                max(total_images_to_sample, 1) if total_images > 0 else 0
-            )
-
-            logger.info(
-                f"Total images to sample on date {upload_date}: {total_images_to_sample}"
-            )
-
-            # Check if 'bin_label' column exists
-            if "bin_label" not in df_date.columns:
-                logger.error(
-                    "bin_label column not found in DataFrame for date: "
-                    + str(upload_date)
-                )
-                continue  # Skip to next date or handle error as needed
-
-            # Get the unique bin labels
-            bin_labels = df_date["bin_label"].unique()
-            logger.debug(f"Bin labels for date {upload_date}: {bin_labels}")
-
-            # Calculate the number of images to sample per bin
-            images_per_bin = total_images_to_sample // len(bin_labels)
-            remainder = total_images_to_sample % len(bin_labels)
-            logger.info(f"Images per bin: {images_per_bin}, Remainder: {remainder}")
-
-            for bin_label in bin_labels:
-                df_bin = df_date[df_date["bin_label"] == bin_label]
-
-                # Adjust the number of images to sample from this bin
-                num_to_sample = min(
-                    images_per_bin + (1 if remainder > 0 else 0), len(df_bin)
-                )
-                remainder -= 1 if remainder > 0 else 0
-
-                # Sample images
-                sampled_from_bin = df_bin.sample(n=num_to_sample)
-                sampled_images_df = sampled_images_df.append(sampled_from_bin)
-
-            # Print statement for debugging
-            logger.debug(
-                f"Sampled images for date {upload_date}: {sampled_images_df.head()}"
-            )
-
-        # Return the full DataFrame after processing all dates
-        return sampled_images_df
-
-    @staticmethod
-    def determine_bin_size(detection_range: int) -> int:
-        """
-        Determines the bin size for categorization based on the detection range.
-
-        Parameters
-        ----------
-        detection_range : int
-            The range of detection counts across all images.
-
-        Returns
-        -------
-        int
-            The number of bins to be used for categorization.
-        """
-
-        if detection_range > 50:
-            return 10
-        if detection_range > 10:
-            return 5
-        return 3

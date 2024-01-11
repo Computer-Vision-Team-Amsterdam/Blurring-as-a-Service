@@ -34,7 +34,6 @@ from blurring_as_a_service.cleaning_pipeline.source.smart_sampler import (  # no
 )
 from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
 
-# Define logger
 logger = logging.getLogger("smart_sampling")
 
 
@@ -70,7 +69,6 @@ def smart_sampling(
         Customer name
     """
 
-    # Find all the images in the input_structured_folder
     image_paths = find_image_paths(input_structured_folder)
     logger.info(f"Input structured folder: {input_structured_folder}")
     logger.info(f"Customer Quality Check folder: {customer_quality_check_folder}")
@@ -78,15 +76,12 @@ def smart_sampling(
     logger.info(f"Number of images found: {len(image_paths)}")
     logger.info(f"Sampling parameters: {sampling_parameters}")
 
-    # Group the images by date
     grouped_images_by_date = group_files_by_date(image_paths)
     logger.info(f"Number of dates (folders) found: {len(grouped_images_by_date)}")
 
-    # Log each date
     for key, values in grouped_images_by_date.items():
         logger.info(f"Date: {key} - Number of images: {len(values)}")
 
-    # Define the SmartSampling object
     smart_sampler = SmartSampler(
         input_structured_folder,
         customer_quality_check_folder,
@@ -96,10 +91,8 @@ def smart_sampling(
         sampling_parameters,
     )
 
-    # Sample a number of random images for manual quality check
     smart_sampler.sample_images_for_quality_check(grouped_images_by_date)
 
-    # Sample images for retraining
     smart_sampler.sample_images_for_retraining(grouped_images_by_date)
 
 
