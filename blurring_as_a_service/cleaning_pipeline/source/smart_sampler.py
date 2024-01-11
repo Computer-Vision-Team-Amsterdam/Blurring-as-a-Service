@@ -95,7 +95,7 @@ class SmartSampler:
 
         logger.info(f"Sampling {n_images_to_sample} images for quality check.. \n")
 
-        quality_check_images = SmartSampler.get_n_random_images_per_date(
+        quality_check_images = SmartSampler._get_n_random_images_per_date(
             grouped_images_by_date, n_images_to_sample
         )
 
@@ -129,18 +129,17 @@ class SmartSampler:
         None
         """
 
-        df_images = self.collect_images_above_threshold_from_db(grouped_images_by_date)
-        df_images, bin_counts = SmartSampler.categorize_images_into_bins(df_images)
+        df_images = self._collect_images_above_threshold_from_db(grouped_images_by_date)
+        df_images, bin_counts = SmartSampler._categorize_images_into_bins(df_images)
 
         for bin_label, images in bin_counts.items():
             logger.info(
                 f"Number of images with detections in bin {bin_label}: {len(images)}"
             )
 
-        # Sample a ratio of the images for each date
         ratio = self.sampling_parameters["sampling_ratio"]
         percentage_ratio = ratio / 100
-        sampled_images_df = SmartSampler.sample_images_equally_from_bins(
+        sampled_images_df = SmartSampler._sample_images_equally_from_bins(
             df_images, percentage_ratio
         )
 
@@ -156,7 +155,7 @@ class SmartSampler:
                 f"Sampled for retraining: /{formatted_upload_date}/{image_filename}"
             )
 
-    def collect_images_above_threshold_from_db(
+    def _collect_images_above_threshold_from_db(
         self, grouped_images_by_date: Dict[str, List[str]]
     ) -> pd.DataFrame:
         """
@@ -255,7 +254,7 @@ class SmartSampler:
         return df
 
     @staticmethod
-    def get_n_random_images_per_date(
+    def _get_n_random_images_per_date(
         grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int
     ) -> Dict[str, List[str]]:
         """
@@ -286,7 +285,7 @@ class SmartSampler:
         return random_result
 
     @staticmethod
-    def categorize_images_into_bins(
+    def _categorize_images_into_bins(
         df: pd.DataFrame,
     ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
         """
@@ -320,7 +319,7 @@ class SmartSampler:
         logger.info(f"Maximum number of detections for an image: {max_count}")
 
         detection_range = max_count - min_count
-        bin_size = SmartSampler.determine_bin_size(detection_range)
+        bin_size = SmartSampler._determine_bin_size(detection_range)
 
         # Calculate the bin edges
         bins = np.linspace(min_count, max_count, bin_size + 1)
@@ -340,7 +339,7 @@ class SmartSampler:
         return unique_df, bin_counts
 
     @staticmethod
-    def sample_images_equally_from_bins(
+    def _sample_images_equally_from_bins(
         df: pd.DataFrame, percentage_ratio: float
     ) -> pd.DataFrame:
         """
@@ -406,7 +405,7 @@ class SmartSampler:
         return sampled_images_df
 
     @staticmethod
-    def determine_bin_size(detection_range: int) -> int:
+    def _determine_bin_size(detection_range: int) -> int:
         """
         Determines the bin size for categorization based on the detection range.
 
