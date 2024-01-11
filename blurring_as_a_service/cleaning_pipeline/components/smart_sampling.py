@@ -9,9 +9,6 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 
-from blurring_as_a_service.cleaning_pipeline.source.sampling_pipeline import (  # noqa: E402
-    SmartSampling,
-)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -32,6 +29,9 @@ sampling_parameters = settings["sampling_parameters"]
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
+from blurring_as_a_service.cleaning_pipeline.source.sampling_pipeline import (  # noqa: E402
+    SmartSampling,
+)
 from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
 
 # Define logger
