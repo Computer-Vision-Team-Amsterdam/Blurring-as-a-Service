@@ -48,31 +48,6 @@ class SmartSampling:
     sampling_parameters : dict
         A dictionary containing parameters for the sampling process, such as sample size, confidence score
         threshold, and sampling ratio.
-
-    Methods
-    -------
-    sample_images_for_quality_check(grouped_images_by_date: Dict[str, List[str]]) -> None
-        Samples a specified number of images from each date for quality checks and stores them in the
-        designated quality check folder.
-
-    sample_images_for_retraining(grouped_images_by_date: Dict[str, List[str]]) -> None
-        Samples images for retraining based on detection counts and confidence score thresholds, and stores
-        them in the designated retraining folder.
-
-    collect_images_above_threshold_from_db(grouped_images_by_date: Dict[str, List[str]]) -> pd.DataFrame
-        Collects images with detections above a specified confidence score threshold from the database.
-
-    get_n_random_images_per_date(grouped_images_by_date: Dict[str, List[str]], n_images_to_sample: int) -> Dict[str, List[str]]
-        Randomly samples a specified number of images for each date.
-
-    categorize_images_into_bins(df: pd.DataFrame) -> Tuple[Dict[str, pd.DataFrame], List[str]]
-        Categorizes images into bins based on their detection counts.
-
-    sample_images_equally_from_bins(df: pd.DataFrame, percentage_ratio: float) -> pd.DataFrame
-        Samples a percentage of images equally from each bin for each date.
-
-    determine_bin_size(detection_range: int) -> int
-        Determines the bin size for categorization based on the detection range.
     """
 
     def __init__(
