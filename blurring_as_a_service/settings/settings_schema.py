@@ -111,6 +111,12 @@ class InferenceCustomerPipelineSpec(SettingsSpecModel):
     model_name: str
     model_version: str
     model_parameters: InferenceModelParameters
+    
+
+class SmartSamplingPipelineSpec(SettingsSpecModel):
+    quality_check_sample_size: int = 10
+    conf_score_threshold: float = 0.0005
+    sampling_ratio: float = 0.5
 
 
 class LoggingSpec(SettingsSpecModel):
@@ -139,5 +145,6 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     training_pipeline: TrainingPipelineSpec = None
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: InferenceCustomerPipelineSpec = None
+    sampling_parameters: SmartSamplingPipelineSpec = None
     database_parameters: DatabaseCredentialsSpec = None
     logging: LoggingSpec = LoggingSpec()
