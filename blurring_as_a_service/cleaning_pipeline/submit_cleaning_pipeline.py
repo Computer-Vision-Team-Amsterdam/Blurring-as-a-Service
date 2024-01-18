@@ -24,6 +24,7 @@ def cleaning_pipeline():
     input_structured_input = Input(
         type=AssetTypes.URI_FOLDER,
         path=input_structured_path,
+        description="Path to the folder containing already processed images",
     )
 
     database_parameters = settings["database_parameters"]
@@ -42,6 +43,7 @@ def cleaning_pipeline():
         type=AssetTypes.URI_FOLDER,
         mode="rw_mount",
         path=customer_quality_check_path,
+        description="Path to the folder containing images sampled for quality check",
     )
 
     customer_retraining_path = aml_interface.get_datastore_full_path(
@@ -52,12 +54,14 @@ def cleaning_pipeline():
         type=AssetTypes.URI_FOLDER,
         mode="rw_mount",
         path=customer_retraining_path,
+        description="Path to the folder containing images sampled for retraining the model",
     )
 
     # output_path = aml_interface.get_datastore_full_path(f"{customer_name}_output")
     # output_folder_input = Input(
     #     type=AssetTypes.URI_FOLDER,
     #     path=output_path,
+    #     description="Path to the folder containing the blurred images",
     # )
     # delete_blurred_images_step = delete_blurred_images(
     #     _=smart_sampling_step.outputs.customer_cvt_folder,
@@ -67,6 +71,7 @@ def cleaning_pipeline():
     #     type=AssetTypes.URI_FOLDER,
     #     mode="rw_mount",
     #     path=input_structured_path,
+    #     description="Path to the folder containing already processed images",
     # )
 
     return {}
