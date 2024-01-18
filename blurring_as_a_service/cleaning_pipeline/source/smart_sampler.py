@@ -380,20 +380,26 @@ class SmartSampler:
                 f"Total images to sample on date {upload_date}: {total_images_to_sample}"
             )
 
-            bin_labels = df_date["bin_label"].unique()
-            logger.debug(f"Bin labels for date {upload_date}: {bin_labels}")
+            if "bin_label" not in df_date.columns:
+                logger.error(
+                    "bin_label column not found in DataFrame for date: "
+                    + str(upload_date)
+                )
+            else:
+                bin_labels = df_date["bin_label"].unique()
+                logger.debug(f"Bin labels for date {upload_date}: {bin_labels}")
 
-            images_per_bin = total_images_to_sample // len(bin_labels)
-            remainder = total_images_to_sample % len(bin_labels)
-            logger.info(f"Images per bin: {images_per_bin}, Remainder: {remainder}")
+                images_per_bin = total_images_to_sample // len(bin_labels)
+                remainder = total_images_to_sample % len(bin_labels)
+                logger.info(f"Images per bin: {images_per_bin}, Remainder: {remainder}")
 
-            sampled_images_df = SmartSampler._calculate_n_of_images_to_sample(
-                sampled_images_df, df_date, bin_labels, images_per_bin, remainder
-            )
+                sampled_images_df = SmartSampler._calculate_n_of_images_to_sample(
+                    sampled_images_df, df_date, bin_labels, images_per_bin, remainder
+                )
 
-            logger.debug(
-                f"Sampled images for date {upload_date}: {sampled_images_df.head()}"
-            )
+                logger.debug(
+                    f"Sampled images for date {upload_date}: {sampled_images_df.head()}"
+                )
 
         return sampled_images_df
 
