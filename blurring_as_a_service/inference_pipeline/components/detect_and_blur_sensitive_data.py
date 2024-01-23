@@ -32,6 +32,7 @@ log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
 from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
+from blurring_as_a_service.utils.lock_file import LockFile  # noqa: E402
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
@@ -104,7 +105,7 @@ def detect_and_blur_sensitive_data(
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     # Iterate over files in the folder
     for batch_file_txt in os.listdir(batches_files_path):
-        if batch_file_txt.endswith('.txt'):
+        if batch_file_txt.endswith(".txt"):
             file_path = os.path.join(batches_files_path, batch_file_txt)
 
             # Check if the path points to a file (not a directory) and if the file exists
@@ -115,23 +116,15 @@ def detect_and_blur_sensitive_data(
                     yolo_yaml_path, batch_file_txt
                 )  # use outputs folder as Azure expects outputs there
 
-                # Define the locked file path with ".lock" extension
-                locked_file_path = file_path + ".lock"
-
                 read_success = False
                 try:
-                    # Rename the file to add ".lock" extension
-                    os.rename(file_path, locked_file_path)
-
-                    with open(locked_file_path, "r") as src:
+                    with LockFile(file_path) as src:
                         with open(files_to_blur_full_path, "w") as dest:
                             for line in src:
                                 dest.write(f"{input_structured_folder}/{line}")
-                    read_success = True
-                except FileNotFoundError as e:
-                    logger.info(f"File {locked_file_path} not found: {e}")
+                            read_success = True
                 except Exception as e:
-                    logger.error(f"Error occurred while reading {locked_file_path}: {e}")
+                    logger.error(e)
 
                 if read_success:
                     data = dict(
@@ -143,7 +136,7 @@ def detect_and_blur_sensitive_data(
                     )
 
                     # Remove the extension
-                    file_name_without_extension = batch_file_txt.rsplit('.', 1)[0]
+                    file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
                     yaml_name = f"{file_name_without_extension}_pano.yaml"
 
                     with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
@@ -163,6 +156,6 @@ def detect_and_blur_sensitive_data(
                         **model_parameters,
                         **database_parameters,
                     )
-                    delete_file(locked_file_path)
                     delete_file(files_to_blur_full_path)
                     delete_file(f"{yolo_yaml_path}/{yaml_name}")
+                    delete_file(file_path)
