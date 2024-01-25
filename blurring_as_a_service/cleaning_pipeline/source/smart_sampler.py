@@ -19,13 +19,12 @@ yolov5_path = os.path.abspath(
 # Add the yolov5 path to sys.path
 sys.path.append(yolov5_path)
 
-from yolov5.baas_utils.database_handler import DBConfigSQLAlchemy  # noqa: E402
-from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
-
-from blurring_as_a_service.utils.generics import (  # noqa: E402
-    copy_file,
+from cvtoolkit.database.database_handler import DBConfigSQLAlchemy  # noqa: E402
+from cvtoolkit.helpers.data_structure_helpers import (  # noqa: E402
     flatten_dict_to_list_of_dicts,
 )
+from cvtoolkit.helpers.file_helpers import copy_file  # noqa: E402
+from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
 
 logger = logging.getLogger(__name__)
 

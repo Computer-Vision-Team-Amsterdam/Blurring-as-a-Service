@@ -1,11 +1,7 @@
+from cvtoolkit.settings.settings_helper import GenericSettings, Settings, strings2flags
 from pydantic import BaseModel
 
 from blurring_as_a_service.settings.flags import PipelineFlag
-from blurring_as_a_service.settings.settings_helper import (
-    GenericSettings,
-    Settings,
-    strings2flags,
-)
 from blurring_as_a_service.settings.settings_schema import (
     BlurringAsAServiceSettingsSpec,
 )

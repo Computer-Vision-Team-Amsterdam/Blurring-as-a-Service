@@ -1,8 +1,6 @@
 import json
 
-from blurring_as_a_service.utils.azure_coco_to_coco_converter import (
-    AzureCocoToCocoConverter,
-)
+from cvtoolkit.converters.azure_coco_to_coco_converter import AzureCocoToCocoConverter
 
 
 def compare_json_files(file1, file2):

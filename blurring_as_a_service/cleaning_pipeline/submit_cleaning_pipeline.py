@@ -1,5 +1,6 @@
 import json
 
+from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -11,7 +12,12 @@ from blurring_as_a_service.cleaning_pipeline.components.smart_sampling import (
     smart_sampling,
 )
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.utils.aml_interface import AMLInterface
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
+setup_azure_logging(settings["logging"], __name__)
+
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
 
 @pipeline()

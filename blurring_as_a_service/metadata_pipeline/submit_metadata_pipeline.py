@@ -1,22 +1,25 @@
 import os
 from datetime import datetime
 
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_coco import (
+from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_coco import (  # noqa: E402
     convert_azure_coco_to_coco,
 )
-from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_yolo import (
+from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_yolo import (  # noqa: E402
     convert_azure_coco_to_yolo,
 )
-from blurring_as_a_service.metadata_pipeline.components.create_metadata import (
+from blurring_as_a_service.metadata_pipeline.components.create_metadata import (  # noqa: E402
     create_metadata,
 )
-from blurring_as_a_service.settings.flags import PipelineFlag
+from blurring_as_a_service.settings.flags import PipelineFlag  # noqa: E402
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.utils.aml_interface import AMLInterface
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @pipeline()

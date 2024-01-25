@@ -2,18 +2,10 @@ import json
 import os
 from datetime import datetime
 
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
-
-from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.settings.settings_helper import setup_azure_logging
-
-# DO NOT import relative paths before setting up the logger.
-# Exception, of course, is settings to set up the logger.
-BlurringAsAServiceSettings.set_from_yaml("config.yml")
-settings = BlurringAsAServiceSettings.get_settings()
-setup_azure_logging(settings["logging"], __name__)
 
 from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_coco import (  # noqa: E402
     evaluate_with_coco,
@@ -24,7 +16,10 @@ from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_wi
 from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (  # noqa: E402
     validate_model,
 )
-from blurring_as_a_service.utils.aml_interface import AMLInterface  # noqa: E402
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @pipeline()

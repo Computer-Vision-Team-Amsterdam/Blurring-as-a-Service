@@ -7,6 +7,7 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 import yolov5.train as train  # noqa: E402
+
 from blurring_as_a_service.settings.flags import PipelineFlag  # noqa: E402
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
@@ -15,7 +16,8 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
-settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+BlurringAsAServiceSettings.set_from_yaml(config_path)
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @command_component(

@@ -1,6 +1,4 @@
-from blurring_as_a_service.utils.azure_coco_to_yolo_converter import (
-    AzureCocoToYoloConverter,
-)
+from cvtoolkit.converters.azure_coco_to_yolo_converter import AzureCocoToYoloConverter
 
 
 def expected_output():

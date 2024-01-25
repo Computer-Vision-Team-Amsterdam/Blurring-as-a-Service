@@ -1,13 +1,13 @@
 import unittest
 
 import numpy as np
+from cvtoolkit.datasets.yolo_labels_dataset import YoloLabelsDataset
 from numpy.testing import assert_allclose
 
 from blurring_as_a_service.performace_evaluation_pipeline.metrics.metrics_utils import (
     ImageSize,
     TargetClass,
 )
-from blurring_as_a_service.utils.yolo_labels_dataset import YoloLabelsDataset
 
 
 def expected_output_get_item():
