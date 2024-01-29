@@ -116,46 +116,43 @@ def detect_and_blur_sensitive_data(
                     yolo_yaml_path, batch_file_txt
                 )  # use outputs folder as Azure expects outputs there
 
-                read_success = False
                 try:
                     with LockFile(file_path) as src:
                         with open(files_to_blur_full_path, "w") as dest:
                             for line in src:
                                 dest.write(f"{input_structured_folder}/{line}")
-                            read_success = True
+                        data = dict(
+                            train=f"{files_to_blur_full_path}",
+                            val=f"{files_to_blur_full_path}",
+                            test=f"{files_to_blur_full_path}",
+                            nc=2,
+                            names=["person", "license_plate"],
+                        )
+
+                        # Remove the extension
+                        file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
+                        yaml_name = f"{file_name_without_extension}_pano.yaml"
+
+                        with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
+                            yaml.dump(data, outfile, default_flow_style=False)
+                        cuda_device = torch.cuda.current_device()
+                        model_parameters = json.loads(model_parameters_json)
+                        database_parameters = json.loads(database_parameters_json)
+                        val.run(
+                            weights=model,
+                            data=f"{yolo_yaml_path}/{yaml_name}",
+                            project=results_path,
+                            device=cuda_device,
+                            name="",
+                            customer_name=customer_name,
+                            start_time=get_current_time(),
+                            run_id=generate_unique_string(10),
+                            **model_parameters,
+                            **database_parameters,
+                        )
+                        delete_file(files_to_blur_full_path)
+                        delete_file(f"{yolo_yaml_path}/{yaml_name}")
+
+                    delete_file(file_path)
                 except Exception as e:
                     logger.error(e)
-
-                if read_success:
-                    data = dict(
-                        train=f"{files_to_blur_full_path}",
-                        val=f"{files_to_blur_full_path}",
-                        test=f"{files_to_blur_full_path}",
-                        nc=2,
-                        names=["person", "license_plate"],
-                    )
-
-                    # Remove the extension
-                    file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
-                    yaml_name = f"{file_name_without_extension}_pano.yaml"
-
-                    with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
-                        yaml.dump(data, outfile, default_flow_style=False)
-                    cuda_device = torch.cuda.current_device()
-                    model_parameters = json.loads(model_parameters_json)
-                    database_parameters = json.loads(database_parameters_json)
-                    val.run(
-                        weights=model,
-                        data=f"{yolo_yaml_path}/{yaml_name}",
-                        project=results_path,
-                        device=cuda_device,
-                        name="",
-                        customer_name=customer_name,
-                        start_time=get_current_time(),
-                        run_id=generate_unique_string(10),
-                        **model_parameters,
-                        **database_parameters,
-                    )
-                    delete_file(files_to_blur_full_path)
-                    delete_file(f"{yolo_yaml_path}/{yaml_name}")
-                    delete_file(file_path)
