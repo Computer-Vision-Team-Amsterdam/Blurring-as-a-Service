@@ -1,10 +1,15 @@
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.training_pipeline.components.train_model import train_model
-from blurring_as_a_service.utils.aml_interface import AMLInterface
+from blurring_as_a_service.training_pipeline.components.train_model import (  # noqa: E402
+    train_model,
+)
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @pipeline()

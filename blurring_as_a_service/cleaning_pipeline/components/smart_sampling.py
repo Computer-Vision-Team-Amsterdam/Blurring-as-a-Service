@@ -9,11 +9,10 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 
+from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
-)
-from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
-    setup_azure_logging,
 )
 
 config_path = os.path.abspath(

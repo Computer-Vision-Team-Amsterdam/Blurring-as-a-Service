@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "blurring_as_a_service"
-version = "0.1.0"
+version = "1.0.0"
 description = ""
 authors = [
     "Sebastian Davrieux <s.davrieux@amsterdam.nl>",
@@ -11,10 +11,12 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "~3.8"
+aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git",  tag = "v1.0.0" }
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
 azure-cli = {version = "2.51.0", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
 cryptography = {version = "<39.0.0", source = "PyPI"}
+cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v1.0.0" }
 dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
 fonttools = {version = "4.45.1", source = "PyPI"}
 GitPython = {version = ">=3.1.30", source = "PyPI"}
@@ -53,7 +55,8 @@ tqdm = {version = ">=4.64.0", source = "PyPI"}
 urllib3 = {version = ">=2.0.6", source = "PyPI"}
 virtualenv = {version = "20.24.7", source = "PyPI"}
 wheel = {version = "^0.42.0", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git", tag = "v0.5.2"}
+yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git", tag = "v0.5.3" }
+
 
 [tool.poetry.dev-dependencies]
 

@@ -13,11 +13,10 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 
+from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
+
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
-)
-from blurring_as_a_service.settings.settings_helper import (  # noqa: E402
-    setup_azure_logging,
 )
 
 config_path = os.path.abspath(
@@ -25,14 +24,14 @@ config_path = os.path.abspath(
 )
 
 settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
-log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 
 # DO NOT import relative paths before setting up the logger.
 # Exception, of course, is settings to set up the logger.
-setup_azure_logging(log_settings, __name__)
+setup_azure_logging(settings["logging"], __name__)
 
-from blurring_as_a_service.utils.generics import delete_file  # noqa: E402
-from blurring_as_a_service.utils.lock_file import LockFile  # noqa: E402
+
+from cvtoolkit.helpers.file_helpers import delete_file  # noqa: E402
+from cvtoolkit.multiprocessing.lock_file import LockFile  # noqa: E402
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
@@ -121,6 +120,7 @@ def detect_and_blur_sensitive_data(
                         with open(files_to_blur_full_path, "w") as dest:
                             for line in src:
                                 dest.write(f"{input_structured_folder}/{line}")
+
                         data = dict(
                             train=f"{files_to_blur_full_path}",
                             val=f"{files_to_blur_full_path}",
@@ -135,6 +135,7 @@ def detect_and_blur_sensitive_data(
 
                         with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
                             yaml.dump(data, outfile, default_flow_style=False)
+
                         cuda_device = torch.cuda.current_device()
                         model_parameters = json.loads(model_parameters_json)
                         database_parameters = json.loads(database_parameters_json)

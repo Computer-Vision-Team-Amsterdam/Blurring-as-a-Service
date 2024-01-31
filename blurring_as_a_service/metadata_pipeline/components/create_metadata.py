@@ -15,9 +15,10 @@ from blurring_as_a_service.settings.settings import (  # noqa: E402
 config_path = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
 )
-aml_experiment_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)[
-    "aml_experiment_details"
-]
+BlurringAsAServiceSettings.set_from_yaml(config_path)
+settings = BlurringAsAServiceSettings.get_settings()
+
+aml_experiment_settings = settings["aml_experiment_details"]
 
 
 @command_component(

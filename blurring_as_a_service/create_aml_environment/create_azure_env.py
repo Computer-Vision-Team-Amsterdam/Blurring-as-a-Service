@@ -1,5 +1,6 @@
+from aml_interface.aml_interface import AMLInterface
+
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-from blurring_as_a_service.utils.aml_interface import AMLInterface
 
 
 def main():
