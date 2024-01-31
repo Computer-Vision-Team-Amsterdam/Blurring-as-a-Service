@@ -153,6 +153,7 @@ def detect_and_blur_sensitive_data(
                         )
                         delete_file(files_to_blur_full_path)
                         delete_file(f"{yolo_yaml_path}/{yaml_name}")
-                        delete_file(file_path)
+
+                    delete_file(file_path)
                 except Exception as e:
                     logger.error(e)
