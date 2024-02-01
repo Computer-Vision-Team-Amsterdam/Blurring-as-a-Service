@@ -105,13 +105,14 @@ class DatabaseCredentialsSpec(SettingsSpecModel):
     db_username: str
     db_hostname: str
     db_name: str
+    client_id: str
 
 
 class InferenceCustomerPipelineSpec(SettingsSpecModel):
     model_name: str
     model_version: str
     model_parameters: InferenceModelParameters
-    
+
 
 class SmartSamplingPipelineSpec(SettingsSpecModel):
     quality_check_sample_size: int = 10

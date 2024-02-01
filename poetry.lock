@@ -1609,7 +1609,7 @@ test = ["pytest (>=6.2.0)", "pytest-benchmark", "pytest-cov", "pytest-subtests",
 
 [[package]]
 name = "cvtoolkit"
-version = "1.0.0"
+version = "1.0.1"
 description = "CVToolkit is a collection of essential utilities for computer vision team projects, enhancing reusability and boosting productivity across multiple projects."
 category = "main"
 optional = false
@@ -1627,8 +1627,8 @@ torch = ">=1.7.0"
 [package.source]
 type = "git"
 url = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git"
-reference = "v1.0.0"
-resolved_reference = "bacbeeef4bcbf9f92338dbd55266d2ad8827d0a7"
+reference = "v1.0.1"
+resolved_reference = "42e1ec25fa95a8c4625d7b79817e7763cf90d707"
 
 [[package]]
 name = "cycler"
@@ -3231,7 +3231,7 @@ python-versions = "*"
 
 [[package]]
 name = "yolov5"
-version = "0.5.3"
+version = "0.5.4"
 description = ""
 category = "main"
 optional = false
@@ -3239,7 +3239,7 @@ python-versions = "~3.8"
 develop = false
 
 [package.dependencies]
-cvtoolkit = {git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git", tag = "v1.0.0"}
+cvtoolkit = {git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git", tag = "v1.0.1"}
 GitPython = "^3.1.31"
 matplotlib = "^3.7.1"
 numpy = "^1.24.2"
@@ -3265,8 +3265,8 @@ yapf = "^0.32.0"
 [package.source]
 type = "git"
 url = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git"
-reference = "v0.5.3"
-resolved_reference = "2164054d36bf863c5d769cd2a137f4136ca90257"
+reference = "v0.5.4"
+resolved_reference = "58c85c442bd26dc275871a8adb2243bffb6d6a22"
 
 [[package]]
 name = "zipp"
@@ -3283,7 +3283,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-ena
 [metadata]
 lock-version = "1.1"
 python-versions = "~3.8"
-content-hash = "16ae86b99ec02f19696a456abbff7d74fe0c44bc999760d39ebf20e36ccf2e31"
+content-hash = "dae271597d6104e9e03057161312b0198f52ecccdf3aa47795806bed9098556f"
 
 [metadata.files]
 absl-py = []
