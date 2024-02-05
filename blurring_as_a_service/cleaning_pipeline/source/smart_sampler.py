@@ -19,12 +19,12 @@ yolov5_path = os.path.abspath(
 # Add the yolov5 path to sys.path
 sys.path.append(yolov5_path)
 
+from cvtoolkit.database.baas_tables import DetectionInformation  # noqa: E402
 from cvtoolkit.database.database_handler import DBConfigSQLAlchemy  # noqa: E402
 from cvtoolkit.helpers.data_structure_helpers import (  # noqa: E402
     flatten_dict_to_list_of_dicts,
 )
 from cvtoolkit.helpers.file_helpers import copy_file  # noqa: E402
-from yolov5.baas_utils.database_tables import DetectionInformation  # noqa: E402
 
 logger = logging.getLogger(__name__)
 
@@ -195,11 +195,12 @@ class SmartSampler:
             db_username = database_parameters["db_username"]
             db_name = database_parameters["db_name"]
             db_hostname = database_parameters["db_hostname"]
+            client_id = database_parameters["client_id"]
 
             if not db_username or not db_name or not db_hostname:
                 raise ValueError("Please provide database credentials.")
 
-            db_config = DBConfigSQLAlchemy(db_username, db_hostname, db_name)
+            db_config = DBConfigSQLAlchemy(db_username, db_hostname, db_name, client_id)
 
             db_config.create_connection()
 

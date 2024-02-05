@@ -80,6 +80,7 @@ database_parameters:
   db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
   db_username: "aml-compute-cvo-p"
   db_name: "blur"
+  client_id: "" # AML User assigned identity Client ID
 
 logging:
   loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
