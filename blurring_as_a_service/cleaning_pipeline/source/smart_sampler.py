@@ -129,30 +129,32 @@ class SmartSampler:
         """
 
         df_images = self._collect_images_above_threshold_from_db(grouped_images_by_date)
-        df_images, bin_counts = SmartSampler._categorize_images_into_bins(df_images)
+        logger.info(df_images)
 
-        for bin_label, images in bin_counts.items():
-            logger.info(
-                f"Number of images with detections in bin {bin_label}: {len(images)}"
-            )
-
-        ratio = self.sampling_parameters["sampling_ratio"]
-        percentage_ratio = ratio / 100
-        sampled_images_df = SmartSampler._sample_images_equally_from_bins(
-            df_images, percentage_ratio
-        )
-
-        for _, row in sampled_images_df.iterrows():
-            formatted_upload_date = row["image_upload_date"]
-            image_filename = row["image_filename"]
-            copy_file(
-                f"/{formatted_upload_date}/{image_filename}",
-                str(self.input_structured_folder),
-                str(self.customer_retraining_folder),
-            )
-            logger.info(
-                f"Sampled for retraining: /{formatted_upload_date}/{image_filename}"
-            )
+        # df_images, bin_counts = SmartSampler._categorize_images_into_bins(df_images)
+        #
+        # for bin_label, images in bin_counts.items():
+        #     logger.info(
+        #         f"Number of images with detections in bin {bin_label}: {len(images)}"
+        #     )
+        #
+        # ratio = self.sampling_parameters["sampling_ratio"]
+        # percentage_ratio = ratio / 100
+        # sampled_images_df = SmartSampler._sample_images_equally_from_bins(
+        #     df_images, percentage_ratio
+        # )
+        #
+        # for _, row in sampled_images_df.iterrows():
+        #     formatted_upload_date = row["image_upload_date"]
+        #     image_filename = row["image_filename"]
+        #     copy_file(
+        #         f"/{formatted_upload_date}/{image_filename}",
+        #         str(self.input_structured_folder),
+        #         str(self.customer_retraining_folder),
+        #     )
+        #     logger.info(
+        #         f"Sampled for retraining: /{formatted_upload_date}/{image_filename}"
+        #     )
 
     def _collect_images_above_threshold_from_db(
         self, grouped_images_by_date: Dict[str, List[str]]
@@ -212,7 +214,6 @@ class SmartSampler:
                     upload_date_datetime = datetime.strptime(
                         upload_date, "%Y-%m-%d_%H_%M_%S"
                     )
-                    logger.info(f"Formatted Upload Date: {upload_date} \n")
 
                     for image_name in image_names:
                         query = session.query(DetectionInformation).filter(
@@ -225,6 +226,7 @@ class SmartSampler:
                         )
                         results = query.all()
                         count = len(results)
+                        logger.info(f"Count results DB: {count} \n")
 
                         if results:
                             extracted_data = [result.__dict__ for result in results]

@@ -74,7 +74,7 @@ inference_pipeline:
 sampling_parameters:
   quality_check_sample_size: 10
   conf_score_threshold: 0.0005
-  sampling_ratio: 0.5
+  sampling_ratio: 1
 
 database_parameters:
   db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
