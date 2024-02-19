@@ -91,8 +91,8 @@ def smart_sampling(
     )
 
     # smart_sampler.sample_images_for_quality_check(grouped_images_by_date)
-
-    smart_sampler.sample_images_for_retraining(grouped_images_by_date)
+    for date in grouped_images_by_date:
+        smart_sampler.sample_images_for_retraining(date, grouped_images_by_date[date])
 
 
 def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:
