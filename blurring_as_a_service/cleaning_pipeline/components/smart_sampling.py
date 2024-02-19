@@ -90,7 +90,7 @@ def smart_sampling(
         sampling_parameters,
     )
 
-    # smart_sampler.sample_images_for_quality_check(grouped_images_by_date)
+    smart_sampler.sample_images_for_quality_check(grouped_images_by_date)
     for date in grouped_images_by_date:
         smart_sampler.sample_images_for_retraining(date, grouped_images_by_date[date])
 
