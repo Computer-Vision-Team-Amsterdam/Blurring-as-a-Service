@@ -20,9 +20,7 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
-from cvtoolkit.helpers.file_helpers import delete_file  # noqa: E402
-
-from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
+from cvtoolkit.helpers.file_helpers import delete_file, find_image_paths  # noqa: E402
 
 aml_experiment_settings = settings["aml_experiment_details"]
 logger = logging.getLogger("delete_blurred_images")

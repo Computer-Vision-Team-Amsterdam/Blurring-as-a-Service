@@ -16,7 +16,7 @@ azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
 azure-cli = {version = "2.51.0", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
 cryptography = {version = "<39.0.0", source = "PyPI"}
-cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v1.0.1" }
+cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v1.0.2" }
 dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
 fonttools = {version = "4.45.1", source = "PyPI"}
 GitPython = {version = ">=3.1.30", source = "PyPI"}

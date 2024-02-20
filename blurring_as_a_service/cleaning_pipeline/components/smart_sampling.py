@@ -28,10 +28,11 @@ sampling_parameters = settings["sampling_parameters"]
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
+from cvtoolkit.helpers.file_helpers import find_image_paths  # noqa: E402
+
 from blurring_as_a_service.cleaning_pipeline.source.smart_sampler import (  # noqa: E402
     SmartSampler,
 )
-from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
 
 logger = logging.getLogger("smart_sampling")
 
