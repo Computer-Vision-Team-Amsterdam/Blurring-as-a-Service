@@ -4,7 +4,7 @@ import os
 import random
 import sys
 from datetime import datetime
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
@@ -275,7 +275,7 @@ class SmartSampler:
     @staticmethod
     def _categorize_images_into_bins(
         df: pd.DataFrame,
-    ):
+    ) -> Tuple[Dict[str, pd.DataFrame], Dict[str, pd.DataFrame]]:
         """
         Categorizes images into bins based on their detection counts.
 
