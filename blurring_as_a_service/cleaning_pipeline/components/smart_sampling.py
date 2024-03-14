@@ -28,10 +28,11 @@ sampling_parameters = settings["sampling_parameters"]
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
 setup_azure_logging(log_settings, __name__)
 
+from cvtoolkit.helpers.file_helpers import find_image_paths  # noqa: E402
+
 from blurring_as_a_service.cleaning_pipeline.source.smart_sampler import (  # noqa: E402
     SmartSampler,
 )
-from blurring_as_a_service.utils.generics import find_image_paths  # noqa: E402
 
 logger = logging.getLogger("smart_sampling")
 
@@ -91,8 +92,8 @@ def smart_sampling(
     )
 
     smart_sampler.sample_images_for_quality_check(grouped_images_by_date)
-
-    smart_sampler.sample_images_for_retraining(grouped_images_by_date)
+    for date in grouped_images_by_date:
+        smart_sampler.sample_images_for_retraining(date, grouped_images_by_date[date])
 
 
 def group_files_by_date(strings: List[str]) -> Dict[str, List[str]]:

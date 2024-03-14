@@ -8,6 +8,7 @@ from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd
+from sqlalchemy import func
 from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.append("../../..")
@@ -21,9 +22,6 @@ sys.path.append(yolov5_path)
 
 from cvtoolkit.database.baas_tables import DetectionInformation  # noqa: E402
 from cvtoolkit.database.database_handler import DBConfigSQLAlchemy  # noqa: E402
-from cvtoolkit.helpers.data_structure_helpers import (  # noqa: E402
-    flatten_dict_to_list_of_dicts,
-)
 from cvtoolkit.helpers.file_helpers import copy_file  # noqa: E402
 
 logger = logging.getLogger(__name__)
@@ -78,12 +76,6 @@ class SmartSampler:
         ----------
         grouped_images_by_date : Dict[str, List[str]]
             A dictionary where keys are dates and values are lists of image file names from those dates.
-        input_structured_folder : str
-            The path of the input folder containing images.
-        customer_quality_check_folder : str
-            The destination folder path for the quality check images.
-        n_images_to_sample : int
-            Number of images to sample for each date.
 
         Returns
         -------
@@ -109,7 +101,7 @@ class SmartSampler:
                 )
 
     def sample_images_for_retraining(
-        self, grouped_images_by_date: Dict[str, List[str]]
+        self, date: str, grouped_images: List[str]
     ) -> None:
         """
         Samples images for retraining purposes from the structured input folder. The function first collects images
@@ -119,8 +111,10 @@ class SmartSampler:
 
         Parameters
         ----------
-        grouped_images_by_date : Dict[str, List[str]]
-            A dictionary mapping dates (in 'YYYY-MM-DD_HH_MM_SS' string format) to lists of image filenames.
+        date: str
+            Date (in 'YYYY-MM-DD_HH_MM_SS' string format)
+        grouped_images : Dict[str, List[str]]
+            Lists of image filenames.
             These filenames are used to query the database and collect detection data for the corresponding images.
 
         Returns
@@ -128,7 +122,13 @@ class SmartSampler:
         None
         """
 
-        df_images = self._collect_images_above_threshold_from_db(grouped_images_by_date)
+        df_images = self._collect_images_above_threshold_from_db(date, grouped_images)
+        logger.info(df_images.head())
+
+        if df_images.empty:
+            logger.warning("The dataframe containing the images is empty.")
+            return None
+
         df_images, bin_counts = SmartSampler._categorize_images_into_bins(df_images)
 
         for bin_label, images in bin_counts.items():
@@ -150,26 +150,20 @@ class SmartSampler:
                 str(self.input_structured_folder),
                 str(self.customer_retraining_folder),
             )
-            logger.info(
-                f"Sampled for retraining: /{formatted_upload_date}/{image_filename}"
-            )
+        logger.info(f"Sampled for retraining: {sampled_images_df.count()} images")
 
     def _collect_images_above_threshold_from_db(
-        self, grouped_images_by_date: Dict[str, List[str]]
+        self, date: str, grouped_images: List[str]
     ) -> pd.DataFrame:
         """
         Collects images with detections above a specified confidence score threshold from the database.
 
         Parameters
         ----------
-        database_parameters_json : str
-            JSON string with database connection parameters.
-        grouped_images_by_date : Dict[str, List[str]]
-            A dictionary mapping dates to lists of image filenames.
-        customer_name : str
-            The name of the customer for whom the images belong.
-        conf_score_threshold : float
-            The threshold for the confidence score above which detections are considered.
+        date: str
+            Date (in 'YYYY-MM-DD_HH_MM_SS' string format)
+        grouped_images : Dict[str, List[str]]
+            Lists of image filenames.
 
         Returns
         -------
@@ -186,8 +180,6 @@ class SmartSampler:
         Exception
             For any other unexpected errors that might occur during the execution of the function.
         """
-
-        images_statistics: Dict[str, list] = {}
 
         try:
             # Connect to the database
@@ -207,42 +199,40 @@ class SmartSampler:
             conf_score_threshold = self.sampling_parameters["conf_score_threshold"]
 
             with db_config.managed_session() as session:
-                for upload_date, image_names in grouped_images_by_date.items():
-                    logger.info(f"Upload Date: {upload_date} \n")
-                    upload_date_datetime = datetime.strptime(
-                        upload_date, "%Y-%m-%d_%H_%M_%S"
+                logger.info(f"Upload Date: {date} \n")
+                upload_date_datetime = datetime.strptime(date, "%Y-%m-%d_%H_%M_%S")
+
+                query = (
+                    session.query(
+                        DetectionInformation.image_upload_date,
+                        DetectionInformation.image_filename,
+                        func.count(DetectionInformation.id).label("count"),
                     )
-                    logger.info(f"Formatted Upload Date: {upload_date} \n")
-
-                    for image_name in image_names:
-                        query = session.query(DetectionInformation).filter(
-                            DetectionInformation.image_customer_name
-                            == self.customer_name,
-                            DetectionInformation.image_upload_date
-                            == upload_date_datetime,
-                            DetectionInformation.image_filename == image_name,
-                            DetectionInformation.conf_score > conf_score_threshold,
-                        )
-                        results = query.all()
-                        count = len(results)
-
-                        if results:
-                            extracted_data = [result.__dict__ for result in results]
-                            for data in extracted_data:
-                                data["count"] = count
-
-                            if upload_date in images_statistics:
-                                images_statistics[upload_date].extend(extracted_data)
-                            else:
-                                images_statistics[upload_date] = extracted_data
-
-                flat_list = flatten_dict_to_list_of_dicts(images_statistics)
-
-                df = pd.DataFrame(flat_list)
-                df["image_upload_date"] = pd.to_datetime(df["image_upload_date"])
-                df["image_upload_date"] = df["image_upload_date"].dt.strftime(
-                    "%Y-%m-%d_%H_%M_%S"
+                    .filter(
+                        DetectionInformation.image_customer_name == self.customer_name,
+                        DetectionInformation.image_upload_date == upload_date_datetime,
+                        DetectionInformation.image_filename.in_(grouped_images),
+                        DetectionInformation.conf_score > conf_score_threshold,
+                    )
+                    .group_by(
+                        DetectionInformation.image_customer_name,
+                        DetectionInformation.image_upload_date,
+                        DetectionInformation.image_filename,
+                    )
+                    .statement
                 )
+                results = pd.read_sql_query(sql=query, con=db_config.engine)
+
+                logger.info(f"Count results DB: {results.shape[0]} \n")
+
+                if not results.empty:
+                    results["image_upload_date"] = pd.to_datetime(
+                        results["image_upload_date"]
+                    )
+                    results["image_upload_date"] = results[
+                        "image_upload_date"
+                    ].dt.strftime("%Y-%m-%d_%H_%M_%S")
+                return results
 
         except SQLAlchemyError as e:
             logger.error(f"Database operation failed: {e}")
@@ -250,8 +240,6 @@ class SmartSampler:
             logger.error(f"Configuration error: {e}")
         except Exception as e:
             logger.error(f"An unexpected error occurred: {e}")
-
-        return df
 
     @staticmethod
     def _get_n_random_images_per_date(
@@ -303,18 +291,9 @@ class SmartSampler:
             - A dictionary where keys are bin labels and values are DataFrames of image identifiers in that bin.
             - A list of bin labels.
         """
+        logger.info(f"Number of unique images: {len(df)}")
 
-        if df.empty:
-            logger.info("No detections found for the given criteria.")
-            return {}, {}
-
-        unique_df = df.drop_duplicates(
-            subset=["image_upload_date", "image_customer_name", "image_filename"]
-        ).copy()
-
-        logger.info(f"Number of unique images: {len(unique_df)}")
-
-        min_count, max_count = unique_df["count"].min(), unique_df["count"].max()
+        min_count, max_count = df["count"].min(), df["count"].max()
         logger.info(f"Minimum number of detections for an image: {min_count}")
         logger.info(f"Maximum number of detections for an image: {max_count}")
 
@@ -329,14 +308,14 @@ class SmartSampler:
         bin_labels = SmartSampler._create_bin_labels(bins)
 
         # Categorize images into bins
-        unique_df["bin_label"] = pd.cut(
-            unique_df["count"], bins, labels=bin_labels, include_lowest=True, right=True
+        df["bin_label"] = pd.cut(
+            df["count"], bins, labels=bin_labels, include_lowest=True, right=True
         )
 
         for label in bin_labels:
-            bin_counts[label] = unique_df[unique_df["bin_label"] == label]
+            bin_counts[label] = df[df["bin_label"] == label]
 
-        return unique_df, bin_counts
+        return df, bin_counts
 
     @staticmethod
     def _sample_images_equally_from_bins(
@@ -349,7 +328,7 @@ class SmartSampler:
         ----------
         df : pd.DataFrame
             A DataFrame containing image data with columns including
-            'image_upload_date', 'image_customer_name', 'image_filename', 'bin_label'.
+            'image_upload_date', 'image_filename', 'bin_label'.
         percentage_ratio : float
             The ratio of total images to sample from each date.
 
@@ -464,7 +443,7 @@ class SmartSampler:
 
         Parameters
         ----------
-        samppled_images_df : pd.DataFrame
+        sampled_images_df : pd.DataFrame
             An empty DataFrame to which sampled images are appended.
         df_date : pd.DataFrame
             A DataFrame filtered for a specific date, containing image data including 'bin_label'.
