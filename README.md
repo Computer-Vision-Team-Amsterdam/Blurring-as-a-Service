@@ -58,7 +58,7 @@ setting azure paths of where the data can be located and the flags to enable or 
 ---
 
 ### Pipelines
-More information about the pipelines can be found [here](docs/performance_evaluation_pipeline.md).
+More information about the pipelines can be found on our [Azure DevOps Wiki](https://dev.azure.com/CloudCompetenceCenter/Computer-Vision-Team-Amsterdam/_wiki/wikis/Computer-Vision-Team-Amsterdam.wiki/17263/AML-pipelines).
 
 ### Database
 
@@ -69,3 +69,9 @@ This database.json file should include the following information:
 ``` 
     client_id:      client id of the managed identity in Azure
 ```
+
+
+### Monitoring
+
+We monitor the health of the pipelines in the BaaS workbook which can be found in [portal](https://portal.azure.com/#@amsterdam.nl/resource/subscriptions/5e762a44-83c7-4972-b0cb-939aa7845c90/resourceGroups/rg-blur-ont-weu-esy-01/providers/microsoft.insights/workbooks/9b284c8e-c5ca-45fb-9194-65f56c6e5066/overview).
+The [`dashboard`](dashboard) folder contains the workbook in gallery template (.workbook) and ARM template (.json).
