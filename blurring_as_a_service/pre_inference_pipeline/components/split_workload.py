@@ -5,7 +5,7 @@ from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
-from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
+from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
 from blurring_as_a_service.pre_inference_pipeline.source.workload_splitter import (  # noqa: E402
     WorkloadSplitter,
@@ -21,7 +21,8 @@ config_path = os.path.abspath(
 )
 BlurringAsAServiceSettings.set_from_yaml(config_path)
 settings = BlurringAsAServiceSettings.get_settings()
-setup_azure_logging(settings["logging"], __name__)
+azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
+azureLoggingConfigurer.setup_baas_logging()
 
 aml_experiment_settings = settings["aml_experiment_details"]
 

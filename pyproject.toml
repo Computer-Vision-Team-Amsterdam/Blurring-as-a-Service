@@ -11,7 +11,7 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "~3.8"
-aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git",  tag = "v1.0.0" }
+aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", branch = "feature/device-logs" }
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
 azure-cli = {version = "2.51.0", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
@@ -55,7 +55,7 @@ tqdm = {version = ">=4.64.0", source = "PyPI"}
 urllib3 = {version = ">=2.0.6", source = "PyPI"}
 virtualenv = {version = "20.24.7", source = "PyPI"}
 wheel = {version = "^0.42.0", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git", tag = "v0.5.4" }
+yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git", branch = "bugfix/versioning" }
 
 
 [tool.poetry.dev-dependencies]
