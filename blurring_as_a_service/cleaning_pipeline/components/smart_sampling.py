@@ -9,7 +9,7 @@ from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 
-from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
+from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
@@ -26,7 +26,8 @@ sampling_parameters = settings["sampling_parameters"]
 # DO NOT import relative paths before setting up the logger.
 # Exception, of course, is settings to set up the logger.
 log_settings = BlurringAsAServiceSettings.set_from_yaml(config_path)["logging"]
-setup_azure_logging(log_settings, __name__)
+azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
+azureLoggingConfigurer.setup_baas_logging()
 
 from cvtoolkit.helpers.file_helpers import find_image_paths  # noqa: E402
 

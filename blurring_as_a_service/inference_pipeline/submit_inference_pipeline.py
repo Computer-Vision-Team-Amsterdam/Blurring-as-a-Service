@@ -1,7 +1,7 @@
 import json
 import os
 
-from aml_interface.azure_logging import setup_azure_logging  # noqa: E402
+from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
@@ -12,7 +12,8 @@ from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 # Exception, of course, is settings to set up the logger.
 BlurringAsAServiceSettings.set_from_yaml("config.yml")
 settings = BlurringAsAServiceSettings.get_settings()
-setup_azure_logging(settings["logging"], __name__)
+azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
+azureLoggingConfigurer.setup_baas_logging()
 
 from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
