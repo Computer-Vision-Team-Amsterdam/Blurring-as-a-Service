@@ -24,33 +24,38 @@ git clone git@github.com:Computer-Vision-Team-Amsterdam/Blurring-as-a-Service.gi
 #### 2. Install Poetry
 If you don't have it yet, follow the instructions [here](https://python-poetry.org/docs/#installation) to install the package manager Poetry.
 
+#### 3. Install libpq-dev
+To be able to install psycopg2 to interact with the database libpq-dev is needed:
+```bash
+sudo apt-get install libpq-dev
+```
 
-#### 3. Init submodules
+#### 4. Init submodules
 You need to initialize the content of the submodules so git clones the latest version.
 ```bash
 git submodule update --init --recursive
 ```
 
-#### 4. Setup the AzureML connection
+#### 5. Setup the AzureML connection
 To allow your code to connect to Azure ML and train the model is necessary to retrieve a connection config.
 This can be done clicking on the change workspace button located on the top right in the [AzureML website](https://ml.azure.com), and then in "Download config file".
 The downloaded "config.json" file must be added in the top folder of the project.
 
-#### 5. Install dependencies
+#### 6. Install dependencies
 In the terminal, navigate to the project root (the folder containing `pyproject.toml`), then use Poetry to create a new virtual environment and install the dependencies.
 
 ```bash
 poetry install
 ```
     
-#### 6. Install pre-commit hooks
+#### 7. Install pre-commit hooks
 The pre-commit hooks help to ensure that all committed code is valid and consistently formatted.
 
 ```bash
 poetry run pre-commit install
 ```
 
-#### 7. Setup running configuration
+#### 8. Setup running configuration
 Copy the config.example.yml file and rename it to config.yml.
 Adapt the config file to your execution configuration, 
 setting azure paths of where the data can be located and the flags to enable or disable pipeline steps.
