@@ -112,6 +112,9 @@ class InferenceCustomerPipelineSpec(SettingsSpecModel):
     model_name: str
     model_version: str
     model_parameters: InferenceModelParameters
+    datastore_input_structured: str
+    datastore_output: str
+    datastore_output_path: str = None
 
 
 class SmartSamplingPipelineSpec(SettingsSpecModel):

@@ -70,6 +70,9 @@ inference_pipeline:
     save_blurred_image: True
     batch_size: 4
     conf_thres: 0.0001
+  datastore_input_structured: "dataoffice_input_structured"
+  datastore_output: "dataoffice_output"
+  datastore_output_path: "output_blurred"
 
 sampling_parameters:
   quality_check_sample_size: 10

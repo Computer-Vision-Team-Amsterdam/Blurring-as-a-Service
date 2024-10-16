@@ -11,9 +11,9 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "~3.8"
-aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.0" }
+aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.1" }
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
-azure-cli = {version = "2.51.0", source = "PyPI"}
+azure-cli = {version = ">=2.51.0", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}
 cryptography = {version = "<39.0.0", source = "PyPI"}
 cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v1.0.3" }
@@ -41,11 +41,11 @@ PyYAML = {version = ">=5.3.1", source = "PyPI"}
 pytest = {version = "^7.2.1", source = "PyPI"}
 python-geohash = {version = "^0.8.5", source = "PyPI"}
 psutil = {version = "^5.9.4", source = "PyPI"}
-psycopg2 = {version = "2.9.3", source = "PyPI"}
+psycopg2 = {version = ">=2.9.3", source = "PyPI"}
 requests = {version = ">=2.23.0", source = "PyPI"}
 scipy = {version = "^1.10.1", source = "PyPI"}
 seaborn = {version = ">=0.11.0", source = "PyPI"}
-setuptools = {version = ">=65.5.1", source = "PyPI"}
+setuptools = {version = ">=69.5.1", source = "PyPI"}
 sqlalchemy = {version = "1.4.50", source = "PyPI"}
 tensorboard = {version = ">=2.4.1", source = "PyPI"}
 thop = {version = ">=0.1.1", source = "PyPI"}
