@@ -11,7 +11,7 @@ authors = [
 
 [tool.poetry.dependencies]
 python = "~3.8"
-aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.0.0" }
+aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.1" }
 azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
 azure-cli = {version = ">=2.51.0", source = "PyPI"}
 azure-identity = {version = "^1.12.0", source = "PyPI"}

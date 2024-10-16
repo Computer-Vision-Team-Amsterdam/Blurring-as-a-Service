@@ -30,7 +30,7 @@ requests = ">=2.0.0,<3"
 
 [[package]]
 name = "aml-interface"
-version = "1.0.0"
+version = "1.1.1"
 description = "AML-Interface is developed with the purpose of simplifying the use of AzureML, adding an abstraction layer over repetitive AzureML functions."
 optional = false
 python-versions = "~3.8"
@@ -43,8 +43,8 @@ azure-ai-ml = "^1.2.0"
 [package.source]
 type = "git"
 url = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git"
-reference = "v1.0.0"
-resolved_reference = "ab1a89e53e7f4592c4785dcd99e97f665b32b277"
+reference = "v1.1.1"
+resolved_reference = "ee5280d945607f36ed1af113d3248f228db36a9c"
 
 [[package]]
 name = "antlr4-python3-runtime"
@@ -4869,13 +4869,13 @@ files = [
 
 [[package]]
 name = "tomli"
-version = "2.0.1"
+version = "2.0.2"
 description = "A lil' TOML parser"
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "tomli-2.0.1-py3-none-any.whl", hash = "sha256:939de3e7a6161af0c887ef91b7d41a53e7c5a1ca976325f429cb46ea9bc30ecc"},
-    {file = "tomli-2.0.1.tar.gz", hash = "sha256:de526c12914f0c550d15924c62d72abc48d6fe7364aa87328337a31007fe8a4f"},
+    {file = "tomli-2.0.2-py3-none-any.whl", hash = "sha256:2ebe24485c53d303f690b0ec092806a085f07af5a5aa1464f3931eec36caaa38"},
+    {file = "tomli-2.0.2.tar.gz", hash = "sha256:d46d457a85337051c36524bc5349dd91b1877838e2979ac5ced3e710ed8a60ed"},
 ]
 
 [[package]]
@@ -5233,4 +5233,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.0"
 python-versions = "~3.8"
-content-hash = "8dff844f06c93620504ce2f193f1e8dede38357b904d10333461e5638dda7be6"
+content-hash = "13e469ffc51f85e6d927bcf6e29df5a77f7eb374246ee96328861506e10e8573"
