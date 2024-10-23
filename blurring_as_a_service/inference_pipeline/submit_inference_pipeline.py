@@ -25,12 +25,13 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 @pipeline()
 def inference_pipeline():
     customer_name = settings["customer"]
+    inference_settings = settings["inference_pipeline"]
     model_name = inference_settings["model_name"]
     model_version = inference_settings["model_version"]
 
     # Format the root path of the Blob Storage Container in Azure using placeholders
     input_structured_path = aml_interface.get_datastore_full_path(
-        f"{customer_name}_input_structured"
+        inference_settings["datastore_input_structured"]
     )
 
     input_structured_input = Input(
@@ -67,7 +68,7 @@ def inference_pipeline():
     )
 
     azureml_outputs_formatted = aml_interface.get_datastore_full_path(
-        f"{customer_name}_output"
+        inference_settings["datastore_output"]
     )
 
     detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(

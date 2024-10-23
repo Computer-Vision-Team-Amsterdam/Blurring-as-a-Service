@@ -102,6 +102,9 @@ def detect_and_blur_sensitive_data(
     logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
+    datastore_output_path = settings["inference_pipeline"]["datastore_output_path"]
+    if datastore_output_path:
+        results_path = os.path.join(results_path, datastore_output_path)
     # Iterate over files in the folder
     for batch_file_txt in os.listdir(batches_files_path):
         if batch_file_txt.endswith(".txt"):
