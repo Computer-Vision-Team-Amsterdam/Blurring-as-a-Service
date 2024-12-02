@@ -6,6 +6,7 @@ import string
 import sys
 from datetime import datetime
 
+import traceback
 import torch
 import yaml
 from azure.ai.ml.constants import AssetTypes
@@ -106,19 +107,20 @@ def detect_and_blur_sensitive_data(
     if datastore_output_path:
         results_path = os.path.join(results_path, datastore_output_path)
     # Iterate over files in the folder
-    for batch_file_txt in os.listdir(batches_files_path):
+    batch_files_to_iterate = os.listdir(batches_files_path)
+    logging.info(f"Batches file to do: {batch_files_to_iterate}")
+    for batch_file_txt in batch_files_to_iterate:
         if batch_file_txt.endswith(".txt"):
             file_path = os.path.join(batches_files_path, batch_file_txt)
+            try:
+                # Check if the path points to a file (not a directory) and if the file exists
+                if os.path.isfile(file_path) and os.path.exists(file_path):
+                    logger.info(f"Creating inference step: {file_path}")
 
-            # Check if the path points to a file (not a directory) and if the file exists
-            if os.path.isfile(file_path) and os.path.exists(file_path):
-                logger.info(f"Creating inference step: {file_path}")
+                    files_to_blur_full_path = os.path.join(
+                        yolo_yaml_path, batch_file_txt
+                    )  # use outputs folder as Azure expects outputs there
 
-                files_to_blur_full_path = os.path.join(
-                    yolo_yaml_path, batch_file_txt
-                )  # use outputs folder as Azure expects outputs there
-
-                try:
                     with LockFile(file_path) as src:
                         with open(files_to_blur_full_path, "w") as dest:
                             for line in src:
@@ -158,5 +160,6 @@ def detect_and_blur_sensitive_data(
                         delete_file(f"{yolo_yaml_path}/{yaml_name}")
 
                     delete_file(file_path)
-                except Exception as e:
-                    logger.error(e)
+            except Exception as e:
+                logger.error(e)
+                logger.error(traceback.format_exc())

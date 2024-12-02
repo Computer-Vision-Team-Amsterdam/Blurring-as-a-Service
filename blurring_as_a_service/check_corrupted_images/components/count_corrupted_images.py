@@ -1,15 +1,14 @@
 import os
 import sys
+import logging
 
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Input, Output, command_component
+from mldesigner import Output, command_component
+
 
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
-from blurring_as_a_service.pre_inference_pipeline.source.workload_splitter import (  # noqa: E402
-    WorkloadSplitter,
-)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -24,27 +23,22 @@ settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
+from blurring_as_a_service.check_corrupted_images.source.count_corrupted_images_per_folder import count_corrupted_images_per_folder  # noqa: E402
+
+
 aml_experiment_settings = settings["aml_experiment_details"]
 
 
 @command_component(
-    name="split_workload",
-    display_name="Distribute the images into multiple batches",
+    name="count_corrupted_images",
+    display_name="Count corrupted images in input_structured folder",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
     is_deterministic=False,
 )
-def split_workload(
-    data_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    datastore_input_path: str,
-    execution_time: str,
-    number_of_batches: int,
-    results_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+def count_corrupted_images(
+    input_structured_container: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
-    WorkloadSplitter.create_batches(
-        data_folder=data_folder,
-        datastore_input_path=datastore_input_path,
-        number_of_batches=number_of_batches,
-        output_folder=results_folder,
-        execution_time=execution_time,
-    )
+    image_counts = count_corrupted_images_per_folder(input_structured_container)
+    for folder, count in image_counts.items():
+        logging.info(f"{folder}: {count} images")

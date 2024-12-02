@@ -88,6 +88,10 @@ class PreInferencePipelineInputs(SettingsSpecModel):
 
 
 class PreInferencePipelineSpec(SettingsSpecModel):
+    datastore_input: str
+    datastore_input_path: str
+    execution_time: str
+    datastore_output: str
     inputs: PreInferencePipelineInputs
 
 
