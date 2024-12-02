@@ -28,32 +28,27 @@ from blurring_as_a_service.pre_inference_pipeline.components.split_workload impo
 
 @pipeline()
 def pre_inference_pipeline():
-    execution_time = datetime.now().strftime("%Y-%m-%d_%H_%M_%S")
     number_of_batches = settings["pre_inference_pipeline"]["inputs"][
         "number_of_batches"
     ]
 
-    move_data = move_files(execution_time=execution_time)
     azureml_input_formatted = aml_interface.get_datastore_full_path(
-        f"{settings['customer']}_input"
+        settings["pre_inference_pipeline"]["datastore_input"]
     )
     azureml_output_formatted = aml_interface.get_datastore_full_path(
-        f"{settings['customer']}_input_structured"
-    )
-
-    # NOTE We need to use Output to also delete the files.
-    move_data.outputs.input_container = Output(
-        type="uri_folder", mode="rw_mount", path=azureml_input_formatted
-    )
-
-    move_data.outputs.output_container = Output(
-        type="uri_folder", mode="rw_mount", path=azureml_output_formatted
+        settings["pre_inference_pipeline"]["datastore_output"]
     )
 
     split_workload_step = split_workload(
-        data_folder=move_data.outputs.output_container,
-        execution_time=execution_time,
+        execution_time=settings["pre_inference_pipeline"]["execution_time"],
+        datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
         number_of_batches=number_of_batches,
+    )
+    split_workload_step.outputs.data_folder = Output(
+        type="uri_folder",
+        mode="rw_mount",
+        path=os.path.join(azureml_input_formatted,
+                          settings["pre_inference_pipeline"]["datastore_input_path"]),
     )
     split_workload_step.outputs.results_folder = Output(
         type="uri_folder",

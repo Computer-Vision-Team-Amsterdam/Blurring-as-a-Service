@@ -56,6 +56,10 @@ training_pipeline:
     - NONE
 
 pre_inference_pipeline:
+  datastore_input: "dataoffice_input_structured"
+  datastore_input_path: "2024-10-23_09_03_18"
+  execution_time: "2024-10-23_09_03_18"
+  datastore_output: "dataoffice_input_structured"
   inputs:
     number_of_batches: 1
 
