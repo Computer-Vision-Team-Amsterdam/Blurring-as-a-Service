@@ -11,7 +11,7 @@ from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  #
 
 class WorkloadSplitter:
     @staticmethod
-    def create_batches(data_folder, number_of_batches, output_folder, execution_time):
+    def create_batches(data_folder, datastore_input_path, number_of_batches, output_folder, execution_time):
         """
         Starting from a data folder, iterates over all subfolders and equally groups all jpg files into number_of_batches
         batches. These groups are stored into multiple txt files where each line is a file including the relative path.
@@ -63,4 +63,4 @@ class WorkloadSplitter:
                 for j in range(start_index, end_index):
                     # Only get the relative image paths
                     image_path = image_paths[j][1]
-                    batch_file.write(os.path.join(execution_time, image_path) + "\n")
+                    batch_file.write(os.path.join(datastore_input_path, image_path) + "\n")
