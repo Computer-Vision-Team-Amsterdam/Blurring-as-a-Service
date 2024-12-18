@@ -17,10 +17,6 @@ azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
 from aml_interface.aml_interface import AMLInterface  # noqa: E402
-
-from blurring_as_a_service.pre_inference_pipeline.components.move_files import (  # noqa: E402
-    move_files,
-)
 from blurring_as_a_service.pre_inference_pipeline.components.split_workload import (  # noqa: E402
     split_workload,
 )
@@ -40,7 +36,7 @@ def pre_inference_pipeline():
     )
 
     split_workload_step = split_workload(
-        execution_time=settings["pre_inference_pipeline"]["execution_time"],
+        execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
         datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
         number_of_batches=number_of_batches,
     )
