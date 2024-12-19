@@ -24,14 +24,8 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 
 @pipeline()
 def inference_pipeline():
-    customer_name = settings["customer"]
-    inference_settings = settings["inference_pipeline"]
-    model_name = inference_settings["model_name"]
-    model_version = inference_settings["model_version"]
-
-    # Format the root path of the Blob Storage Container in Azure using placeholders
     input_structured_path = aml_interface.get_datastore_full_path(
-        inference_settings["datastore_input_structured"]
+        settings["inference_pipeline"]["datastore_input_structured"]
     )
 
     input_structured_input = Input(
@@ -42,37 +36,27 @@ def inference_pipeline():
 
     model_input = Input(
         type=AssetTypes.CUSTOM_MODEL,
-        path=f"azureml:{model_name}:{model_version}",
+        path=f"azureml:{settings['inference_pipeline']['inputs']['model_name']}:{settings['inference_pipeline']['inputs']['model_version']}",
         description="Model weights for evaluation",
     )
-
-    # Get the txt file that contains all paths of the files to run inference on
-    batches_files_path = os.path.join(
-        input_structured_path,
-        "inference_queue",
-    )
-
-    model_parameters = inference_settings["model_parameters"]
-    model_parameters_json = json.dumps(
-        model_parameters
-    )  # TODO it seems I can not pass a dict to @command_component function
-    database_parameters = settings["database_parameters"]
-    database_parameters_json = json.dumps(database_parameters)
 
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         input_structured_folder=input_structured_input,
         model=model_input,
-        customer_name=customer_name,
-        model_parameters_json=model_parameters_json,
-        database_parameters_json=database_parameters_json,
+        customer_name=settings["customer"],
+        model_parameters_json=json.dumps(
+            settings["inference_pipeline"]["model_parameters"]
+        ),
+        database_parameters_json=json.dumps(settings["database_parameters"]),
     )
 
     azureml_outputs_formatted = aml_interface.get_datastore_full_path(
         inference_settings["datastore_output"]
     )
-
     detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
-        type="uri_folder", mode="rw_mount", path=batches_files_path
+        type="uri_folder",
+        mode="rw_mount",
+        path=os.path.join(input_structured_path, "inference_queue"),
     )
 
     detect_and_blur_sensitive_data_step.outputs.results_path = Output(

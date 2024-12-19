@@ -1,4 +1,4 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional, Tuple
 
 from pydantic import BaseModel
 
@@ -96,13 +96,27 @@ class PreInferencePipelineSpec(SettingsSpecModel):
 
 
 class InferenceModelParameters(SettingsSpecModel):
-    imgsz: int = 4000
-    save_txt: bool = True
-    exist_ok: bool = True
-    skip_evaluation: bool = True
-    save_blurred_image: bool = True
     batch_size: int = 1
-    conf_thres: float = 0.001
+    img_size: int = 640
+    conf: float = 0.5
+    save_img_flag: bool = False
+    save_txt_flag: bool = False
+    save_conf_flag: bool = False
+
+
+class InferencePipelineSpec(SettingsSpecModel):
+    model_params: InferenceModelParameters
+    inputs: Dict[str, str] = None
+    outputs: Dict[str, str] = None
+    target_classes: List[int] = None
+    sensitive_classes: List[int] = []
+    target_classes_conf: Optional[float] = None
+    sensitive_classes_conf: Optional[float] = None
+    output_image_size: Optional[Tuple[int, int]] = None
+    save_detection_images: bool = False
+    save_detection_labels: bool = True
+    save_all_images: bool = False
+    defisheye_flag: bool = False
 
 
 class DatabaseCredentialsSpec(SettingsSpecModel):
@@ -110,15 +124,6 @@ class DatabaseCredentialsSpec(SettingsSpecModel):
     db_hostname: str
     db_name: str
     client_id: str
-
-
-class InferenceCustomerPipelineSpec(SettingsSpecModel):
-    model_name: str
-    model_version: str
-    model_parameters: InferenceModelParameters
-    datastore_input_structured: str
-    datastore_output: str
-    datastore_output_path: str = None
 
 
 class SmartSamplingPipelineSpec(SettingsSpecModel):
@@ -152,7 +157,7 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     performance_evaluation_pipeline: PerformanceEvaluationPipelineSpec = None
     training_pipeline: TrainingPipelineSpec = None
     pre_inference_pipeline: PreInferencePipelineSpec = None
-    inference_pipeline: InferenceCustomerPipelineSpec = None
+    inference_pipeline: InferencePipelineSpec = None
     sampling_parameters: SmartSamplingPipelineSpec = None
     database_parameters: DatabaseCredentialsSpec = None
     logging: LoggingSpec = LoggingSpec()

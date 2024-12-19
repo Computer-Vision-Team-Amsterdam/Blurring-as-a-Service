@@ -1,16 +1,16 @@
-import json
 import logging
 import os
 import secrets
 import string
 import sys
+import traceback
+from collections import defaultdict
 from datetime import datetime
 
-import traceback
-import torch
-import yaml
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
+
+from blurring_as_a_service.inference_pipeline.source.baas_inference import BaaSInference
 
 sys.path.append("../../..")
 
@@ -31,12 +31,9 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
-from cvtoolkit.helpers.file_helpers import delete_file  # noqa: E402
 from cvtoolkit.multiprocessing.lock_file import LockFile  # noqa: E402
 
 aml_experiment_settings = settings["aml_experiment_details"]
-
-import yolov5.val as val  # noqa: E402
 
 
 def generate_unique_string(length):
@@ -117,49 +114,63 @@ def detect_and_blur_sensitive_data(
                 if os.path.isfile(file_path) and os.path.exists(file_path):
                     logger.info(f"Creating inference step: {file_path}")
 
-                    files_to_blur_full_path = os.path.join(
-                        yolo_yaml_path, batch_file_txt
-                    )  # use outputs folder as Azure expects outputs there
+                    # files_to_blur_full_path = os.path.join(
+                    #     yolo_yaml_path, batch_file_txt
+                    # )  # use outputs folder as Azure expects outputs there
 
                     with LockFile(file_path) as src:
-                        with open(files_to_blur_full_path, "w") as dest:
-                            for line in src:
-                                dest.write(f"{input_structured_folder}/{line}")
+                        folders_and_frames = defaultdict(list)
+                        for line in src:
+                            first_parent_folder = line.split("/")[0]
+                            without_parent_folder = "/".join(line.split("\n")[1])
+                            folders_and_frames[
+                                f"{input_structured_folder}/{first_parent_folder}"
+                            ].append(without_parent_folder)
 
-                        data = dict(
-                            train=f"{files_to_blur_full_path}",
-                            val=f"{files_to_blur_full_path}",
-                            test=f"{files_to_blur_full_path}",
-                            nc=2,
-                            names=["person", "license_plate"],
+                        inference_settings = settings["inference_pipeline"]
+                        inference_pipeline = BaaSInference(
+                            images_folder=input_structured_folder,
+                            output_folder=results_path,
+                            model_path=model,
+                            inference_settings=inference_settings,
+                            folders_and_frames=folders_and_frames,
                         )
 
-                        # Remove the extension
-                        file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
-                        yaml_name = f"{file_name_without_extension}_pano.yaml"
+                        inference_pipeline.run_pipeline()
+            #             data = dict(
+            #                 train=f"{files_to_blur_full_path}",
+            #                 val=f"{files_to_blur_full_path}",
+            #                 test=f"{files_to_blur_full_path}",
+            #                 nc=2,
+            #                 names=["person", "license_plate"],
+            #             )
 
-                        with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
-                            yaml.dump(data, outfile, default_flow_style=False)
+            #             # Remove the extension
+            #             file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
+            #             yaml_name = f"{file_name_without_extension}_pano.yaml"
 
-                        cuda_device = torch.cuda.current_device()
-                        model_parameters = json.loads(model_parameters_json)
-                        database_parameters = json.loads(database_parameters_json)
-                        val.run(
-                            weights=model,
-                            data=f"{yolo_yaml_path}/{yaml_name}",
-                            project=results_path,
-                            device=cuda_device,
-                            name="",
-                            customer_name=customer_name,
-                            start_time=get_current_time(),
-                            run_id=generate_unique_string(10),
-                            **model_parameters,
-                            **database_parameters,
-                        )
-                        delete_file(files_to_blur_full_path)
-                        delete_file(f"{yolo_yaml_path}/{yaml_name}")
+            #             with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
+            #                 yaml.dump(data, outfile, default_flow_style=False)
 
-                    delete_file(file_path)
+            #             cuda_device = torch.cuda.current_device()
+            #             model_parameters = json.loads(model_parameters_json)
+            #             database_parameters = json.loads(database_parameters_json)
+            #             val.run(
+            #                 weights=model,
+            #                 data=f"{yolo_yaml_path}/{yaml_name}",
+            #                 project=results_path,
+            #                 device=cuda_device,
+            #                 name="",
+            #                 customer_name=customer_name,
+            #                 start_time=get_current_time(),
+            #                 run_id=generate_unique_string(10),
+            #                 **model_parameters,
+            #                 **database_parameters,
+            #             )
+            #             delete_file(files_to_blur_full_path)
+            #             delete_file(f"{yolo_yaml_path}/{yaml_name}")
+
+            #         delete_file(file_path)
             except Exception as e:
                 logger.error(e)
                 logger.error(traceback.format_exc())
