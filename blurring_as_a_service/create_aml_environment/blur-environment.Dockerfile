@@ -14,7 +14,7 @@ RUN apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
 
 WORKDIR /opt/app
 
-RUN conda create -n env python=3.8
+RUN conda create -n env python=3.12
 RUN echo "source activate env" > ~/.bashrc
 ENV PATH="/opt/miniconda/envs/env/bin:$PATH"
 

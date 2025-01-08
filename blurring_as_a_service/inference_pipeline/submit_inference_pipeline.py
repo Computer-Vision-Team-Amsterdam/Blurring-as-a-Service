@@ -1,4 +1,3 @@
-import json
 import os
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
@@ -25,7 +24,7 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 @pipeline()
 def inference_pipeline():
     input_structured_path = aml_interface.get_datastore_full_path(
-        settings["inference_pipeline"]["datastore_input_structured"]
+        settings["inference_pipeline"]["inputs"]["datastore_path"]
     )
 
     input_structured_input = Input(
@@ -43,15 +42,10 @@ def inference_pipeline():
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         input_structured_folder=input_structured_input,
         model=model_input,
-        customer_name=settings["customer"],
-        model_parameters_json=json.dumps(
-            settings["inference_pipeline"]["model_parameters"]
-        ),
-        database_parameters_json=json.dumps(settings["database_parameters"]),
     )
 
     azureml_outputs_formatted = aml_interface.get_datastore_full_path(
-        inference_settings["datastore_output"]
+        settings["inference_pipeline"]["outputs"]["datastore_path"]
     )
     detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
         type="uri_folder",
@@ -70,7 +64,6 @@ def inference_pipeline():
 
 
 if __name__ == "__main__":
-    inference_settings = settings["inference_pipeline"]
     default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(

@@ -10,12 +10,13 @@ from datetime import datetime
 from azure.ai.ml.constants import AssetTypes
 from mldesigner import Input, Output, command_component
 
-from blurring_as_a_service.inference_pipeline.source.baas_inference import BaaSInference
-
 sys.path.append("../../..")
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
+from blurring_as_a_service.inference_pipeline.source.baas_inference import (  # noqa: E402
+    BaaSInference,
+)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -67,9 +68,6 @@ def detect_and_blur_sensitive_data(
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    customer_name: str,
-    model_parameters_json: str,
-    database_parameters_json: str,
 ):
     """
     Pipeline step to detect the areas to blur and blur those areas.
@@ -100,7 +98,7 @@ def detect_and_blur_sensitive_data(
     logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
-    datastore_output_path = settings["inference_pipeline"]["datastore_output_path"]
+    datastore_output_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
     if datastore_output_path:
         results_path = os.path.join(results_path, datastore_output_path)
     # Iterate over files in the folder
@@ -122,10 +120,11 @@ def detect_and_blur_sensitive_data(
                         folders_and_frames = defaultdict(list)
                         for line in src:
                             first_parent_folder = line.split("/")[0]
-                            without_parent_folder = "/".join(line.split("\n")[1])
+                            without_parent_folder = line.split("/", 1)[1]
                             folders_and_frames[
                                 f"{input_structured_folder}/{first_parent_folder}"
                             ].append(without_parent_folder)
+                        logger.info(f"folders_and_frames: {folders_and_frames}")
 
                         inference_settings = settings["inference_pipeline"]
                         inference_pipeline = BaaSInference(
