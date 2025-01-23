@@ -2,7 +2,7 @@ import os
 import sys
 
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Input, Output, command_component
+from mldesigner import Output, command_component
 
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402

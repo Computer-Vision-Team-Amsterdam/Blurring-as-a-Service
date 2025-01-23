@@ -17,6 +17,7 @@ azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
 from aml_interface.aml_interface import AMLInterface  # noqa: E402
+
 from blurring_as_a_service.pre_inference_pipeline.components.split_workload import (  # noqa: E402
     split_workload,
 )
@@ -27,14 +28,12 @@ def pre_inference_pipeline():
     number_of_batches = settings["pre_inference_pipeline"]["inputs"][
         "number_of_batches"
     ]
-
     azureml_input_formatted = aml_interface.get_datastore_full_path(
         settings["pre_inference_pipeline"]["datastore_input"]
     )
     azureml_output_formatted = aml_interface.get_datastore_full_path(
         settings["pre_inference_pipeline"]["datastore_output"]
     )
-
     split_workload_step = split_workload(
         execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
         datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
@@ -43,22 +42,28 @@ def pre_inference_pipeline():
     split_workload_step.outputs.data_folder = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=os.path.join(azureml_input_formatted,
-                          settings["pre_inference_pipeline"]["datastore_input_path"]),
+        path=os.path.join(
+            azureml_input_formatted,
+            settings["pre_inference_pipeline"]["datastore_input_path"],
+        ),
     )
     split_workload_step.outputs.results_folder = Output(
         type="uri_folder",
         mode="rw_mount",
         path=os.path.join(azureml_output_formatted, "inference_queue"),
     )
-
     return {}
 
 
-if __name__ == "__main__":
-    pre_inference_settings = settings["pre_inference_pipeline"]
+aml_interface = AMLInterface()
+
+
+def main():
     default_compute = settings["aml_experiment_details"]["compute_name"]
-    aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(
         pre_inference_pipeline, "pre_inference_pipeline", default_compute
     )
+
+
+if __name__ == "__main__":
+    main()

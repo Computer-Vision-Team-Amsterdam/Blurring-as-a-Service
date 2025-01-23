@@ -14,6 +14,9 @@ python = "~3.12"
 aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.2" }
 cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v2.0.3" }
 yolo_model_development_kit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/YOLO-model-development-kit.git", branch = "feature/BCV-1495" }
+azure-cli = "^2.67.0"
+psycopg2 = "^2.9.10"
+azureml-core = "^1.59.0"
 
 [[tool.poetry.source]]
 name = "torch"

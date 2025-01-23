@@ -1,22 +1,23 @@
 import logging
 import os
+import re
 import secrets
 import string
 import sys
 import traceback
 from collections import defaultdict
 from datetime import datetime
+from typing import List
 
 from azure.ai.ml.constants import AssetTypes
+from azureml.core import Run
 from mldesigner import Input, Output, command_component
+from sqlalchemy.exc import SQLAlchemyError
 
 sys.path.append("../../..")
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
-from blurring_as_a_service.inference_pipeline.source.baas_inference import (  # noqa: E402
-    BaaSInference,
-)
 from blurring_as_a_service.settings.settings import (  # noqa: E402
     BlurringAsAServiceSettings,
 )
@@ -32,27 +33,22 @@ settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
+from cvtoolkit.database.baas_tables import (  # noqa: E402
+    BatchRunInformation,
+    ImageProcessingStatus,
+)
+from cvtoolkit.helpers.file_helpers import delete_file  # noqa: E402
 from cvtoolkit.multiprocessing.lock_file import LockFile  # noqa: E402
 
+from blurring_as_a_service.inference_pipeline.source.baas_inference import (  # noqa: E402
+    BaaSInference,
+)
+from blurring_as_a_service.inference_pipeline.source.db_utils import (  # noqa: E402
+    create_db_connector,
+)
+
 aml_experiment_settings = settings["aml_experiment_details"]
-
-
-def generate_unique_string(length):
-    # Define the characters to use in the random part of the string
-    characters = string.ascii_letters + string.digits
-
-    # Generate a random string of the specified length
-    unique_string = "".join(secrets.choice(characters) for _ in range(length))
-
-    return unique_string
-
-
-def get_current_time():
-    current_time = datetime.now()
-    current_time_str = current_time.strftime(
-        "%Y-%m-%d %H:%M:%S"
-    )  # Format the datetime as a string
-    return current_time_str
+run_id = Run.get_context().id
 
 
 @command_component(
@@ -66,7 +62,6 @@ def detect_and_blur_sensitive_data(
     input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    yolo_yaml_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     """
@@ -84,92 +79,247 @@ def detect_and_blur_sensitive_data(
          Each row is a relative path to {customer_name}_input_structured/inference_queue
     results_path:
         Where to store the results.
-    yolo_yaml_path:
-        Where to store the yaml file which is used during validation
     customer_name
         The name of the customer, with spaces replaced by underscores
     model_parameters_json
         All parameters used to run YOLOv5 inference in json format
     database_parameters_json
         Database credentials
-
     """
-    # Check if the folder exists
+    start_time = get_current_time()
     logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
     datastore_output_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
     if datastore_output_path:
         results_path = os.path.join(results_path, datastore_output_path)
-    # Iterate over files in the folder
     batch_files_to_iterate = os.listdir(batches_files_path)
     logging.info(f"Batches file to do: {batch_files_to_iterate}")
+    error_trace = ""
     for batch_file_txt in batch_files_to_iterate:
         if batch_file_txt.endswith(".txt"):
             file_path = os.path.join(batches_files_path, batch_file_txt)
             try:
-                # Check if the path points to a file (not a directory) and if the file exists
                 if os.path.isfile(file_path) and os.path.exists(file_path):
                     logger.info(f"Creating inference step: {file_path}")
-
-                    # files_to_blur_full_path = os.path.join(
-                    #     yolo_yaml_path, batch_file_txt
-                    # )  # use outputs folder as Azure expects outputs there
-
                     with LockFile(file_path) as src:
-                        folders_and_frames = defaultdict(list)
-                        for line in src:
-                            first_parent_folder = line.split("/")[0]
-                            without_parent_folder = line.split("/", 1)[1]
-                            folders_and_frames[
-                                f"{input_structured_folder}/{first_parent_folder}"
-                            ].append(without_parent_folder)
-                        logger.info(f"folders_and_frames: {folders_and_frames}")
-
-                        inference_settings = settings["inference_pipeline"]
+                        preprocessing_date = datetime.strptime(
+                            re.search(
+                                r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", batch_file_txt
+                            ).group(),
+                            "%Y-%m-%d_%H_%M_%S",
+                        ).strftime("%Y-%m-%d %H:%M:%S")
+                        folders_and_frames = create_dict_folders_and_frames_to_blur(
+                            input_structured_folder, src, preprocessing_date
+                        )
                         inference_pipeline = BaaSInference(
                             images_folder=input_structured_folder,
                             output_folder=results_path,
                             model_path=model,
-                            inference_settings=inference_settings,
+                            inference_settings=settings["inference_pipeline"],
                             folders_and_frames=folders_and_frames,
+                            customer_name=settings["customer"],
+                            image_upload_date=preprocessing_date,
                         )
 
                         inference_pipeline.run_pipeline()
-            #             data = dict(
-            #                 train=f"{files_to_blur_full_path}",
-            #                 val=f"{files_to_blur_full_path}",
-            #                 test=f"{files_to_blur_full_path}",
-            #                 nc=2,
-            #                 names=["person", "license_plate"],
-            #             )
-
-            #             # Remove the extension
-            #             file_name_without_extension = batch_file_txt.rsplit(".", 1)[0]
-            #             yaml_name = f"{file_name_without_extension}_pano.yaml"
-
-            #             with open(f"{yolo_yaml_path}/{yaml_name}", "w") as outfile:
-            #                 yaml.dump(data, outfile, default_flow_style=False)
-
-            #             cuda_device = torch.cuda.current_device()
-            #             model_parameters = json.loads(model_parameters_json)
-            #             database_parameters = json.loads(database_parameters_json)
-            #             val.run(
-            #                 weights=model,
-            #                 data=f"{yolo_yaml_path}/{yaml_name}",
-            #                 project=results_path,
-            #                 device=cuda_device,
-            #                 name="",
-            #                 customer_name=customer_name,
-            #                 start_time=get_current_time(),
-            #                 run_id=generate_unique_string(10),
-            #                 **model_parameters,
-            #                 **database_parameters,
-            #             )
-            #             delete_file(files_to_blur_full_path)
-            #             delete_file(f"{yolo_yaml_path}/{yaml_name}")
-
-            #         delete_file(file_path)
+                    delete_file(file_path)
             except Exception as e:
                 logger.error(e)
                 logger.error(traceback.format_exc())
+                error_trace += f"{e}\n"
+
+                db_connector = create_db_connector()
+                db_connector.create_connection()
+                try:
+                    with db_connector.managed_session() as session:
+                        batch_info = BatchRunInformation(
+                            run_id=run_id,
+                            start_time=start_time,
+                            end_time=get_current_time(),
+                            trained_yolo_model=os.path.split(model)[-1],
+                            success=False,
+                            error_code=e,
+                        )
+                        session.add(batch_info)
+                except SQLAlchemyError as e:
+                    db_connector.close_connection()
+                    raise e
+                db_connector.close_connection()
+
+    db_connector = create_db_connector()
+    db_connector.create_connection()
+    try:
+        with db_connector.managed_session() as session:
+            batch_info = BatchRunInformation(
+                run_id=run_id,
+                start_time=start_time,
+                end_time=get_current_time(),
+                trained_yolo_model=os.path.split(model)[-1],
+                success=not bool(error_trace),
+                error_code=error_trace if error_trace else None,
+            )
+            session.add(batch_info)
+    except SQLAlchemyError as e:
+        db_connector.close_connection()
+        raise e
+    db_connector.close_connection()
+
+
+def create_dict_folders_and_frames_to_blur(
+    input_structured_folder: str, src: List[str], preprocessing_date: str
+) -> defaultdict[str, List[str]]:
+    """
+    Create a dictionary mapping folders to frames that need to be blurred.
+
+    This function reads lines from the source list, filters out already processed images,
+    and constructs a dictionary where the keys are folder paths and the values are lists
+    of frames that need to be blurred.
+
+    Parameters
+    ----------
+    input_structured_folder : str
+        Path of the folder containing the images.
+    src : List[str]
+        List of image paths to be processed.
+    preprocessing_date : str
+        The date for which to fetch the processed images.
+
+    Returns
+    -------
+    defaultdict
+        A dictionary where keys are folder paths and values are lists of frames to be blurred.
+    """
+    processed_images = fetch_already_processed_images(preprocessing_date)
+    folders_and_frames = defaultdict(list)
+    for line in src:
+        if line not in processed_images:
+            parent_folder = line.split("/")[0]
+            relative_path = line.split("/", 1)[1]
+            folders_and_frames[f"{input_structured_folder}/{parent_folder}"].append(
+                relative_path
+            )
+            lock_images_that_will_be_blurred(
+                image_filename=line, image_upload_date=preprocessing_date
+            )
+    return folders_and_frames
+
+
+def fetch_already_processed_images(preprocessing_date: str) -> List[str]:
+    """
+    Fetches the filenames of images that have already been processed on a given date.
+
+    This function connects to a database using credentials specified in the settings,
+    queries the database for images that have been processed or are in progress for a
+    specific customer on the given preprocessing date, and returns a list of filenames
+    of these images.
+
+    Parameters
+    ----------
+    preprocessing_date : str
+        The date for which to fetch the processed images.
+
+    Returns
+    -------
+    List[str]
+        A list of filenames of images that have already been processed or are in progress.
+
+    Raises
+    ------
+    ValueError
+        If any of the required database credentials are missing or incomplete.
+    SQLAlchemyError
+        If there is an error querying the database.
+    """
+    db_connector = create_db_connector()
+    db_connector.create_connection()
+    processed_images = []
+    with db_connector.managed_session() as session:
+        try:
+            processed_images = (
+                session.query(
+                    ImageProcessingStatus.image_upload_date,
+                    ImageProcessingStatus.image_filename,
+                )
+                .filter(
+                    ImageProcessingStatus.image_customer_name == settings["customer"],
+                    ImageProcessingStatus.processing_status.in_(
+                        ["inprogress", "processed"]
+                    ),
+                    ImageProcessingStatus.image_upload_date == preprocessing_date,
+                )
+                .all()
+            )
+        except SQLAlchemyError as e:
+            db_connector.close_connection()
+            raise e
+
+    db_connector.close_connection()
+    return [image.image_filename for image in processed_images]
+
+
+def lock_images_that_will_be_blurred(
+    image_filename: str, image_upload_date: str
+) -> None:
+    """
+    Locks the images that will be blurred by updating the processing status in the database.
+
+    Parameters
+    ----------
+    image_filename : str
+        The filename of the image to be processed.
+    image_upload_date : str
+        The upload date of the image.
+
+    Returns
+    -------
+    None
+    """
+    db_connector = create_db_connector()
+    db_connector.create_connection()
+    try:
+        with db_connector.managed_session() as session:
+            image_processing_status = ImageProcessingStatus(
+                image_filename=image_filename,
+                image_upload_date=image_upload_date,
+                image_customer_name=settings["customer"],
+                processing_status="inprogress",
+            )
+            session.add(image_processing_status)
+    except SQLAlchemyError as e:
+        db_connector.close_connection()
+        raise e
+
+    db_connector.close_connection()
+
+
+def generate_random_string(length):
+    """
+    Generate a random string of specified length.
+
+    This function creates a random string consisting of uppercase and lowercase
+    ASCII letters and digits. The length of the generated string is determined
+    by the input parameter `length`.
+
+    Parameters
+    ----------
+        length (int): The length of the random string to be generated.
+
+    Returns
+    -------
+        str: A random string of the specified length.
+    """
+    allowed_characters = string.ascii_letters + string.digits
+    random_string = "".join(secrets.choice(allowed_characters) for _ in range(length))
+    return random_string
+
+
+def get_current_time():
+    """
+    Get the current time formatted as a string.
+
+    Returns
+    -------
+        str: The current time in the format "YYYY-MM-DD HH:MM:SS".
+    """
+    return datetime.now().strftime("%Y-%m-%d %H:%M:%S")

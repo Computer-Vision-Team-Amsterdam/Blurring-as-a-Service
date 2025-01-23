@@ -1,19 +1,27 @@
-import glob
 import os
-import sys
 from collections import defaultdict
 
-# Construct the path to the yolov5 package
-yolov5_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "yolov5")
-)
-# Add the yolov5 path to sys.path
-sys.path.append(yolov5_path)
-from yolov5.utils.dataloaders import IMG_FORMATS  # noqa: E402
+IMG_FORMATS = "bmp", "dng", "jpeg", "jpg", "mpo", "png", "tif", "tiff", "webp", "pfm"
 
 
-def count_corrupted_images_per_folder(input_container):
-    image_counts = defaultdict(lambda: defaultdict(int))
+def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
+    """
+    Count the number of corrupted images in each folder within the input container.
+
+    Parameters
+    ----------
+    input_container : str
+        The path to the input container directory.
+
+    Returns
+    -------
+    defaultdict
+        A nested defaultdict where the keys are folder paths and the values are dictionaries
+        with counts of total, good, empty, and corrupted images.
+    """
+    image_counts: defaultdict[str, defaultdict[str, int]] = defaultdict(
+        lambda: defaultdict(int)
+    )
     for root, _, files in os.walk(input_container):
         total_images = good_images = empty_images = corrupted_images = 0
         for file in files:
@@ -40,14 +48,32 @@ def count_corrupted_images_per_folder(input_container):
 
 
 def check_image(filename: str) -> int:
+    """
+    Checks if an image file is corrupted based on its size and end-of-file marker.
+
+    Parameters
+    ----------
+    filename : str
+        The path to the image file to be checked.
+
+    Returns
+    -------
+    int
+        A validation code indicating the status of the image file:
+        - 0: The image file is valid.
+        - 1: The image file is empty.
+        - 2: The image file does not end with the JPEG end-of-image marker (0xFFD9).
+    """
     validation_code = 0
     statfile = os.stat(filename)
     filesize = statfile.st_size
     if filesize == 0:
         validation_code = 1
     else:
-        with open(filename, 'rb') as f:
+        with open(filename, "rb") as f:
             check_chars = f.read()[-2:]
-        if check_chars != b'\xff\xd9':
+        if (
+            check_chars != b"\xff\xd9"
+        ):  # Check if the last two bytes are the JPEG end-of-image marker
             validation_code = 2
     return validation_code

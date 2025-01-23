@@ -104,6 +104,13 @@ class InferenceModelParameters(SettingsSpecModel):
     save_conf_flag: bool = False
 
 
+class DatabaseCredentialsSpec(SettingsSpecModel):
+    db_username: str
+    db_hostname: str
+    db_name: str
+    client_id: str
+
+
 class InferencePipelineSpec(SettingsSpecModel):
     model_params: InferenceModelParameters
     inputs: Dict[str, str] = None
@@ -117,13 +124,7 @@ class InferencePipelineSpec(SettingsSpecModel):
     save_detection_labels: bool = True
     save_all_images: bool = False
     defisheye_flag: bool = False
-
-
-class DatabaseCredentialsSpec(SettingsSpecModel):
-    db_username: str
-    db_hostname: str
-    db_name: str
-    client_id: str
+    database_parameters: DatabaseCredentialsSpec
 
 
 class SmartSamplingPipelineSpec(SettingsSpecModel):
@@ -159,5 +160,4 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: InferencePipelineSpec = None
     sampling_parameters: SmartSamplingPipelineSpec = None
-    database_parameters: DatabaseCredentialsSpec = None
     logging: LoggingSpec = LoggingSpec()

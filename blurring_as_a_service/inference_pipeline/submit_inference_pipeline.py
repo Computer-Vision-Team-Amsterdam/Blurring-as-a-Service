@@ -26,24 +26,20 @@ def inference_pipeline():
     input_structured_path = aml_interface.get_datastore_full_path(
         settings["inference_pipeline"]["inputs"]["datastore_path"]
     )
-
     input_structured_input = Input(
         type=AssetTypes.URI_FOLDER,
         path=input_structured_path,
         description="Data to be blurred",
     )
-
     model_input = Input(
         type=AssetTypes.CUSTOM_MODEL,
         path=f"azureml:{settings['inference_pipeline']['inputs']['model_name']}:{settings['inference_pipeline']['inputs']['model_version']}",
         description="Model weights for evaluation",
     )
-
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         input_structured_folder=input_structured_input,
         model=model_input,
     )
-
     azureml_outputs_formatted = aml_interface.get_datastore_full_path(
         settings["inference_pipeline"]["outputs"]["datastore_path"]
     )
@@ -52,20 +48,21 @@ def inference_pipeline():
         mode="rw_mount",
         path=os.path.join(input_structured_path, "inference_queue"),
     )
-
     detect_and_blur_sensitive_data_step.outputs.results_path = Output(
         type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
     )
-    detect_and_blur_sensitive_data_step.outputs.yolo_yaml_path = Output(
-        type="uri_folder", mode="rw_mount", path=input_structured_path
-    )
-
     return {}
 
 
-if __name__ == "__main__":
+aml_interface = AMLInterface()
+
+
+def main():
     default_compute = settings["aml_experiment_details"]["compute_name"]
-    aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(
         inference_pipeline, "inference_pipeline", default_compute
     )
+
+
+if __name__ == "__main__":
+    main()

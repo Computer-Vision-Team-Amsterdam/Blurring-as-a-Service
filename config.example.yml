@@ -64,30 +64,39 @@ pre_inference_pipeline:
     number_of_batches: 1
 
 inference_pipeline:
-  model_name: "dataoffice_model"
-  model_version: "1"
-  model_parameters:
-    imgsz: 2048
-    save_txt: True
-    exist_ok: True
-    skip_evaluation: True
-    save_blurred_image: True
+  model_params:
     batch_size: 4
-    conf_thres: 0.0001
-  datastore_input_structured: "dataoffice_input_structured"
-  datastore_output: "dataoffice_output"
-  datastore_output_path: "output_blurred"
+    img_size: 2048
+    conf: 0.0001
+  inputs:
+    datastore_path: "dataoffice_input"
+    inference_data_rel_path: "."
+    model_name: "yolo11m_orbs_lilac_spaceship-2"
+    model_version: "1"
+  outputs:
+    datastore_path: "dataoffice_output"  # empty string "" means same as input datastore
+    output_rel_path: "2023/output_blurred"
+    detections_subfolder: ""
+    labels_subfolder: ""
+  target_classes: []
+  sensitive_classes: [0, 1]
+  target_classes_conf: null  # null means conf is taken from model_params
+  sensitive_classes_conf: null  # null means conf is taken from model_params
+  output_image_size: null  # null means keep original size
+  save_detection_images: True
+  save_detection_labels: True
+  save_all_images: True  # If True, all images will be saved regardless of whether they contain target class objects
+  database_parameters:
+    db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
+    db_username: "aml-compute-cvo-p"
+    db_name: "blur"
+    client_id: "" # AML User assigned identity Client ID
 
 sampling_parameters:
   quality_check_sample_size: 10
   conf_score_threshold: 0.0005
   sampling_ratio: 1
 
-database_parameters:
-  db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
-  db_username: "aml-compute-cvo-p"
-  db_name: "blur"
-  client_id: "" # AML User assigned identity Client ID
 
 logging:
   loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
