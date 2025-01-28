@@ -93,15 +93,15 @@ class BaaSInference(YOLOInference):
         image_upload_date: str
             Date when the images were uploaded.
         """
-        self.folders_and_frames = folders_and_frames
-        self.customer_name = customer_name
-        self.image_upload_date = image_upload_date
         super().__init__(
             images_folder=images_folder,
             output_folder=output_folder,
             model_path=model_path,
             inference_settings=inference_settings,
         )
+        self.folders_and_frames = folders_and_frames
+        self.customer_name = customer_name
+        self.image_upload_date = image_upload_date
 
     def _process_detections(
         self, model_results: List[Results], image_paths: List[str]
