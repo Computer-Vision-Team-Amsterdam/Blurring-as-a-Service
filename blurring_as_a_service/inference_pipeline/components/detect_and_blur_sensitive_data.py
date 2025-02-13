@@ -1,8 +1,6 @@
 import logging
 import os
 import re
-import secrets
-import string
 import sys
 import traceback
 from collections import defaultdict
@@ -18,15 +16,7 @@ sys.path.append("../../..")
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
-
-config_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
-)
-
-settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
+from blurring_as_a_service import settings  # noqa: E402
 
 # DO NOT import relative paths before setting up the logger.
 # Exception, of course, is settings to set up the logger.
@@ -59,17 +49,17 @@ run_id = Run.get_context().id
     is_deterministic=False,
 )
 def detect_and_blur_sensitive_data(
-    input_structured_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    images_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
     batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    results_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    output_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     """
     Pipeline step to detect the areas to blur and blur those areas.
 
     Parameters
     ----------
-    input_structured_folder:
+    images_folder:
         Path of the mounted folder containing the images.
     model:
         Model weights for inference
@@ -77,7 +67,7 @@ def detect_and_blur_sensitive_data(
          Path to folder with multiple text files.
          One text file contains multiple rows.
          Each row is a relative path to {customer_name}_input_structured/inference_queue
-    results_path:
+    output_folder:
         Where to store the results.
     customer_name
         The name of the customer, with spaces replaced by underscores
@@ -90,9 +80,9 @@ def detect_and_blur_sensitive_data(
     logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
-    datastore_output_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
-    if datastore_output_path:
-        results_path = os.path.join(results_path, datastore_output_path)
+    output_rel_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
+    if output_rel_path:
+        output_folder = os.path.join(output_folder, output_rel_path)
     batch_files_to_iterate = os.listdir(batches_files_path)
     logging.info(f"Batches file to do: {batch_files_to_iterate}")
     error_trace = ""
@@ -100,7 +90,7 @@ def detect_and_blur_sensitive_data(
         if batch_file_txt.endswith(".txt"):
             file_path = os.path.join(batches_files_path, batch_file_txt)
             try:
-                if os.path.isfile(file_path) and os.path.exists(file_path):
+                if os.path.isfile(file_path):
                     logger.info(f"Creating inference step: {file_path}")
                     with LockFile(file_path) as src:
                         preprocessing_date = datetime.strptime(
@@ -110,11 +100,11 @@ def detect_and_blur_sensitive_data(
                             "%Y-%m-%d_%H_%M_%S",
                         ).strftime("%Y-%m-%d %H:%M:%S")
                         folders_and_frames = create_dict_folders_and_frames_to_blur(
-                            input_structured_folder, src, preprocessing_date
+                            images_folder, src, preprocessing_date
                         )
                         inference_pipeline = BaaSInference(
-                            images_folder=input_structured_folder,
-                            output_folder=results_path,
+                            images_folder=images_folder,
+                            output_folder=output_folder,
                             model_path=model,
                             inference_settings=settings["inference_pipeline"],
                             folders_and_frames=folders_and_frames,
@@ -291,27 +281,6 @@ def lock_images_that_will_be_blurred(
         raise e
 
     db_connector.close_connection()
-
-
-def generate_random_string(length):
-    """
-    Generate a random string of specified length.
-
-    This function creates a random string consisting of uppercase and lowercase
-    ASCII letters and digits. The length of the generated string is determined
-    by the input parameter `length`.
-
-    Parameters
-    ----------
-        length (int): The length of the random string to be generated.
-
-    Returns
-    -------
-        str: A random string of the specified length.
-    """
-    allowed_characters = string.ascii_letters + string.digits
-    random_string = "".join(secrets.choice(allowed_characters) for _ in range(length))
-    return random_string
 
 
 def get_current_time():

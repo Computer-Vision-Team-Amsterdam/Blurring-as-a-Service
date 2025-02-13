@@ -122,8 +122,7 @@ class InferencePipelineSpec(SettingsSpecModel):
     output_image_size: Optional[Tuple[int, int]] = None
     save_detection_images: bool = False
     save_detection_labels: bool = True
-    save_all_images: bool = False
-    defisheye_flag: bool = False
+    save_all_images: bool = True
     database_parameters: DatabaseCredentialsSpec
 
 

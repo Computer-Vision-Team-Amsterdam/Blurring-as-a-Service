@@ -5,16 +5,10 @@ from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
+from blurring_as_a_service import aml_interface, settings
 
-# DO NOT import relative paths before setting up the logger.
-# Exception, of course, is settings to set up the logger.
-BlurringAsAServiceSettings.set_from_yaml("config.yml")
-settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
-
-from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
 from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensitive_data import (  # noqa: E402
     detect_and_blur_sensitive_data,
@@ -23,12 +17,12 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 
 @pipeline()
 def inference_pipeline():
-    input_structured_path = aml_interface.get_datastore_full_path(
+    images_folder_path = aml_interface.get_datastore_full_path(
         settings["inference_pipeline"]["inputs"]["datastore_path"]
     )
-    input_structured_input = Input(
+    images_folder = Input(
         type=AssetTypes.URI_FOLDER,
-        path=input_structured_path,
+        path=images_folder_path,
         description="Data to be blurred",
     )
     model_input = Input(
@@ -37,24 +31,21 @@ def inference_pipeline():
         description="Model weights for evaluation",
     )
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
-        input_structured_folder=input_structured_input,
+        images_folder=images_folder,
         model=model_input,
-    )
-    azureml_outputs_formatted = aml_interface.get_datastore_full_path(
-        settings["inference_pipeline"]["outputs"]["datastore_path"]
     )
     detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=os.path.join(input_structured_path, "inference_queue"),
+        path=os.path.join(images_folder_path, "inference_queue"),
     )
-    detect_and_blur_sensitive_data_step.outputs.results_path = Output(
-        type="uri_folder", mode="rw_mount", path=azureml_outputs_formatted
+    output_datastore_fullpath = aml_interface.get_datastore_full_path(
+        settings["inference_pipeline"]["outputs"]["datastore_path"]
+    )
+    detect_and_blur_sensitive_data_step.outputs.output_folder = Output(
+        type="uri_folder", mode="rw_mount", path=output_datastore_fullpath
     )
     return {}
-
-
-aml_interface = AMLInterface()
 
 
 def main():

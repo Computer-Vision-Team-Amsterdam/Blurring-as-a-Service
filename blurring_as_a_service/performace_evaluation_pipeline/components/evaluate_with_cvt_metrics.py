@@ -1,10 +1,11 @@
 import json
 import logging
-import os
 import sys
 from pathlib import Path
 
-from mldesigner import Input, Output, command_component  # noqa: E402
+from mldesigner import Input, Output, command_component
+
+from blurring_as_a_service import settings
 
 sys.path.append("../../..")
 
@@ -14,15 +15,6 @@ from blurring_as_a_service.performace_evaluation_pipeline.metrics.fnr_calculator
 from blurring_as_a_service.performace_evaluation_pipeline.metrics.tba_calculator import (  # noqa: E402
     collect_and_store_tba_results_per_class_and_size,
 )
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
-
-config_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
-)
-BlurringAsAServiceSettings.set_from_yaml(config_path)
-settings = BlurringAsAServiceSettings.get_settings()
 
 aml_experiment_settings = settings["aml_experiment_details"]
 

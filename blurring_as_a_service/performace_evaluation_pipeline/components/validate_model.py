@@ -1,25 +1,16 @@
 import json
 import logging
 import os
-import sys
 
 import yaml
 from mldesigner import Input, Output, command_component
 
-sys.path.append("../../..")
-
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
-
-config_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
-)
-BlurringAsAServiceSettings.set_from_yaml(config_path)
-settings = BlurringAsAServiceSettings.get_settings()
+from blurring_as_a_service import settings
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
+# THIS WILL NOT WORK, YOLOV5 IS NOT PART OF THE PROJECT ANYMORE
+# IT NEEDS REFACTORING
 import yolov5.val as val  # noqa: E402
 
 

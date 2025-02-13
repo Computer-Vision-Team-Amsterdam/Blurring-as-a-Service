@@ -1,7 +1,7 @@
 import os
 from collections import defaultdict
 
-IMG_FORMATS = "bmp", "dng", "jpeg", "jpg", "mpo", "png", "tif", "tiff", "webp", "pfm"
+IMG_FORMATS = "jpeg", "jpg"
 
 
 def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
@@ -26,7 +26,7 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
         total_images = good_images = empty_images = corrupted_images = 0
         for file in files:
             if file.lower().endswith(IMG_FORMATS):
-                validation_code = check_image(os.path.join(root, file))
+                validation_code = check_jpgs(os.path.join(root, file))
                 total_images += 1
                 if validation_code == 0:
                     good_images += 1
@@ -47,9 +47,9 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
     return image_counts
 
 
-def check_image(filename: str) -> int:
+def check_jpgs(filename: str) -> int:
     """
-    Checks if an image file is corrupted based on its size and end-of-file marker.
+    Checks if a jpg image file is corrupted based on its size and end-of-file marker.
 
     Parameters
     ----------

@@ -5,18 +5,10 @@ from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 from azure.ai.ml import Output
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
+from blurring_as_a_service import aml_interface, settings
 
-# DO NOT import relative paths before setting up the logger.
-# Exception, of course, is settings to set up the logger.
-BlurringAsAServiceSettings.set_from_yaml("config.yml")
-settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
-
-from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
 from blurring_as_a_service.pre_inference_pipeline.components.split_workload import (  # noqa: E402
     split_workload,
@@ -53,9 +45,6 @@ def pre_inference_pipeline():
         path=os.path.join(azureml_output_formatted, "inference_queue"),
     )
     return {}
-
-
-aml_interface = AMLInterface()
 
 
 def main():

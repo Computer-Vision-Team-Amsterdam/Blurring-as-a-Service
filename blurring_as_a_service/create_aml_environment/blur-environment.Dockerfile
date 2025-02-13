@@ -8,8 +8,8 @@ RUN apt-get -y update \
         curl \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update
-RUN apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
+RUN apt-get update \
+    && apt-get install ffmpeg libsm6 libxext6 libpq-dev -y
 
 
 WORKDIR /opt/app

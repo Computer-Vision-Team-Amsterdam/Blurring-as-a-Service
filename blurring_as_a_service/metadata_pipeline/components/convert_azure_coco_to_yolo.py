@@ -1,23 +1,10 @@
-import os
-import sys
-
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Input, Output, command_component
-
-sys.path.append("../../..")
-from blurring_as_a_service.settings.settings import (  # noqa: E402
-    BlurringAsAServiceSettings,
-)
-
-config_path = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
-)
-BlurringAsAServiceSettings.set_from_yaml(config_path)
-settings = BlurringAsAServiceSettings.get_settings()
-
 from cvtoolkit.converters.azure_coco_to_yolo_converter import (  # noqa: E402
     AzureCocoToYoloConverter,
 )
+from mldesigner import Input, Output, command_component
+
+from blurring_as_a_service import settings
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
