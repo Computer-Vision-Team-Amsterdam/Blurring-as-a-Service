@@ -48,11 +48,11 @@ class WorkloadSplitter:
         """
         image_paths = get_image_paths(data_folder)
         if number_of_batches > len(image_paths):
-            logger.warning(
-                "Number of batches is greater than the number of images. Setting number_of_batches to 1."
-            )
             number_of_batches = (
                 math.ceil(len(image_paths) / 50) if len(image_paths) > 50 else 1
+            )
+            logger.warning(
+                f"Number of batches is greater than the number of images. Setting number_of_batches to {number_of_batches}."
             )
 
         images_per_batch = math.ceil(len(image_paths) / number_of_batches)

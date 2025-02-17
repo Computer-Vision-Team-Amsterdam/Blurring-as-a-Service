@@ -19,5 +19,4 @@ class BlurringAsAServiceSettings(Settings):  # type: ignore
     def set_from_yaml(
         cls, filename: str, spec: BaseModel = BlurringAsAServiceSettingsSpec
     ) -> "GenericSettings":
-        print("BlurringAsAServiceSettings.set_from_yaml: filename = ", filename)
         return super().set_from_yaml(filename, spec)
