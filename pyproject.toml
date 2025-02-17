@@ -1,62 +1,28 @@
 [tool.poetry]
 name = "blurring_as_a_service"
-version = "1.0.2"
+version = "2.0.0"
 description = ""
 authors = [
     "Sebastian Davrieux <s.davrieux@amsterdam.nl>",
+    "Andrea Lombardo <a.lombardo@amsterdam.nl>",
     "Diana Epureanu <d.epureanu@amsterdam.nl>",
-    "Chris Eijgenstein <c.eijgenstein@amsterdam.nl>",
-    "Andrea Lombardo <a.lombardo@amsterdam.nl>"
+    "Chris Eijgenstein",
+    "Daan Bloembergen <d.bloembergen@amsterdam.nl>"
 ]
 
 [tool.poetry.dependencies]
-python = "~3.8"
-aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.1" }
-azure-ai-ml = {version = "^1.2.0", source = "PyPI"}
-azure-cli = {version = ">=2.51.0", source = "PyPI"}
-azure-identity = {version = "^1.12.0", source = "PyPI"}
-cryptography = {version = "<39.0.0", source = "PyPI"}
-cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v1.0.3" }
-dataclass-wizard = {version = "^0.22.2", source = "PyPI"}
-fonttools = {version = "4.45.1", source = "PyPI"}
-GitPython = {version = ">=3.1.30", source = "PyPI"}
-google-auth = {version = "2.23.4", source = "PyPI"}
-importlib-metadata = {version = "6.8.0", source = "PyPI"}
-joblib = {version="^1.2.0", source = "PyPI"}
-jsonschema-specifications = {version = "2023.11.1", source = "PyPI"}
-markdown-it-py = {version="^2.2.0", source = "PyPI"}
-matplotlib = {version = ">=3.2.2", source = "PyPI"}
-mldesigner = {version = "^0.1.0-beta.9", source = "PyPI"}
-msal = {version = "1.24.0b1", source = "PyPI"}
-mss = {version="^7.0.1", source = "PyPI"}
-numpy = {version = "^1.24.2", source = "PyPI"}
-opencv-python = {version = ">=4.1.1", source = "PyPI"}
-packaging = {version = "20.9", source = "PyPI"}
-Panorama = {git = "https://github.com/Computer-Vision-Team-Amsterdam/panorama.git", tag = "v0.2.2"}
-pandas = {version = ">=1.1.4", source = "PyPI"}
-Pillow = {version = ">=7.1.2", source = "PyPI"}
-pre-commit = {version = "^3.2.0", source = "PyPI"}
-pycocotools = {version = "^2.0.6", source="PyPI"}
-PyYAML = {version = ">=5.3.1", source = "PyPI"}
-pytest = {version = "^7.2.1", source = "PyPI"}
-python-geohash = {version = "^0.8.5", source = "PyPI"}
-psutil = {version = "^5.9.4", source = "PyPI"}
-psycopg2 = {version = ">=2.9.3", source = "PyPI"}
-requests = {version = ">=2.23.0", source = "PyPI"}
-scipy = {version = "^1.10.1", source = "PyPI"}
-seaborn = {version = ">=0.11.0", source = "PyPI"}
-setuptools = {version = ">=69.5.1", source = "PyPI"}
-sqlalchemy = {version = "1.4.50", source = "PyPI"}
-tensorboard = {version = ">=2.4.1", source = "PyPI"}
-thop = {version = ">=0.1.1", source = "PyPI"}
-torch = {version = ">=1.7.0", source = "PyPI"}
-torchvision = {version = ">=0.8.1", source = "PyPI"}
-tqdm = {version = ">=4.64.0", source = "PyPI"}
-urllib3 = {version = ">=2.0.6", source = "PyPI"}
-virtualenv = {version = "20.24.7", source = "PyPI"}
-wheel = {version = "^0.42.0", source = "PyPI"}
-yolov5 = { git = "https://github.com/Computer-Vision-Team-Amsterdam/yolov5.git", tag = "v0.5.5" }
+python = "~3.12"
+aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.2" }
+cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git",  tag = "v2.0.4" }
+yolo_model_development_kit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/YOLO-model-development-kit.git", tag = "v1.1.2" }
+azure-cli = "^2.67.0"
+psycopg2 = "^2.9.10"
+azureml-core = "^1.59.0"
 
+[[tool.poetry.source]]
+name = "torch"
+url = "https://download.pytorch.org/whl/cu118"
+priority = "explicit"
 
 [tool.poetry.dev-dependencies]
 

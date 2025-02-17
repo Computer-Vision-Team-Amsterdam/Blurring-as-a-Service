@@ -20,6 +20,8 @@ settings = BlurringAsAServiceSettings.get_settings()
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
+# THIS WILL NOT WORK, YOLOV5 IS NOT PART OF THE PROJECT ANYMORE
+# IT NEEDS REFACTORING
 import yolov5.val as val  # noqa: E402
 
 

@@ -28,7 +28,7 @@ repos:
     rev: v1.5.1
     hooks:
     - id: mypy
-      additional_dependencies: [types-all]
+      additional_dependencies: [types-PyYAML, types-requests]
       # for args see https://mypy.readthedocs.io/en/stable/command_line.html
       args: [
           --no-strict-optional,

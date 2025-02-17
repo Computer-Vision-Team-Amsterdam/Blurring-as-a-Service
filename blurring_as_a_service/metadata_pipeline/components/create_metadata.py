@@ -17,7 +17,6 @@ config_path = os.path.abspath(
 )
 BlurringAsAServiceSettings.set_from_yaml(config_path)
 settings = BlurringAsAServiceSettings.get_settings()
-
 aml_experiment_settings = settings["aml_experiment_details"]
 
 

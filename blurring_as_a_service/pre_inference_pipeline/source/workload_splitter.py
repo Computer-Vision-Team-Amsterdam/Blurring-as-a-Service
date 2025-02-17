@@ -11,7 +11,13 @@ from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  #
 
 class WorkloadSplitter:
     @staticmethod
-    def create_batches(data_folder, number_of_batches, output_folder, execution_time):
+    def create_batches(
+        data_folder: str,
+        datastore_input_path: str,
+        number_of_batches: int,
+        output_folder: str,
+        execution_time: str,
+    ) -> None:
         """
         Starting from a data folder, iterates over all subfolders and equally groups all jpg files into number_of_batches
         batches. These groups are stored into multiple txt files where each line is a file including the relative path.
@@ -40,27 +46,28 @@ class WorkloadSplitter:
         execution_time: str
             Datetime containing when the job was executed. Used to prefix the files name.
         """
-        # Get all image paths within the input folder
         image_paths = get_image_paths(data_folder)
-
-        # Ensure number_of_batches is not greater than the number of images
         if number_of_batches > len(image_paths):
-            logger.warning(
-                "Number of batches is greater than the number of images. Setting number_of_batches to 1."
+            number_of_batches = (
+                math.ceil(len(image_paths) / 50) if len(image_paths) > 50 else 1
             )
-            number_of_batches = 1
+            logger.warning(
+                f"Number of batches is greater than the number of images. Setting number_of_batches to {number_of_batches}."
+            )
 
         images_per_batch = math.ceil(len(image_paths) / number_of_batches)
 
-        # Process images and create batches
         for i in range(number_of_batches):
             start_index = i * images_per_batch
             end_index = min(start_index + images_per_batch, len(image_paths))
 
-            with open(
-                f"{output_folder}/{execution_time}_batch_{i}.txt", "w"
-            ) as batch_file:
+            batch_file_path = os.path.join(
+                output_folder, f"{execution_time}_batch_{i}.txt"
+            )
+            with open(batch_file_path, "w") as batch_file:
                 for j in range(start_index, end_index):
-                    # Only get the relative image paths
                     image_path = image_paths[j][1]
-                    batch_file.write(os.path.join(execution_time, image_path) + "\n")
+                    batch_file.write(
+                        os.path.join(datastore_input_path, image_path) + "\n"
+                    )
+            logger.info(f"Batch {i} written to {batch_file_path}")
