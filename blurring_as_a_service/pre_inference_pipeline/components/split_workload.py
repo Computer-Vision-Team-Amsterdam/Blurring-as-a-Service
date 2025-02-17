@@ -1,3 +1,4 @@
+import os
 import sys
 
 from azure.ai.ml.constants import AssetTypes
@@ -6,10 +7,20 @@ from mldesigner import Output, command_component
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
-from blurring_as_a_service import settings  # noqa: E402
 from blurring_as_a_service.pre_inference_pipeline.source.workload_splitter import (  # noqa: E402
     WorkloadSplitter,
 )
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
+)
+
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+config_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
+)
+BlurringAsAServiceSettings.set_from_yaml(config_path)
+settings = BlurringAsAServiceSettings.get_settings()
 
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()

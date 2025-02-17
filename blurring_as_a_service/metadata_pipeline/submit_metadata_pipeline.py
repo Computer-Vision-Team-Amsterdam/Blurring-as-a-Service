@@ -1,11 +1,11 @@
 import os
 from datetime import datetime
 
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service import aml_interface, settings  # noqa: E402
 from blurring_as_a_service.metadata_pipeline.components.convert_azure_coco_to_coco import (  # noqa: E402
     convert_azure_coco_to_coco,
 )
@@ -16,6 +16,10 @@ from blurring_as_a_service.metadata_pipeline.components.create_metadata import (
     create_metadata,
 )
 from blurring_as_a_service.settings.flags import PipelineFlag  # noqa: E402
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @pipeline()
@@ -105,8 +109,12 @@ def metadata_pipeline():
 
 
 if __name__ == "__main__":
+    BlurringAsAServiceSettings.set_from_yaml("config.yml")
+    settings = BlurringAsAServiceSettings.get_settings()
     metadata_settings = settings["metadata_pipeline"]
+
     default_compute = settings["aml_experiment_details"]["compute_name"]
+    aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(
         metadata_pipeline, "metadata_pipeline", default_compute
     )

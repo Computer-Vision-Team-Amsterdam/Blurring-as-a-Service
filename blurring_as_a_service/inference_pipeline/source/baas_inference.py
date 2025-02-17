@@ -117,6 +117,7 @@ class BaaSInference(YOLOInference):
         image_paths: List[str]
             List of input image paths corresponding to the Results.
         """
+        super()._process_detections(model_results, image_paths)
         batch_detection_info = []
         logger.info(
             f"Processing detections for {model_results} and {image_paths} images."

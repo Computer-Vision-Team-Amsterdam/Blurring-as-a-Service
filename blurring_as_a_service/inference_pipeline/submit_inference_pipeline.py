@@ -5,10 +5,16 @@ from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service import aml_interface, settings
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 
+# DO NOT import relative paths before setting up the logger.
+# Exception, of course, is settings to set up the logger.
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
+
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
 from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensitive_data import (  # noqa: E402
     detect_and_blur_sensitive_data,
@@ -46,6 +52,9 @@ def inference_pipeline():
         type="uri_folder", mode="rw_mount", path=output_datastore_fullpath
     )
     return {}
+
+
+aml_interface = AMLInterface()
 
 
 def main():

@@ -2,11 +2,11 @@ import json
 import os
 from datetime import datetime
 
+from aml_interface.aml_interface import AMLInterface  # noqa: E402
 from azure.ai.ml import Input, Output
 from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
-from blurring_as_a_service import aml_interface, settings
 from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_with_coco import (  # noqa: E402
     evaluate_with_coco,
 )
@@ -16,6 +16,10 @@ from blurring_as_a_service.performace_evaluation_pipeline.components.evaluate_wi
 from blurring_as_a_service.performace_evaluation_pipeline.components.validate_model import (  # noqa: E402
     validate_model,
 )
+from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
+
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
 
 
 @pipeline()
@@ -105,6 +109,7 @@ def performance_evaluation_pipeline():
 if __name__ == "__main__":
     performance_evaluation_settings = settings["performance_evaluation_pipeline"]
     default_compute = settings["aml_experiment_details"]["compute_name"]
+    aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(
         performance_evaluation_pipeline,
         "performance_evaluation_pipeline",

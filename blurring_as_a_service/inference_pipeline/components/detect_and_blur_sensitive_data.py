@@ -16,7 +16,15 @@ sys.path.append("../../..")
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
 
-from blurring_as_a_service import settings  # noqa: E402
+from blurring_as_a_service.settings.settings import (  # noqa: E402
+    BlurringAsAServiceSettings,
+)
+
+config_path = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "..", "config.yml")
+)
+
+settings = BlurringAsAServiceSettings.set_from_yaml(config_path)
 
 # DO NOT import relative paths before setting up the logger.
 # Exception, of course, is settings to set up the logger.
