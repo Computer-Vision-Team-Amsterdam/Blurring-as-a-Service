@@ -16,35 +16,36 @@ azureLoggingConfigurer.setup_baas_logging()
 
 from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
-aml_interface = AMLInterface()
-
 
 def main():
+    aml_interface = AMLInterface()
     ml_client = aml_interface.ml_client
-    endpoint_name = "endpt-cvt-baas"
+    endpoint_name = "endpt-cvt-baas-2"
+
     endpoint = ManagedOnlineEndpoint(
-        name=endpoint_name, auth_mode="key"  # you can also use token if preferred
+        name=endpoint_name,
+        auth_mode="aml_token",
+        public_network_access="Disabled",
     )
     ml_client.online_endpoints.begin_create_or_update(endpoint).result()
 
     deployment = ManagedOnlineDeployment(
-        name=f"{endpoint_name}-deployment",
+        name=f"{endpoint_name}-green",
         endpoint_name=endpoint.name,
         model="OOR-model:2",
-        environment="baas-environment:108",
+        environment="seb-environment:9",
         code_configuration=CodeConfiguration(
-            code="blurring_as_a_service/endpoint/components/",  # directory containing your score.py file
-            scoring_script="scoring.py",
+            code=".",
+            scoring_script="blurring_as_a_service/endpoint/components/score.py",
         ),
-        instance_type="Standard_DS3_v2",  # choose an instance type that fits your workload
+        instance_type="Standard_NC6s_v3",
         instance_count=1,
+        egress_public_network_access="disabled",
     )
-
     ml_client.online_deployments.begin_create_or_update(deployment).result()
 
-    # Update the endpoint traffic to route 100% to this deployment.
     ml_client.online_endpoints.begin_update(
-        endpoint, traffic={"yolov11-deployment": 100}
+        endpoint, traffic={f"{endpoint_name}-deployment": 100}
     ).result()
 
 

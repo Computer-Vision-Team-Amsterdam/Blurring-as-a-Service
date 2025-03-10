@@ -14,7 +14,7 @@ RUN apt-get -y update \
 
 WORKDIR /opt/app
 
-RUN conda create -n env python=3.12
+RUN conda create -n env python=3.11
 RUN echo "source activate env" > ~/.bashrc
 ENV PATH="/opt/miniconda/envs/env/bin:$PATH"
 
