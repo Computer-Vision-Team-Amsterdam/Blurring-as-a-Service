@@ -23,7 +23,7 @@ allowSelfSignedHttps(
 
 
 def main():
-    with open("test_image.jpg", "rb") as f:
+    with open("blurring_as_a_service/endpoint/test_image.jpg", "rb") as f:
         image_b64 = base64.b64encode(f.read()).decode("utf-8")
 
     aml_interface = AMLInterface()
@@ -47,7 +47,14 @@ def main():
         "Accept": "application/json",
     }
 
-    payload = str.encode(json.dumps({"data": image_b64}))
+    payload = str.encode(
+        json.dumps(
+            {
+                "data": image_b64,
+                "user_id": "s.davrieux@amsterdam.nl",
+            }
+        )
+    )
     if scoring_url.lower().startswith("http"):
         req = urllib.request.Request(scoring_url, payload, headers)
     else:

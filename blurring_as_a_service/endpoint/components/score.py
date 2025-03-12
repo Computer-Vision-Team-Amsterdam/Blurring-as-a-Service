@@ -54,79 +54,85 @@ def init():
 
 
 def run(raw_data):
-    # try:
-    # Assume the incoming data is JSON with a key "data" containing the base64 image string.
-    data = json.loads(raw_data)
-    image_data = data.get("data")
-    if image_data is None:
-        return json.dumps({"error": "No image data provided."})
+    try:
+        # Assume the incoming data is JSON with a key "data" containing the base64 image string.
+        data = json.loads(raw_data)
+        user_id = data.get("user_id", "unknown")
+        print(f"Request received from user: {user_id}")
 
-    image_bytes = base64.b64decode(image_data)
-    pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
-    image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+        image_data = data.get("data")
+        if image_data is None:
+            return json.dumps({"error": "No image data provided."})
 
-    results = model(image)
+        image_bytes = base64.b64decode(image_data)
+        pil_image = Image.open(io.BytesIO(image_bytes)).convert("RGB")
+        image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
-    result = results[0].cpu()
-    boxes = result.boxes.numpy()
-    inference_settings = settings["inference_pipeline"]
-    target_classes = inference_settings["target_classes"]
-    sensitive_classes = inference_settings["sensitive_classes"]
-    inference_params = {
-        "imgsz": inference_settings["model_params"].get("img_size", 640),
-        "save": inference_settings["model_params"].get("save_img_flag", False),
-        "save_txt": inference_settings["model_params"].get("save_txt_flag", False),
-        "save_conf": inference_settings["model_params"].get("save_conf_flag", False),
-        "conf": inference_settings["model_params"].get("conf", 0.25),
-        "project": "inference",
-    }
-    target_classes_conf = (
-        inference_settings["target_classes_conf"]
-        if inference_settings["target_classes_conf"]
-        else inference_params["conf"]
-    )
-    sensitive_classes_conf = (
-        inference_settings["sensitive_classes_conf"]
-        if inference_settings["sensitive_classes_conf"]
-        else inference_params["conf"]
-    )
-    output_image = OutputImage(result.orig_img.copy())
+        results = model(image)
 
-    target_idxs = np.where(
-        np.in1d(boxes.cls, target_classes) & (boxes.conf >= target_classes_conf)
-    )[0]
-
-    sensitive_idxs = np.where(
-        np.in1d(boxes.cls, sensitive_classes) & (boxes.conf >= sensitive_classes_conf)
-    )[0]
-    if len(sensitive_idxs) > 0:
-        sensitive_bounding_boxes = boxes[sensitive_idxs].xyxy
-        output_image.blur_inside_boxes(boxes=sensitive_bounding_boxes)
-
-    if len(target_idxs) > 0:
-        target_bounding_boxes = boxes[target_idxs].xyxy
-        target_categories = [int(box.cls) for box in boxes[target_idxs]]
-        category_colors = defaultdict(
-            lambda: (
-                secrets.randbelow(256),
-                secrets.randbelow(256),
-                secrets.randbelow(256),
+        result = results[0].cpu()
+        boxes = result.boxes.numpy()
+        inference_settings = settings["inference_pipeline"]
+        target_classes = inference_settings["target_classes"]
+        sensitive_classes = inference_settings["sensitive_classes"]
+        inference_params = {
+            "imgsz": inference_settings["model_params"].get("img_size", 640),
+            "save": inference_settings["model_params"].get("save_img_flag", False),
+            "save_txt": inference_settings["model_params"].get("save_txt_flag", False),
+            "save_conf": inference_settings["model_params"].get(
+                "save_conf_flag", False
             ),
-            OutputImage.DEFAULT_COLORS,
+            "conf": inference_settings["model_params"].get("conf", 0.25),
+            "project": "inference",
+        }
+        target_classes_conf = (
+            inference_settings["target_classes_conf"]
+            if inference_settings["target_classes_conf"]
+            else inference_params["conf"]
         )
-        output_image.draw_bounding_boxes(
-            boxes=target_bounding_boxes,
-            categories=target_categories,
-            colour_map=category_colors,
+        sensitive_classes_conf = (
+            inference_settings["sensitive_classes_conf"]
+            if inference_settings["sensitive_classes_conf"]
+            else inference_params["conf"]
         )
+        output_image = OutputImage(result.orig_img.copy())
 
-    success, encoded_image = cv2.imencode(".jpg", output_image.image)
-    if not success:
-        print("Image encoding failed.")
-        return json.dumps({"error": "Image encoding failed."})
+        target_idxs = np.where(
+            np.in1d(boxes.cls, target_classes) & (boxes.conf >= target_classes_conf)
+        )[0]
 
-    # Return the annotated image as a base64-encoded string.
-    annotated_image_b64 = base64.b64encode(encoded_image).decode("utf-8")
-    return json.dumps({"annotated_image": annotated_image_b64})
-    # except Exception as e:
-    #     return json.dumps({"error": str(e)})
+        sensitive_idxs = np.where(
+            np.in1d(boxes.cls, sensitive_classes)
+            & (boxes.conf >= sensitive_classes_conf)
+        )[0]
+        if len(sensitive_idxs) > 0:
+            sensitive_bounding_boxes = boxes[sensitive_idxs].xyxy
+            output_image.blur_inside_boxes(boxes=sensitive_bounding_boxes)
+
+        if len(target_idxs) > 0:
+            target_bounding_boxes = boxes[target_idxs].xyxy
+            target_categories = [int(box.cls) for box in boxes[target_idxs]]
+            category_colors = defaultdict(
+                lambda: (
+                    secrets.randbelow(256),
+                    secrets.randbelow(256),
+                    secrets.randbelow(256),
+                ),
+                OutputImage.DEFAULT_COLORS,
+            )
+            output_image.draw_bounding_boxes(
+                boxes=target_bounding_boxes,
+                categories=target_categories,
+                colour_map=category_colors,
+            )
+
+        success, encoded_image = cv2.imencode(".jpg", output_image.image)
+        if not success:
+            print("Image encoding failed.")
+            return json.dumps({"error": "Image encoding failed."})
+
+        # Return the annotated image as a base64-encoded string.
+        annotated_image_b64 = base64.b64encode(encoded_image).decode("utf-8")
+        return json.dumps({"annotated_image": annotated_image_b64})
+    except Exception as e:
+        return json.dumps({"error": str(e)})

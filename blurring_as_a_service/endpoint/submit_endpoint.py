@@ -30,7 +30,7 @@ def main():
     ml_client.online_endpoints.begin_create_or_update(endpoint).result()
 
     deployment = ManagedOnlineDeployment(
-        name=f"{endpoint_name}-green",
+        name=f"{endpoint_name}-blue",
         endpoint_name=endpoint.name,
         model="OOR-model:2",
         environment="seb-environment:9",
@@ -38,15 +38,11 @@ def main():
             code=".",
             scoring_script="blurring_as_a_service/endpoint/components/score.py",
         ),
-        instance_type="Standard_NC6s_v3",
+        instance_type="Standard_NC4as_T4_v3",
         instance_count=1,
         egress_public_network_access="disabled",
     )
     ml_client.online_deployments.begin_create_or_update(deployment).result()
-
-    ml_client.online_endpoints.begin_update(
-        endpoint, traffic={f"{endpoint_name}-deployment": 100}
-    ).result()
 
 
 if __name__ == "__main__":
