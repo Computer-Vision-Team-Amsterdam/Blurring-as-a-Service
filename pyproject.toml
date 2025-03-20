@@ -25,14 +25,13 @@ dependencies = [
 [tool.uv.sources]
 torch = { index = "pytorch" }
 aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", branch = "feature/Updating_logs_library" }
-cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git", tag = "v2.0.4" }
+cvtoolkit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/CVToolkit.git", branch = "fix/Package_version" }
 yolo_model_development_kit = { git = "https://github.com/Computer-Vision-Team-Amsterdam/YOLO-model-development-kit.git", branch = "fix/Package_version" }
 
 [[tool.uv.index]]
 name = "pytorch"
 url = "https://download.pytorch.org/whl/cu118"
 explicit = true
-
 
 [tool.isort]
 profile = "black"

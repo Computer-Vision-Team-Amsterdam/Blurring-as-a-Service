@@ -35,6 +35,7 @@ from cvtoolkit.database.baas_tables import (  # noqa: E402
     BatchRunInformation,
     ImageProcessingStatus,
 )
+from cvtoolkit.database.database_handler import DBConfigSQLAlchemy  # noqa: E402
 from cvtoolkit.helpers.file_helpers import delete_file  # noqa: E402
 from cvtoolkit.multiprocessing.lock_file import LockFile  # noqa: E402
 
@@ -94,6 +95,8 @@ def detect_and_blur_sensitive_data(
     batch_files_to_iterate = os.listdir(batches_files_path)
     logging.info(f"Batches file to do: {batch_files_to_iterate}")
     error_trace = ""
+    db_connector = create_db_connector()
+    db_connector.create_connection()
     for batch_file_txt in batch_files_to_iterate:
         if batch_file_txt.endswith(".txt"):
             file_path = os.path.join(batches_files_path, batch_file_txt)
@@ -108,7 +111,7 @@ def detect_and_blur_sensitive_data(
                             "%Y-%m-%d_%H_%M_%S",
                         ).strftime("%Y-%m-%d %H:%M:%S")
                         folders_and_frames = create_dict_folders_and_frames_to_blur(
-                            images_folder, src, preprocessing_date
+                            images_folder, src, preprocessing_date, db_connector
                         )
                         inference_pipeline = BaaSInference(
                             images_folder=images_folder,
@@ -122,13 +125,15 @@ def detect_and_blur_sensitive_data(
 
                         inference_pipeline.run_pipeline()
                     delete_file(file_path)
+            except FileNotFoundError as e:
+                logger.warning(
+                    f"File {file_path} not found: {e}, if running in parallel, this could be expected."
+                )
             except Exception as e:
                 logger.error(e)
                 logger.error(traceback.format_exc())
                 error_trace += f"{e}\n"
 
-                db_connector = create_db_connector()
-                db_connector.create_connection()
                 try:
                     with db_connector.managed_session() as session:
                         batch_info = BatchRunInformation(
@@ -143,10 +148,7 @@ def detect_and_blur_sensitive_data(
                 except SQLAlchemyError as e:
                     db_connector.close_connection()
                     raise e
-                db_connector.close_connection()
 
-    db_connector = create_db_connector()
-    db_connector.create_connection()
     try:
         with db_connector.managed_session() as session:
             batch_info = BatchRunInformation(
@@ -165,7 +167,10 @@ def detect_and_blur_sensitive_data(
 
 
 def create_dict_folders_and_frames_to_blur(
-    input_structured_folder: str, src: List[str], preprocessing_date: str
+    input_structured_folder: str,
+    src: List[str],
+    preprocessing_date: str,
+    db_connector: DBConfigSQLAlchemy,
 ) -> defaultdict[str, List[str]]:
     """
     Create a dictionary mapping folders to frames that need to be blurred.
@@ -182,13 +187,15 @@ def create_dict_folders_and_frames_to_blur(
         List of image paths to be processed.
     preprocessing_date : str
         The date for which to fetch the processed images.
+    db_connector : DBConfigSQLAlchemy
+        A configuration object for connecting to the database.
 
     Returns
     -------
     defaultdict
         A dictionary where keys are folder paths and values are lists of frames to be blurred.
     """
-    processed_images = fetch_already_processed_images(preprocessing_date)
+    processed_images = fetch_already_processed_images(preprocessing_date, db_connector)
     folders_and_frames = defaultdict(list)
     for line in src:
         if line not in processed_images:
@@ -198,12 +205,16 @@ def create_dict_folders_and_frames_to_blur(
                 relative_path
             )
             lock_images_that_will_be_blurred(
-                image_filename=line, image_upload_date=preprocessing_date
+                image_filename=line,
+                image_upload_date=preprocessing_date,
+                db_connector=db_connector,
             )
     return folders_and_frames
 
 
-def fetch_already_processed_images(preprocessing_date: str) -> List[str]:
+def fetch_already_processed_images(
+    preprocessing_date: str, db_connector: DBConfigSQLAlchemy
+) -> List[str]:
     """
     Fetches the filenames of images that have already been processed on a given date.
 
@@ -216,6 +227,8 @@ def fetch_already_processed_images(preprocessing_date: str) -> List[str]:
     ----------
     preprocessing_date : str
         The date for which to fetch the processed images.
+    db_connector : DBConfigSQLAlchemy
+        A configuration object for connecting to the database.
 
     Returns
     -------
@@ -229,8 +242,6 @@ def fetch_already_processed_images(preprocessing_date: str) -> List[str]:
     SQLAlchemyError
         If there is an error querying the database.
     """
-    db_connector = create_db_connector()
-    db_connector.create_connection()
     processed_images = []
     with db_connector.managed_session() as session:
         try:
@@ -249,15 +260,15 @@ def fetch_already_processed_images(preprocessing_date: str) -> List[str]:
                 .all()
             )
         except SQLAlchemyError as e:
-            db_connector.close_connection()
             raise e
 
-    db_connector.close_connection()
     return [image.image_filename for image in processed_images]
 
 
 def lock_images_that_will_be_blurred(
-    image_filename: str, image_upload_date: str
+    image_filename: str,
+    image_upload_date: str,
+    db_connector: DBConfigSQLAlchemy,
 ) -> None:
     """
     Locks the images that will be blurred by updating the processing status in the database.
@@ -273,22 +284,14 @@ def lock_images_that_will_be_blurred(
     -------
     None
     """
-    db_connector = create_db_connector()
-    db_connector.create_connection()
-    try:
-        with db_connector.managed_session() as session:
-            image_processing_status = ImageProcessingStatus(
-                image_filename=image_filename,
-                image_upload_date=image_upload_date,
-                image_customer_name=settings["customer"],
-                processing_status="inprogress",
-            )
-            session.add(image_processing_status)
-    except SQLAlchemyError as e:
-        db_connector.close_connection()
-        raise e
-
-    db_connector.close_connection()
+    with db_connector.managed_session() as session:
+        image_processing_status = ImageProcessingStatus(
+            image_filename=image_filename,
+            image_upload_date=image_upload_date,
+            image_customer_name=settings["customer"],
+            processing_status="inprogress",
+        )
+        session.add(image_processing_status)
 
 
 def get_current_time():

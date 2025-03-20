@@ -58,7 +58,6 @@ training_pipeline:
 pre_inference_pipeline:
   datastore_input: "dataoffice_input_structured"
   datastore_input_path: "2024-10-23_09_03_18"
-  execution_time: "2024-10-23_09_03_18"
   datastore_output: "dataoffice_input_structured"
   inputs:
     number_of_batches: 1
@@ -78,6 +77,12 @@ inference_pipeline:
     output_rel_path: "2023/output_blurred"
     detections_subfolder: ""
     labels_subfolder: ""
+  sahi_params:
+    model_type: "ultralytics"
+    slice_height: 2048
+    slice_width: 2048
+    overlap_height_ratio: 0.2
+    overlap_width_ratio: 0.2
   target_classes: []
   sensitive_classes: [0, 1]
   target_classes_conf: null  # null means conf is taken from model_params
@@ -86,6 +91,7 @@ inference_pipeline:
   save_detection_images: True
   save_detection_labels: True
   save_all_images: True  # If True, all images will be saved regardless of whether they contain target class objects
+  use_sahi: False
   database_parameters:
     db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"

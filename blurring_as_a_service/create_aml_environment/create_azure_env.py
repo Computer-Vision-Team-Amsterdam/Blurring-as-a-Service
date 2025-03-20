@@ -13,6 +13,7 @@ def main():
         env_name=settings["aml_experiment_details"]["env_name"],
         build_context_path="blurring_as_a_service/create_aml_environment",
         dockerfile_path="blur-environment.Dockerfile",
+        build_context_files=["pyproject.toml"],
     )
 
 

@@ -119,9 +119,6 @@ class BaaSInference(YOLOInference):
         """
         super()._process_detections(model_results, image_paths)
         batch_detection_info = []
-        logger.info(
-            f"Processing detections for {model_results} and {image_paths} images."
-        )
         for result, image_path in zip(model_results, image_paths):
             p = Path(image_path)
             image_filename = (
@@ -162,7 +159,7 @@ class BaaSInference(YOLOInference):
                         empty_detection = DetectionInformation(
                             image_customer_name=self.customer_name,
                             image_upload_date=self.image_upload_date,
-                            image_filename=image_filename,
+                            image_filename=str(image_filename),
                             has_detection=False,
                             class_id=None,
                             x_norm=None,

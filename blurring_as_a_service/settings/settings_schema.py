@@ -90,7 +90,6 @@ class PreInferencePipelineInputs(SettingsSpecModel):
 class PreInferencePipelineSpec(SettingsSpecModel):
     datastore_input: str
     datastore_input_path: str
-    execution_time: str
     datastore_output: str
     inputs: PreInferencePipelineInputs
 
@@ -111,10 +110,19 @@ class DatabaseCredentialsSpec(SettingsSpecModel):
     client_id: str
 
 
+class InferenceSAHIParameters(SettingsSpecModel):
+    model_type: str = "ultralytics"
+    slice_height: int = 2048
+    slice_width: int = 2048
+    overlap_height_ratio: float = 0.2
+    overlap_width_ratio: float = 0.2
+
+
 class InferencePipelineSpec(SettingsSpecModel):
     model_params: InferenceModelParameters
     inputs: Dict[str, str] = None
     outputs: Dict[str, str] = None
+    sahi_params: InferenceSAHIParameters
     target_classes: List[int] = None
     sensitive_classes: List[int] = []
     target_classes_conf: Optional[float] = None
@@ -123,6 +131,7 @@ class InferencePipelineSpec(SettingsSpecModel):
     save_detection_images: bool = False
     save_detection_labels: bool = True
     save_all_images: bool = True
+    use_sahi: bool = False
     database_parameters: DatabaseCredentialsSpec
 
 
