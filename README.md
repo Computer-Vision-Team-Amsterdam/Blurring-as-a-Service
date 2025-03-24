@@ -53,6 +53,13 @@ uv pip install -r pyproject.toml --extra dev [--extra model_export]
 uv add <pacakage_name>
 ```
 
+To update dependencies (e.g. when pyproject.toml dependencies change):
+
+```bash
+uv lock --upgrade
+uv sync --extra dev
+```
+
 ### 4. Install pre-commit hooks
 The pre-commit hooks help to ensure that all committed code is valid and consistently formatted. We use UV to manage pre-commit as well.
 
