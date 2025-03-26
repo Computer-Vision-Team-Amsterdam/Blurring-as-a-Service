@@ -18,4 +18,4 @@ RUN pip install uv
 
 COPY pyproject.toml .
 
-RUN uv pip install --system -r pyproject.toml --prerelease=allow 
+RUN uv pip install --system -r pyproject.toml

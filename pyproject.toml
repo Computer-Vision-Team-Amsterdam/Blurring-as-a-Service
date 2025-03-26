@@ -22,6 +22,9 @@ dependencies = [
     "azureml-core>=1.59.0",
 ]
 
+[tool.uv]
+prerelease = "allow"
+
 [tool.uv.sources]
 torch = { index = "pytorch" }
 aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.4" }
