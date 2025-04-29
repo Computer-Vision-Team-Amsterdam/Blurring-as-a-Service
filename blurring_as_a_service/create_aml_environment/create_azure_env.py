@@ -1,22 +1,6 @@
-import logging
-import os
-
 from aml_interface.aml_interface import AMLInterface
 
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
-
-logger = logging.getLogger(__name__)
-
-
-def delete_file(file_path):
-    try:
-        os.remove(file_path)
-        logger.info(f"{file_path} has been deleted.")
-    except FileNotFoundError:
-        logger.error(f"{file_path} does not exist.")
-    except Exception as e:
-        logger.error(f"Failed to remove file '{file_path}': {str(e)}")
-        raise Exception(f"Failed to remove file '{file_path}': {e}")
 
 
 def main():
