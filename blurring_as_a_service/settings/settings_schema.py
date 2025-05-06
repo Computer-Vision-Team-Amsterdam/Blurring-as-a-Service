@@ -1,6 +1,6 @@
 from typing import Dict, List
 
-from yolo_model_development_kit import (
+from yolo_model_development_kit.settings.settings_schema import (
     AMLExperimentDetailsSpec,
     InferencePipelineSpec,
     LoggingSpec,
@@ -69,6 +69,14 @@ class SmartSamplingPipelineSpec(SettingsSpecModel):
     sampling_ratio: float = 0.5
 
 
+class APIEndpointSpec(SettingsSpecModel):
+    endpoint_name: str
+    deployment_color: str
+    instance_type: str
+    model_name: str
+    model_version: str
+
+
 class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     class Config:
         extra = "forbid"
@@ -79,4 +87,5 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: BaaSInferencePipelineSpec = None
     sampling_parameters: SmartSamplingPipelineSpec = None
+    api_endpoint: APIEndpointSpec = None
     logging: LoggingSpec = LoggingSpec()

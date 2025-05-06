@@ -20,7 +20,8 @@ from aml_interface.aml_interface import AMLInterface  # noqa: E402
 def main():
     aml_interface = AMLInterface()
     ml_client = aml_interface.ml_client
-    endpoint_name = "endpt-cvt-baas-2"
+    endpoint_name = settings["api_endpoint"]["endpoint_name"]
+    deployment_color = settings["api_endpoint"]["deployment_color"]
 
     endpoint = ManagedOnlineEndpoint(
         name=endpoint_name,
@@ -30,15 +31,15 @@ def main():
     ml_client.online_endpoints.begin_create_or_update(endpoint).result()
 
     deployment = ManagedOnlineDeployment(
-        name=f"{endpoint_name}-blue",
+        name=f"{endpoint_name}-{deployment_color}",
         endpoint_name=endpoint.name,
-        model="OOR-model:2",
-        environment="seb-environment:9",
+        model=f"{settings['api_endpoint']['model_name']}:{settings['api_endpoint']['model_version']}",
+        environment=f"{settings['aml_experiment_details']['env_name']}:{settings['aml_experiment_details']['env_version']}",
         code_configuration=CodeConfiguration(
             code=".",
             scoring_script="blurring_as_a_service/endpoint/components/score.py",
         ),
-        instance_type="Standard_NC4as_T4_v3",
+        instance_type=settings["api_endpoint"]["instance_type"],
         instance_count=1,
         egress_public_network_access="disabled",
     )

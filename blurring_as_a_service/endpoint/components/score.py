@@ -2,14 +2,15 @@ import base64
 import io
 import json
 import os
-import secrets
 import sys
-from collections import defaultdict
 
 import cv2
 import numpy as np
 from PIL import Image
 from ultralytics import YOLO
+from yolo_model_development_kit.inference_pipeline.source.model_result import (
+    ModelResult,
+)
 from yolo_model_development_kit.inference_pipeline.source.output_image import (
     OutputImage,
 )
@@ -69,9 +70,8 @@ def run(raw_data):
         image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
 
         results = model(image)
-
         result = results[0].cpu()
-        boxes = result.boxes.numpy()
+
         inference_settings = settings["inference_pipeline"]
         target_classes = inference_settings["target_classes"]
         sensitive_classes = inference_settings["sensitive_classes"]
@@ -95,36 +95,24 @@ def run(raw_data):
             if inference_settings["sensitive_classes_conf"]
             else inference_params["conf"]
         )
+        print(f"Result: {result}")
+        model_result = ModelResult(
+            model_result=result,
+            target_classes=target_classes,
+            sensitive_classes=sensitive_classes,
+            target_classes_conf=target_classes_conf,
+            sensitive_classes_conf=sensitive_classes_conf,
+            save_image=False,
+            save_labels=False,
+            save_all_images=False,
+        )
         output_image = OutputImage(result.orig_img.copy())
 
-        target_idxs = np.where(
-            np.in1d(boxes.cls, target_classes) & (boxes.conf >= target_classes_conf)
-        )[0]
-
-        sensitive_idxs = np.where(
-            np.in1d(boxes.cls, sensitive_classes)
-            & (boxes.conf >= sensitive_classes_conf)
-        )[0]
-        if len(sensitive_idxs) > 0:
-            sensitive_bounding_boxes = boxes[sensitive_idxs].xyxy
-            output_image.blur_inside_boxes(boxes=sensitive_bounding_boxes)
-
-        if len(target_idxs) > 0:
-            target_bounding_boxes = boxes[target_idxs].xyxy
-            target_categories = [int(box.cls) for box in boxes[target_idxs]]
-            category_colors = defaultdict(
-                lambda: (
-                    secrets.randbelow(256),
-                    secrets.randbelow(256),
-                    secrets.randbelow(256),
-                ),
-                OutputImage.DEFAULT_COLORS,
-            )
-            output_image.draw_bounding_boxes(
-                boxes=target_bounding_boxes,
-                categories=target_categories,
-                colour_map=category_colors,
-            )
+        model_result.calculate_bounding_boxes()
+        if len(model_result.sensitive_bounding_boxes):
+            output_image.blur_inside_boxes(boxes=model_result.sensitive_bounding_boxes)
+        else:
+            print("No sensitive classes detected, skipping blurring.")
 
         success, encoded_image = cv2.imencode(".jpg", output_image.image)
         if not success:
@@ -133,6 +121,7 @@ def run(raw_data):
 
         # Return the annotated image as a base64-encoded string.
         annotated_image_b64 = base64.b64encode(encoded_image).decode("utf-8")
+        print(f"Returned annotated image size: {len(annotated_image_b64)} bytes")
         return json.dumps({"annotated_image": annotated_image_b64})
     except Exception as e:
         return json.dumps({"error": str(e)})

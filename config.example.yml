@@ -71,6 +71,13 @@ sampling_parameters:
   conf_score_threshold: 0.0005
   sampling_ratio: 1
 
+api_endpoint:
+  endpoint_name: "endpt-cvt-baas-2"
+  deployment_color: "blue"  # blue or green
+  instance_type: "Standard_NC4as_T4_v3"
+  model_name: "OOR-model"
+  model_version: "2"
+
 logging:
   loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
   own_packages: ["__main__", "blurring_as_a_service", "yolov5", "cvtoolkit", "aml_interface",

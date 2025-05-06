@@ -62,11 +62,14 @@ def main():
     try:
         response = urllib.request.urlopen(req).read()  # nosec
         response_dict = json.loads(json.loads(response))
-        annotated_image_b64 = response_dict["annotated_image"]
-        if annotated_image_b64:
-            with open("annotated_image.jpg", "wb") as f:
-                f.write(base64.b64decode(annotated_image_b64))
-    except urllib.error.HTTPError as error:
+        if "error" in response_dict:
+            raise ValueError(f"Error in response: {response_dict['error']}")
+        elif "annotated_image" in response_dict:
+            annotated_image_b64 = response_dict["annotated_image"]
+            if annotated_image_b64:
+                with open("annotated_image.jpg", "wb") as f:
+                    f.write(base64.b64decode(annotated_image_b64))
+    except Exception as error:
         print("The request failed with status code: " + str(error.code))
         print(error.info())
         print(error.read().decode("utf8", "ignore"))
