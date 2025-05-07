@@ -69,6 +69,8 @@ def main():
             if annotated_image_b64:
                 with open("annotated_image.jpg", "wb") as f:
                     f.write(base64.b64decode(annotated_image_b64))
+        if "metadata" in response_dict:
+            print("Metadata: ", response_dict["metadata"])
     except Exception as error:
         print("The request failed with status code: " + str(error.code))
         print(error.info())
