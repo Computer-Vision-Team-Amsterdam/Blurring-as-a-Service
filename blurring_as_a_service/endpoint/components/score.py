@@ -56,7 +56,6 @@ def init():
 
 def run(raw_data):
     try:
-        # Assume the incoming data is JSON with a key "data" containing the base64 image string.
         data = json.loads(raw_data)
         user_id = data.get("user_id", "unknown")
         print(f"Request received from user: {user_id}")
@@ -95,7 +94,6 @@ def run(raw_data):
             if inference_settings["sensitive_classes_conf"]
             else inference_params["conf"]
         )
-        print(f"Result: {result}")
         model_result = ModelResult(
             model_result=result,
             target_classes=target_classes,
@@ -107,8 +105,8 @@ def run(raw_data):
             save_all_images=False,
         )
         output_image = OutputImage(result.orig_img.copy())
-
         model_result.calculate_bounding_boxes()
+
         if len(model_result.sensitive_bounding_boxes):
             output_image.blur_inside_boxes(boxes=model_result.sensitive_bounding_boxes)
         else:
@@ -119,9 +117,15 @@ def run(raw_data):
             print("Image encoding failed.")
             return json.dumps({"error": "Image encoding failed."})
 
-        # Return the annotated image as a base64-encoded string.
         annotated_image_b64 = base64.b64encode(encoded_image).decode("utf-8")
-        print(f"Returned annotated image size: {len(annotated_image_b64)} bytes")
-        return json.dumps({"annotated_image": annotated_image_b64})
+        metadata = {
+            "persons_count": int((model_result.boxes.cls == 0).sum()),
+            "licence_plates_count": int((model_result.boxes.cls == 1).sum()),
+        }
+        print(f"Metadata: {metadata}")
+        return json.dumps(
+            {"annotated_image": annotated_image_b64, "metadata": metadata}
+        )
     except Exception as e:
+        print(f"Error processing request: {e}")
         return json.dumps({"error": str(e)})
