@@ -82,7 +82,7 @@ logging:
   loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
   own_packages: ["__main__", "blurring_as_a_service", "yolov5", "cvtoolkit", "aml_interface",
                  "evaluate_with_cvt_metrics", "validate_model", "evaluate_with_coco", "detect_and_blur_sensitive_data",
-                 "move_files", "split_workload", "smart_sampling"]
+                 "move_files", "split_workload", "smart_sampling", "api_endpoint"]
   basic_config:
     # log config as arguments to `logging.basicConfig`
     level: INFO
