@@ -55,24 +55,35 @@ def main():
             }
         )
     )
-    if scoring_url.lower().startswith("http"):
-        req = urllib.request.Request(scoring_url, payload, headers)
-    else:
-        raise ValueError(f"Invalid scoring URL: {scoring_url}")
+    req = urllib.request.Request(scoring_url, payload, headers)
+
+    url_to_check = req.get_full_url()
+    if not url_to_check.startswith(("http://", "https://")):
+        print(f"Error: Invalid URL scheme in request: {url_to_check}")
+        raise ValueError(
+            f"Disallowed URL scheme: {url_to_check}. Only http/https are allowed."
+        )
+
     try:
-        response = urllib.request.urlopen(req).read()  # nosec
-        response_dict = json.loads(json.loads(response))
-        if "error" in response_dict:
-            raise ValueError(f"Error in response: {response_dict['error']}")
-        elif "annotated_image" in response_dict:
-            annotated_image_b64 = response_dict["annotated_image"]
-            if annotated_image_b64:
-                with open("annotated_image.jpg", "wb") as f:
-                    f.write(base64.b64decode(annotated_image_b64))
-        if "metadata" in response_dict:
-            print("Metadata: ", response_dict["metadata"])
+        with urllib.request.urlopen(req) as http_response:  # nosec B310
+            status_code = http_response.getcode()
+            response_body_str = http_response.read().decode("utf-8")
+            response_dict = json.loads(json.loads(response_body_str)[0])
+            if status_code != 200:
+                if "error" in response_dict:
+                    raise ValueError(
+                        f"Request failed with status code: {status_code}, error in response: {response_dict['error']}"
+                    )
+                raise ValueError(f"Request failed with status code: {status_code}")
+            elif "annotated_image" in response_dict:
+                annotated_image_b64 = response_dict["annotated_image"]
+                if annotated_image_b64:
+                    with open("annotated_image.jpg", "wb") as f:
+                        f.write(base64.b64decode(annotated_image_b64))
+            if "metadata" in response_dict:
+                print("Metadata: ", response_dict["metadata"])
     except Exception as error:
-        print("The request failed with status code: " + str(error.code))
+        print("The process of the response failed with error code: " + str(error.code))
         print(error.info())
         print(error.read().decode("utf8", "ignore"))
 
