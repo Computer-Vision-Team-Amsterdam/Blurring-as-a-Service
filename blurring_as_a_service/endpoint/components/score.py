@@ -86,7 +86,6 @@ def run(raw_data):
         raw_data (str): The raw request data in JSON format. The JSON contains:
             - "data" field containing the image encoded in base64.
             - "user_id" field containing the email of who is using the API.
-        }
     Returns:
         tuple: A tuple containing the response (str) and HTTP status code (int).
     """
