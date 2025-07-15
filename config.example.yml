@@ -3,7 +3,7 @@ customer: dataoffice
 aml_experiment_details:
   compute_name: gpu-blurring-model
   env_name: baas-environment
-  env_version: 45
+  env_version: 53
   src_dir: "."
 
 metadata_pipeline:
@@ -14,8 +14,8 @@ metadata_pipeline:
     images: "selectie_original/images/val"
   outputs:
     yolo_annotations: "selectie_original/labels/val"  # yolo labels are overwritten with every new run
-    image_width: 8000
-    image_height: 40000
+    image_width: "8000"
+    image_height: "4000"
     metadata: "metadata.json"
     coco_annotations: "coco.json"
   flags:
@@ -34,12 +34,12 @@ inference_pipeline:
   model_params:
     batch_size: 4
     img_size: 2048
-    conf: 0.0001
+    conf: 0.01
   inputs:
     datastore_path: "dataoffice_input"
     inference_data_rel_path: "."
-    model_name: "yolo11m_orbs_lilac_spaceship-2"
-    model_version: "1"
+    model_name: "dataoffice_model"
+    model_version: "2"
   outputs:
     datastore_path: "dataoffice_output"  # empty string "" means same as input datastore
     output_rel_path: "2023/output_blurred"
@@ -57,7 +57,7 @@ inference_pipeline:
   sensitive_classes_conf: null  # null means conf is taken from model_params
   output_image_size: null  # null means keep original size
   save_detection_images: True
-  save_detection_labels: True
+  save_detection_labels: False
   save_all_images: True  # If True, all images will be saved regardless of whether they contain target class objects
   use_sahi: False
   database_parameters:
