@@ -187,3 +187,4 @@ poetry.lock
 /tests
 /experiments
 /datasets
+.git
