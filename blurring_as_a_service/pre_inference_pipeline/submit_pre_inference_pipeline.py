@@ -28,6 +28,7 @@ def pre_inference_pipeline():
     number_of_batches = settings["pre_inference_pipeline"]["inputs"][
         "number_of_batches"
     ]
+    exclude_file = settings["pre_inference_pipeline"]["inputs"]["exclude_list_file"]
     azureml_input_formatted = aml_interface.get_datastore_full_path(
         settings["pre_inference_pipeline"]["datastore_input"]
     )
@@ -38,6 +39,7 @@ def pre_inference_pipeline():
         execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
         datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
         number_of_batches=number_of_batches,
+        exclude_file=exclude_file,
     )
     split_workload_step.outputs.data_folder = Output(
         type="uri_folder",

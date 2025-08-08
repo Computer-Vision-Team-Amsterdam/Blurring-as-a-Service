@@ -29,6 +29,7 @@ pre_inference_pipeline:
   datastore_output: "dataoffice_input_structured"
   inputs:
     number_of_batches: 1
+    exclude_list_file: "files_not_to_process.csv"
 
 inference_pipeline:
   model_params:
