@@ -5,7 +5,7 @@ import sys
 import traceback
 from collections import defaultdict
 from datetime import datetime
-from typing import List
+from typing import List, Set
 
 from azure.ai.ml.constants import AssetTypes
 from azureml.core import Run
@@ -214,7 +214,7 @@ def create_dict_folders_and_frames_to_blur(
 
 def fetch_already_processed_images(
     preprocessing_date: str, db_connector: DBConfigSQLAlchemy
-) -> List[str]:
+) -> Set[str]:
     """
     Fetches the filenames of images that have already been processed on a given date.
 
@@ -262,7 +262,7 @@ def fetch_already_processed_images(
         except SQLAlchemyError as e:
             raise e
 
-    return [image.image_filename for image in processed_images]
+    return {image.image_filename for image in processed_images}
 
 
 def lock_images_that_will_be_blurred(
