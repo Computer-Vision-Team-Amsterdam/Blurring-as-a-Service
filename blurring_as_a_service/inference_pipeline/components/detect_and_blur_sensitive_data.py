@@ -89,42 +89,46 @@ def detect_and_blur_sensitive_data(
     logger = logging.getLogger("detect_and_blur_sensitive_data")
     if not os.path.exists(batches_files_path):
         raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
+
     output_rel_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
     if output_rel_path:
         output_folder = os.path.join(output_folder, output_rel_path)
-    batch_files_to_iterate = os.listdir(batches_files_path)
-    logging.info(f"Batches file to do: {batch_files_to_iterate}")
+
+    batch_files_to_iterate = [
+        file for file in os.listdir(batches_files_path) if file.endswith(".txt")
+    ]
+    logger.info(f"Batches file to do: {batch_files_to_iterate}")
+
     error_trace = ""
     db_connector = create_db_connector()
     db_connector.create_connection()
-    for batch_file_txt in batch_files_to_iterate:
-        if batch_file_txt.endswith(".txt"):
-            file_path = os.path.join(batches_files_path, batch_file_txt)
-            try:
-                if os.path.isfile(file_path):
-                    logger.info(f"Creating inference step: {file_path}")
-                    with LockFile(file_path) as src:
-                        preprocessing_date = datetime.strptime(
-                            re.search(
-                                r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", batch_file_txt
-                            ).group(),
-                            "%Y-%m-%d_%H_%M_%S",
-                        ).strftime("%Y-%m-%d %H:%M:%S")
-                        folders_and_frames = create_dict_folders_and_frames_to_blur(
-                            images_folder, src, preprocessing_date, db_connector
-                        )
-                        inference_pipeline = BaaSInference(
-                            images_folder=images_folder,
-                            output_folder=output_folder,
-                            model_path=model,
-                            inference_settings=settings["inference_pipeline"],
-                            folders_and_frames=folders_and_frames,
-                            customer_name=settings["customer"],
-                            image_upload_date=preprocessing_date,
-                        )
 
-                        inference_pipeline.run_pipeline()
-                    delete_file(file_path)
+    for batch_file_txt in batch_files_to_iterate:
+        file_path = os.path.join(batches_files_path, batch_file_txt)
+        if os.path.exists(file_path):
+            try:
+                logger.info(f"Creating inference step: {file_path}")
+                with LockFile(file_path) as src:
+                    preprocessing_date = datetime.strptime(
+                        re.search(
+                            r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", batch_file_txt
+                        ).group(),
+                        "%Y-%m-%d_%H_%M_%S",
+                    ).strftime("%Y-%m-%d %H:%M:%S")
+                    folders_and_frames = create_dict_folders_and_frames_to_blur(
+                        images_folder, src, preprocessing_date, db_connector
+                    )
+                    inference_pipeline = BaaSInference(
+                        images_folder=images_folder,
+                        output_folder=output_folder,
+                        model_path=model,
+                        inference_settings=settings["inference_pipeline"],
+                        folders_and_frames=folders_and_frames,
+                        customer_name=settings["customer"],
+                        image_upload_date=preprocessing_date,
+                    )
+                    inference_pipeline.run_pipeline()
+                delete_file(file_path)
             except FileNotFoundError as e:
                 logger.warning(
                     f"File {file_path} not found: {e}, if running in parallel, this could be expected."

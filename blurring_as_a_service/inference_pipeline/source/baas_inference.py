@@ -187,14 +187,14 @@ class BaaSInference(YOLOInference):
                         session.merge(image_processing_status)
                     break
                 except SQLAlchemyError as e:
-                    print(
+                    logger.warning(
                         f"Database operation failed on attempt {attempt + 1}/{MAX_RETRIES}: {e}"
                     )
                     if attempt < MAX_RETRIES - 1:
-                        print(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
+                        logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
                         time.sleep(RETRY_DELAY_SECONDS)
                     else:
-                        print("All database retry attempts failed.")
+                        logger.error("All database retry attempts failed.")
                         raise e
                 finally:
                     if db_connector:
