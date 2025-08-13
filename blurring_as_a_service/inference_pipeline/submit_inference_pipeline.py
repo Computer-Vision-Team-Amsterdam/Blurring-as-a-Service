@@ -1,3 +1,4 @@
+import argparse
 import os
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
@@ -57,12 +58,20 @@ def inference_pipeline():
 aml_interface = AMLInterface()
 
 
-def main():
+def main(n_jobs: int = 1):
     default_compute = settings["aml_experiment_details"]["compute_name"]
-    aml_interface.submit_pipeline_experiment(
-        inference_pipeline, "inference_pipeline", default_compute
-    )
+    for i in range(n_jobs):
+        print(f"\n==> Starting job {i + 1}/{n_jobs}...")
+        aml_interface.submit_pipeline_experiment(
+            inference_pipeline, "inference_pipeline", default_compute, show_log=False
+        )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--n_jobs", default="1", help="Number of identical jobs to start."
+    )
+    args = parser.parse_args()
+    n_jobs = int(args.n_jobs)
+    main(n_jobs=n_jobs)
