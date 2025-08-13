@@ -40,12 +40,14 @@ def split_workload(
     datastore_input_path: str,
     execution_time: str,
     number_of_batches: int,
+    exclude_file: str,
     results_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     WorkloadSplitter.create_batches(
         data_folder=data_folder,
         datastore_input_path=datastore_input_path,
         number_of_batches=number_of_batches,
+        exclude_file=exclude_file,
         output_folder=results_folder,
         execution_time=execution_time,
     )

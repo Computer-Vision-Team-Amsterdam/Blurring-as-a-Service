@@ -1,3 +1,4 @@
+import csv
 import logging
 import math
 import os
@@ -15,6 +16,7 @@ class WorkloadSplitter:
         data_folder: str,
         datastore_input_path: str,
         number_of_batches: int,
+        exclude_file: str,
         output_folder: str,
         execution_time: str,
     ) -> None:
@@ -41,12 +43,33 @@ class WorkloadSplitter:
             Root folder containing the images.
         number_of_batches : int
             Number of files to distribute the data.
+        exclude_file : Optional[str]
+            CSV file containing a column `filename` with names of files to skip.
         output_folder : str
             Where to store the output files.
         execution_time: str
             Datetime containing when the job was executed. Used to prefix the files name.
         """
         image_paths = get_image_paths(data_folder)
+
+        logger.info(f"Number of input files found: {len(image_paths)}")
+
+        if exclude_file != "":
+            with open(os.path.join(data_folder, exclude_file), "r") as csv_file:
+                reader = csv.reader(csv_file)
+                _ = next(reader)
+                exclude_list = {row[0] for row in reader}
+
+                logger.info(f"Read {len(exclude_list)} rows from {exclude_file}")
+
+                image_paths = [
+                    img_path
+                    for img_path in image_paths
+                    if os.path.basename(img_path[1]) not in exclude_list
+                ]
+
+                logger.info(f"Number of input files remaining: {len(image_paths)}")
+
         if number_of_batches > len(image_paths):
             number_of_batches = (
                 math.ceil(len(image_paths) / 50) if len(image_paths) > 50 else 1

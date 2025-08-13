@@ -1,4 +1,5 @@
 import logging
+import time
 from pathlib import Path
 from typing import Dict, List
 
@@ -147,39 +148,54 @@ class BaaSInference(YOLOInference):
                     }
                 )
 
-            db_connector = create_db_connector()
-            db_connector.create_connection()
-            try:
-                with db_connector.managed_session() as session:
-                    if batch_detection_info:
-                        session.bulk_insert_mappings(
-                            DetectionInformation, batch_detection_info
-                        )
-                    else:
-                        empty_detection = DetectionInformation(
-                            image_customer_name=self.customer_name,
-                            image_upload_date=self.image_upload_date,
+            MAX_RETRIES = 5
+            RETRY_DELAY_SECONDS = 60
+
+            for attempt in range(MAX_RETRIES):
+                db_connector = None
+                try:
+                    db_connector = create_db_connector()
+                    db_connector.create_connection()
+                    with db_connector.managed_session() as session:
+                        if batch_detection_info:
+                            session.bulk_insert_mappings(
+                                DetectionInformation, batch_detection_info
+                            )
+                        else:
+                            empty_detection = DetectionInformation(
+                                image_customer_name=self.customer_name,
+                                image_upload_date=self.image_upload_date,
+                                image_filename=str(image_filename),
+                                has_detection=False,
+                                class_id=None,
+                                x_norm=None,
+                                y_norm=None,
+                                w_norm=None,
+                                h_norm=None,
+                                image_width=None,
+                                image_height=None,
+                                run_id="",
+                                conf_score=None,
+                            )
+                            session.add(empty_detection)
+                        image_processing_status = ImageProcessingStatus(
                             image_filename=str(image_filename),
-                            has_detection=False,
-                            class_id=None,
-                            x_norm=None,
-                            y_norm=None,
-                            w_norm=None,
-                            h_norm=None,
-                            image_width=None,
-                            image_height=None,
-                            run_id="",
-                            conf_score=None,
+                            image_upload_date=self.image_upload_date,
+                            image_customer_name=self.customer_name,
+                            processing_status="processed",
                         )
-                        session.add(empty_detection)
-                    image_processing_status = ImageProcessingStatus(
-                        image_filename=str(image_filename),
-                        image_upload_date=self.image_upload_date,
-                        image_customer_name=self.customer_name,
-                        processing_status="processed",
+                        session.merge(image_processing_status)
+                    break
+                except SQLAlchemyError as e:
+                    logger.warning(
+                        f"Database operation failed on attempt {attempt + 1}/{MAX_RETRIES}: {e}"
                     )
-                    session.merge(image_processing_status)
-            except SQLAlchemyError as e:
-                db_connector.close_connection()
-                raise e
-            db_connector.close_connection()
+                    if attempt < MAX_RETRIES - 1:
+                        logger.info(f"Retrying in {RETRY_DELAY_SECONDS} seconds...")
+                        time.sleep(RETRY_DELAY_SECONDS)
+                    else:
+                        logger.error("All database retry attempts failed.")
+                        raise e
+                finally:
+                    if db_connector:
+                        db_connector.close_connection()
