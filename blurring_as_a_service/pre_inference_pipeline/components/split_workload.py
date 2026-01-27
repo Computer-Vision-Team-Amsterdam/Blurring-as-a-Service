@@ -47,7 +47,7 @@ def split_workload(
         data_folder=data_folder,
         datastore_input_path=datastore_input_path,
         number_of_batches=number_of_batches,
-        exclude_file=exclude_file,
         output_folder=results_folder,
         execution_time=execution_time,
+        exclude_file=exclude_file,
     )

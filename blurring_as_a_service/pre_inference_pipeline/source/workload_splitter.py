@@ -2,6 +2,7 @@ import csv
 import logging
 import math
 import os
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -16,9 +17,9 @@ class WorkloadSplitter:
         data_folder: str,
         datastore_input_path: str,
         number_of_batches: int,
-        exclude_file: str,
         output_folder: str,
         execution_time: str,
+        exclude_file: Optional[str] = None,
     ) -> None:
         """
         Starting from a data folder, iterates over all subfolders and equally groups all jpg files into number_of_batches
@@ -43,18 +44,18 @@ class WorkloadSplitter:
             Root folder containing the images.
         number_of_batches : int
             Number of files to distribute the data.
-        exclude_file : Optional[str]
-            CSV file containing a column `filename` with names of files to skip.
         output_folder : str
             Where to store the output files.
         execution_time: str
             Datetime containing when the job was executed. Used to prefix the files name.
+        exclude_file : Optional[str]
+            CSV file containing a column `filename` with names of files to skip.
         """
-        image_paths = get_image_paths(data_folder)
+        image_paths = get_image_paths(os.path.join(data_folder, datastore_input_path))
 
         logger.info(f"Number of input files found: {len(image_paths)}")
 
-        if exclude_file != "":
+        if (exclude_file is not None) and (exclude_file != "None"):
             with open(os.path.join(data_folder, exclude_file), "r") as csv_file:
                 reader = csv.reader(csv_file)
                 _ = next(reader)

@@ -28,7 +28,9 @@ def pre_inference_pipeline():
     number_of_batches = settings["pre_inference_pipeline"]["inputs"][
         "number_of_batches"
     ]
-    exclude_file = settings["pre_inference_pipeline"]["inputs"]["exclude_list_file"]
+    exclude_file = settings["pre_inference_pipeline"]["inputs"].get(
+        "exclude_list_file", None
+    )
     azureml_input_formatted = aml_interface.get_datastore_full_path(
         settings["pre_inference_pipeline"]["datastore_input"]
     )

@@ -43,7 +43,7 @@ class MetadataPipelineSpec(SettingsSpecModel):
 
 class PreInferencePipelineInputs(SettingsSpecModel):
     number_of_batches: int
-    exclude_list_file: str = ""
+    exclude_list_file: str = "None"
 
 
 class PreInferencePipelineSpec(SettingsSpecModel):
