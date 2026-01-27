@@ -2,7 +2,8 @@ import os
 from datetime import datetime
 
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
-from azure.ai.ml import Output
+from azure.ai.ml import Input, Output
+from azure.ai.ml.constants import AssetTypes
 from azure.ai.ml.dsl import pipeline
 
 from blurring_as_a_service.settings.settings import (  # noqa: E402
@@ -37,19 +38,17 @@ def pre_inference_pipeline():
     azureml_output_formatted = aml_interface.get_datastore_full_path(
         settings["pre_inference_pipeline"]["datastore_output"]
     )
+    input_datastore = Input(
+        type=AssetTypes.URI_FOLDER,
+        path=azureml_input_formatted,
+        description="Input datastore",
+    )
     split_workload_step = split_workload(
-        execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
+        data_folder=input_datastore,
         datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
+        execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
         number_of_batches=number_of_batches,
         exclude_file=exclude_file,
-    )
-    split_workload_step.outputs.data_folder = Output(
-        type="uri_folder",
-        mode="rw_mount",
-        path=os.path.join(
-            azureml_input_formatted,
-            settings["pre_inference_pipeline"]["datastore_input_path"],
-        ),
     )
     split_workload_step.outputs.results_folder = Output(
         type="uri_folder",
