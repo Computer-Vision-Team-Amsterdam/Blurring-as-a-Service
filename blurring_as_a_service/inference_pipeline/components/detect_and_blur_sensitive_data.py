@@ -5,7 +5,7 @@ import sys
 import traceback
 from collections import defaultdict
 from datetime import datetime
-from typing import List, Set
+from typing import List, Optional, Set
 
 from azure.ai.ml.constants import AssetTypes
 from azureml.core import Run
@@ -94,24 +94,23 @@ def detect_and_blur_sensitive_data(
     if output_rel_path:
         output_folder = os.path.join(output_folder, output_rel_path)
 
-    batch_files_to_iterate = [
-        file for file in os.listdir(batches_files_path) if file.endswith(".txt")
-    ]
-    logger.info(f"Batches file to do: {batch_files_to_iterate}")
-
     error_trace = ""
     db_connector = create_db_connector()
     db_connector.create_connection()
 
-    for batch_file_txt in batch_files_to_iterate:
-        file_path = os.path.join(batches_files_path, batch_file_txt)
-        if os.path.exists(file_path):
+    while True:
+        next_batch_file = get_next_batch_file(batches_files_path, logger)
+        if next_batch_file is None:
+            break
+
+        file_path = os.path.join(batches_files_path, next_batch_file)
+        if os.path.isfile(file_path):
             try:
                 logger.info(f"Creating inference step: {file_path}")
                 with LockFile(file_path) as src:
                     preprocessing_date = datetime.strptime(
                         re.search(
-                            r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", batch_file_txt
+                            r"\d{4}-\d{2}-\d{2}_\d{2}_\d{2}_\d{2}", next_batch_file
                         ).group(),
                         "%Y-%m-%d_%H_%M_%S",
                     ).strftime("%Y-%m-%d %H:%M:%S")
@@ -168,6 +167,23 @@ def detect_and_blur_sensitive_data(
         db_connector.close_connection()
         raise e
     db_connector.close_connection()
+
+
+def get_next_batch_file(
+    batches_files_path: str, logger: logging.Logger
+) -> Optional[str]:
+    """
+    Get the filename of the next batch file. If none are left, returns None.
+    """
+    batch_files_to_iterate = sorted(
+        [file for file in os.listdir(batches_files_path) if file.endswith(".txt")]
+    )
+    if len(batch_files_to_iterate) > 0:
+        logger.info(f"Batches file to do: {batch_files_to_iterate}")
+        return batch_files_to_iterate[0]
+    else:
+        logger.info("No more batch files to do.")
+        return None
 
 
 def create_dict_folders_and_frames_to_blur(
