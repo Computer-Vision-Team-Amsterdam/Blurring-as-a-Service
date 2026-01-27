@@ -1,13 +1,13 @@
 [project]
 name = "blurring_as_a_service"
-version = "2.2.0"
-description = ""
+version = "2.2.1"
+description = "Blurring of people and license plates in images."
 authors = [
+    {name = "Daan Bloembergen", email = "d.bloembergen@amsterdam.nl"},
     {name = "Sebastian Davrieux", email = "s.davrieux@amsterdam.nl"},
+    {name = "Chris Eijgenstein", email = ""},
     {name = "Diana Epureanu", email = "d.epureanu@amsterdam.nl"},
     {name = "Andrea Lombardo", email = "a.lombardo@amsterdam.nl"},
-    {name = "Daan Bloembergen", email = "d.bloembergen@amsterdam.nl"},
-    {name = "Chris Eijgenstein", email = ""},
 ]
 maintainers = [
     { name = "Computer Vision Team, Gemeente Amsterdam", email = "cvt@amsterdam.nl" },
@@ -19,6 +19,15 @@ dependencies = [
     "psycopg2>=2.9.10",
     "azureml-core>=1.59.0",
     "azureml-inference-server-http>=1.4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ipykernel>=6.29.4",
+    "pre-commit>=3.2.0",
+    "pytest>=7.0.1",
+    "pytest-cov>=4.0.0",
+    "safety>=3.2.4",
 ]
 
 [tool.uv]
