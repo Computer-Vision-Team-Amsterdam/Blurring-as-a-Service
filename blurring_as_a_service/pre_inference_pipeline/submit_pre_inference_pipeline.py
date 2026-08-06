@@ -62,9 +62,11 @@ aml_interface = AMLInterface()
 
 
 def main():
-    default_compute = settings["aml_experiment_details"]["compute_name"]
     aml_interface.submit_pipeline_experiment(
-        pre_inference_pipeline, "pre_inference_pipeline", default_compute
+        pipeline_function=pre_inference_pipeline,
+        experiment_name=settings["aml_experiment_details"]["experiment_name"],
+        default_compute=settings["aml_experiment_details"]["compute_name"],
+        show_log=False,
     )
 
 

@@ -1,7 +1,8 @@
 customer: dataoffice
 
 aml_experiment_details:
-  compute_name: gpu-blurring-model
+experiment_name: "baas_dataoffice"
+  compute_name: gpu-inference-cluster
   env_name: baas-environment
   env_version: 53
   src_dir: "."
@@ -24,34 +25,28 @@ metadata_pipeline:
     - CONVERT_AZURE_COCO_TO_COCO
 
 pre_inference_pipeline:
-  datastore_input: "dataoffice_input_structured"
-  datastore_input_path: "2024-10-23_09_03_18"
-  datastore_output: "dataoffice_input_structured"
+  datastore_input: "inference_test"
+  datastore_input_path: "datasets/kavel10_kempkes_geo360_sampled_panos_test"
+  datastore_output: "inference_test"
   inputs:
     number_of_batches: 1
     exclude_list_file: "files_not_to_process.csv"  # column of file names with header "file"; omit or use "None" for no exclude list
 
 inference_pipeline:
   model_params:
-    batch_size: 4
+    batch_size: 1
     img_size: 2048
     conf: 0.01
   inputs:
-    datastore_path: "dataoffice_input"
+    datastore_path: "inference_test"
     inference_data_rel_path: "."
     model_name: "dataoffice_model"
     model_version: "2"
   outputs:
-    datastore_path: "dataoffice_output"  # empty string "" means same as input datastore
-    output_rel_path: "2023/output_blurred"
+    datastore_path: "inference_test"  # empty string "" means same as input datastore
+    output_rel_path: "inference/baas_test"
     detections_subfolder: ""
     labels_subfolder: ""
-  sahi_params:
-    model_type: "ultralytics"
-    slice_height: 2048
-    slice_width: 2048
-    overlap_height_ratio: 0.2
-    overlap_width_ratio: 0.2
   target_classes: []
   sensitive_classes: [0, 1]
   target_classes_conf: null  # null means conf is taken from model_params
@@ -60,7 +55,6 @@ inference_pipeline:
   save_detection_images: True
   save_detection_labels: False
   save_all_images: True  # If True, all images will be saved regardless of whether they contain target class objects
-  use_sahi: False
   database_parameters:
     db_hostname: "psql-flexi-blur-ont-weu-esy-01.postgres.database.azure.com"
     db_username: "aml-compute-cvo-p"
