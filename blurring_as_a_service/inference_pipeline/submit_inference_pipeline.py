@@ -59,11 +59,13 @@ aml_interface = AMLInterface()
 
 
 def main(n_jobs: int = 1):
-    default_compute = settings["aml_experiment_details"]["compute_name"]
     for i in range(n_jobs):
         print(f"\n==> Starting job {i + 1}/{n_jobs}...")
         aml_interface.submit_pipeline_experiment(
-            inference_pipeline, "inference_pipeline", default_compute, show_log=False
+            pipeline_function=inference_pipeline,
+            experiment_name=settings["aml_experiment_details"]["experiment_name"],
+            default_compute=settings["aml_experiment_details"]["compute_name"],
+            show_log=False,
         )
 
 

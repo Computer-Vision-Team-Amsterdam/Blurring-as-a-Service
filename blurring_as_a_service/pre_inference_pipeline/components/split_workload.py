@@ -2,7 +2,7 @@ import os
 import sys
 
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Output, command_component
+from mldesigner import Input, Output, command_component
 
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
@@ -36,7 +36,7 @@ aml_experiment_settings = settings["aml_experiment_details"]
     is_deterministic=False,
 )
 def split_workload(
-    data_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    data_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     datastore_input_path: str,
     execution_time: str,
     number_of_batches: int,
@@ -47,7 +47,7 @@ def split_workload(
         data_folder=data_folder,
         datastore_input_path=datastore_input_path,
         number_of_batches=number_of_batches,
-        exclude_file=exclude_file,
         output_folder=results_folder,
         execution_time=execution_time,
+        exclude_file=exclude_file,
     )

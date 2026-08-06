@@ -184,6 +184,7 @@ poetry.lock
 *.jpg
 *.DS_Store
 *.md
+*.ipynb
 /tests
 /experiments
 /datasets
