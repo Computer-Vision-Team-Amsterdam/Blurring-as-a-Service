@@ -4,7 +4,7 @@ aml_experiment_details:
 experiment_name: "baas_dataoffice"
   compute_name: gpu-inference-cluster
   env_name: baas-environment
-  env_version: 53
+  env_version: 1  # Replace with the latest version
   src_dir: "."
 
 metadata_pipeline:

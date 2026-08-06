@@ -16,6 +16,7 @@ requires-python = ">=3.10"
 dependencies = [
     "yolo_model_development_kit",
     "azure-cli>=2.67.0",
+    "azure-monitor-opentelemetry>=1.8",
     "psycopg2>=2.9.10",
     "azureml-core>=1.59.0",
     "azureml-inference-server-http>=1.4.0",
