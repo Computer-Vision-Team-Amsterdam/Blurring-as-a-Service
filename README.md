@@ -41,13 +41,13 @@ In the terminal, navigate to the project root (the folder containing `pyproject.
 
 ```bash
 # Create the environment locally in the folder .venv
-uv venv --python 3.11
+uv venv --python 3.12
 
 # Activate the environment
 source .venv/bin/activate 
 
-# Install dependencies
-uv pip install -r pyproject.toml
+# Install dependencies, e.g. for development using CPU
+uv pip install -r pyproject.toml --extra dev --extra cpu
 
 # Add package
 uv add <package_name>
