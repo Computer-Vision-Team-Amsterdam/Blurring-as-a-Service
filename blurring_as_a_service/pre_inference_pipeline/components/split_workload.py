@@ -37,17 +37,17 @@ aml_experiment_settings = settings["aml_experiment_details"]
 )
 def split_workload(
     data_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
-    datastore_input_path: str,
+    input_rel_path: str,
     execution_time: str,
     number_of_batches: int,
     exclude_file: str,
-    results_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    inference_queue_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     WorkloadSplitter.create_batches(
-        data_folder=data_folder,
-        datastore_input_path=datastore_input_path,
+        input_data_folder=data_folder,
+        input_rel_path=input_rel_path,
         number_of_batches=number_of_batches,
-        output_folder=results_folder,
+        output_folder=inference_queue_folder,
         execution_time=execution_time,
         exclude_file=exclude_file,
     )

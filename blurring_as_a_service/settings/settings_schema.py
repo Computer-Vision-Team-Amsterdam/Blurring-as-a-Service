@@ -42,15 +42,20 @@ class MetadataPipelineSpec(SettingsSpecModel):
 
 
 class PreInferencePipelineInputs(SettingsSpecModel):
-    number_of_batches: int
+    datastore: str
+    input_rel_path: str
     exclude_list_file: str = "None"
 
 
+class PreInferencePipelineOutputs(SettingsSpecModel):
+    datastore: str
+    inference_queue_rel_path: str = "inference_queue"
+
+
 class PreInferencePipelineSpec(SettingsSpecModel):
-    datastore_input: str
-    datastore_input_path: str
-    datastore_output: str
     inputs: PreInferencePipelineInputs
+    outputs: PreInferencePipelineOutputs
+    number_of_batches: int = 1
 
 
 class DatabaseCredentialsSpec(SettingsSpecModel):

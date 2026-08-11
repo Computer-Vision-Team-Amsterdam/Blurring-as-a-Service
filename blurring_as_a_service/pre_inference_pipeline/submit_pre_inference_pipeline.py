@@ -26,35 +26,38 @@ from blurring_as_a_service.pre_inference_pipeline.components.split_workload impo
 
 @pipeline()
 def pre_inference_pipeline():
-    number_of_batches = settings["pre_inference_pipeline"]["inputs"][
-        "number_of_batches"
-    ]
-    exclude_file = settings["pre_inference_pipeline"]["inputs"].get(
-        "exclude_list_file", None
-    )
-    azureml_input_formatted = aml_interface.get_datastore_full_path(
-        settings["pre_inference_pipeline"]["datastore_input"]
-    )
-    azureml_output_formatted = aml_interface.get_datastore_full_path(
-        settings["pre_inference_pipeline"]["datastore_output"]
+    input_datastore_fullpath = aml_interface.get_datastore_full_path(
+        settings["pre_inference_pipeline"]["inputs"]["datastore"]
     )
     input_datastore = Input(
         type=AssetTypes.URI_FOLDER,
-        path=azureml_input_formatted,
+        path=input_datastore_fullpath,
         description="Input datastore",
     )
+
     split_workload_step = split_workload(
         data_folder=input_datastore,
-        datastore_input_path=settings["pre_inference_pipeline"]["datastore_input_path"],
+        input_rel_path=settings["pre_inference_pipeline"]["inputs"]["input_rel_path"],
         execution_time=datetime.now().strftime("%Y-%m-%d_%H_%M_%S"),
-        number_of_batches=number_of_batches,
-        exclude_file=exclude_file,
+        number_of_batches=settings["pre_inference_pipeline"]["number_of_batches"],
+        exclude_file=settings["pre_inference_pipeline"]["inputs"].get(
+            "exclude_list_file", None
+        ),
     )
-    split_workload_step.outputs.results_folder = Output(
+
+    output_datastore_fullpath = aml_interface.get_datastore_full_path(
+        settings["pre_inference_pipeline"]["outputs"]["datastore"]
+    )
+    inference_queue_folder = os.path.join(
+        output_datastore_fullpath,
+        settings["pre_inference_pipeline"]["outputs"]["inference_queue_rel_path"],
+    )
+    split_workload_step.outputs.inference_queue_folder = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=os.path.join(azureml_output_formatted, "inference_queue"),
+        path=inference_queue_folder,
     )
+
     return {}
 
 
