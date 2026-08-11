@@ -1,10 +1,9 @@
+import logging
 import os
 import sys
-import logging
 
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Output, command_component
-
+from mldesigner import Input, command_component
 
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
@@ -23,10 +22,14 @@ settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
-from blurring_as_a_service.check_corrupted_images.source.count_corrupted_images_per_folder import count_corrupted_images_per_folder  # noqa: E402
+logger = logging.getLogger(__name__)
 
+from blurring_as_a_service.check_corrupted_images.source.count_corrupted_images_per_folder import (  # noqa: E402
+    count_corrupted_images_per_folder,
+)
 
 aml_experiment_settings = settings["aml_experiment_details"]
+logger = logging.getLogger("count_corrupted_images")
 
 
 @command_component(
@@ -37,8 +40,11 @@ aml_experiment_settings = settings["aml_experiment_details"]
     is_deterministic=False,
 )
 def count_corrupted_images(
-    input_structured_container: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    input_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
-    image_counts = count_corrupted_images_per_folder(input_structured_container)
+    image_counts, image_names = count_corrupted_images_per_folder(input_folder)
     for folder, count in image_counts.items():
-        logging.info(f"{folder}: {count} images")
+        logger.info(f"{folder}: {count} images")
+    for key, file_list in image_names.items():
+        logger.info(f"\n{key}\n-----")
+        logger.info("\n".join(file_list))

@@ -1,10 +1,13 @@
 import os
 from collections import defaultdict
+from typing import List, Tuple
 
 IMG_FORMATS = "jpeg", "jpg"
 
 
-def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
+def count_corrupted_images_per_folder(
+    input_folder: str,
+) -> Tuple[defaultdict, defaultdict]:
     """
     Count the number of corrupted images in each folder within the input container.
 
@@ -22,7 +25,9 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
     image_counts: defaultdict[str, defaultdict[str, int]] = defaultdict(
         lambda: defaultdict(int)
     )
-    for root, _, files in os.walk(input_container):
+    image_names: defaultdict[str, List[str]] = defaultdict(list)
+
+    for root, _, files in os.walk(input_folder):
         total_images = good_images = empty_images = corrupted_images = 0
         for file in files:
             if file.lower().endswith(IMG_FORMATS):
@@ -32,8 +37,10 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
                     good_images += 1
                 elif validation_code == 1:
                     empty_images += 1
+                    image_names["empty_images"].append(os.path.join(root, file))
                 elif validation_code == 2:
                     corrupted_images += 1
+                    image_names["corrupted_images"].append(os.path.join(root, file))
 
         if total_images > 0:
             image_counts[root]["total_images"] += total_images
@@ -44,7 +51,7 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
         if corrupted_images > 0:
             image_counts[root]["corrupted_images"] += corrupted_images
 
-    return image_counts
+    return image_counts, image_names
 
 
 def check_jpgs(filename: str) -> int:
