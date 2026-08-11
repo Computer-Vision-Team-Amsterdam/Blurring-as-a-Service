@@ -1,11 +1,11 @@
 [project]
 name = "blurring_as_a_service"
-version = "2.2.1"
+version = "2.2.2"
 description = "Blurring of people and license plates in images."
 authors = [
     {name = "Daan Bloembergen", email = "d.bloembergen@amsterdam.nl"},
     {name = "Sebastian Davrieux", email = "s.davrieux@amsterdam.nl"},
-    {name = "Chris Eijgenstein", email = ""},
+    {name = "Chris Eijgenstein"},
     {name = "Diana Epureanu", email = "d.epureanu@amsterdam.nl"},
     {name = "Andrea Lombardo", email = "a.lombardo@amsterdam.nl"},
 ]
@@ -39,6 +39,14 @@ cu128 = [
   "torchvision>=0.26.0",
 ]
 
+[project.scripts]
+create_azure_env = "blurring_as_a_service.create_aml_environment.create_azure_env:main"
+submit_pre_inference_pipeline = "blurring_as_a_service.pre_inference_pipeline.submit_pre_inference_pipeline:main"
+submit_inference_pipeline = "blurring_as_a_service.inference_pipeline.submit_inference_pipeline:main"
+
+[tool.setuptools.packages.find]
+include=["blurring_as_a_service", "tests"]
+
 [tool.uv]
 conflicts = [
   [
@@ -46,6 +54,7 @@ conflicts = [
     { extra = "cu128" },
   ],
 ]
+package = true
 prerelease = "allow"
 
 [tool.uv.sources]
