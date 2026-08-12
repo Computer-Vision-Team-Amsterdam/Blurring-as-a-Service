@@ -29,7 +29,6 @@ from blurring_as_a_service.check_corrupted_images.source.count_corrupted_images_
 )
 
 aml_experiment_settings = settings["aml_experiment_details"]
-logger = logging.getLogger("count_corrupted_images")
 
 
 @command_component(
@@ -44,7 +43,9 @@ def count_corrupted_images(
 ):
     image_counts, image_names = count_corrupted_images_per_folder(input_folder)
     for folder, count in image_counts.items():
-        logger.info(f"{folder}: {count} images")
+        count_str = ", ".join([f"{key}: {value}" for key, value in count.items()])
+        logger.info(f"Image counts for {folder}: {count_str}")
     for key, file_list in image_names.items():
-        logger.info(f"\n{key}\n-----")
-        logger.info("\n".join(file_list))
+        key_str = key.upper()
+        for file in file_list:
+            logger.info(f"{key_str}: {file}")
