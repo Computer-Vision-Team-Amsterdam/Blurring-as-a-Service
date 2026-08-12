@@ -6,19 +6,18 @@ We create a document with a list of potential biases that we want to minimize an
 the panorama images used for training the model based on this document.
 
 ### Useful links
+
 1. [Panorama API](https://api.data.amsterdam.nl/panorama/panoramas)
 2. [Panorama viewer](https://data.amsterdam.nl/data/geozoek/?modus=kaart&term=Panoramabeelden&lagen=pano-pano2022bi%7Cpano-pano2021bi%7Cpano-pano2020bi%7Cpano-pano2019bi%7Cpano-pano2018bi%7Cpano-pano2017bi%7Cpano-pano2016bi%7Cpano-pano2021woz%7Cpano-pano2020woz%7Cpano-pano2019woz%7Cpano-pano2018woz%7Cpano-pano2017woz&legenda=true)
-3. [Excel sheet with inclusivity biases (risico's en maatregelen.xlsx)](https://hoofdstad.sharepoint.com/sites/DigitaliseringenCTO/Shared%20Documents/Forms/AllItems.aspx?RootFolder=%2Fsites%2FDigitaliseringenCTO%2FShared%20Documents%2FInnovatie%20en%20RenD%2FComputer%20Vision%20Team%2FProjecten%2FInnovatiebudget%20%28hieronder%20valt%20Blur%20use%20case%29%2FInclusiviteit&FolderCTID=0x0120002EC45AFB501BC64FB525D14106AF3E05)
-4. [Annotation project in Azure ML](https://ml.azure.com/labeling/project/93e9b2be-62de-6a8c-9c22-5b20cc5b90af/details?wsid=/subscriptions/b5d1b0e0-1ce4-40f9-87d5-cf3fde7a7b14/resourceGroups/cvo-aml-p-rg/providers/Microsoft.MachineLearningServices/workspaces/cvo-weu-aml-p-xnjyjutinwfyu&tid=72fca1b1-2c2e-4376-a445-294d80196804)
-5. [Miro board with pipelines architecture](https://miro.com/app/board/uXjVPbDfQ9s=/?share_link_id=940866715023)
----
+
 
 ## Installation
+---
 
-#### 1. Clone the code
+### 1. Clone the code
 
 ```bash
-git clone git@github.com:Computer-Vision-Team-Amsterdam/Blurring-as-a-Service.git
+git clone https://github.com/Computer-Vision-Team-Amsterdam/Blurring-as-a-Service.git
 ```
 
 ### 2. Install UV
@@ -76,7 +75,7 @@ pre-commit autoupdate
 bash .git/hooks/pre-commit
 ```
 
-### 5. Install libpq-dev
+### 5. Install libpq-dev (only needed when running locally)
 To be able to install psycopg2 to interact with the database libpq-dev is needed:
 ```bash
 sudo apt-get install libpq-dev
@@ -92,22 +91,29 @@ Copy the config.example.yml file and rename it to config.yml.
 Adapt the config file to your execution configuration, 
 setting azure paths of where the data can be located and the flags to enable or disable pipeline steps.
 
----
 
 ## Pipelines
-More information about the pipelines can be found on our [Azure DevOps Wiki](https://dev.azure.com/CloudCompetenceCenter/Computer-Vision-Team-Amsterdam/_wiki/wikis/Computer-Vision-Team-Amsterdam.wiki/17263/AML-pipelines).
+---
 
-## Database
+Pipelines can be started as follows from your local installation:
 
-To access a database in Azure Machine Learning it is necessary to create a `database.json` file inside the `database` folder.
-An example of the structure can be found in the folder under the name `database.example.json`.
+```bash
+az login
 
-This database.json file should include the following information:
-``` 
-    client_id:      client id of the managed identity in Azure
+uv run --extra dev --extra cpu create_azure_env  # Create an AzureML environment based on the Dockerfile
+
+uv run --extra dev --extra cpu run_count_images_pipeline  # Count the number of images in the input folder and check if any are corrupted
+
+uv run --extra dev --extra cpu run_pre_inference_pipeline  # Generate a queue of batch files to process
+
+uv run --extra dev --extra cpu run_inference_pipeline --n_jobs 8  # Process the queue of batch files in parallel
 ```
 
+More information about the pipelines can be found on our [Azure DevOps Wiki](https://dev.azure.com/CloudCompetenceCenter/Computer-Vision-Team-Amsterdam/_wiki/wikis/Computer-Vision-Team-Amsterdam.wiki/60186/Blurring-OPS).
+
+
 ## Monitoring
+---
 
 We monitor the health of the pipelines in the BaaS workbook which can be found in [portal](https://portal.azure.com/#@amsterdam.nl/resource/subscriptions/5e762a44-83c7-4972-b0cb-939aa7845c90/resourceGroups/rg-blur-ont-weu-esy-01/providers/microsoft.insights/workbooks/9b284c8e-c5ca-45fb-9194-65f56c6e5066/overview).
 The [`dashboard`](dashboard) folder contains the workbook in gallery template (.workbook) and ARM template (.json).
