@@ -12,7 +12,6 @@ the panorama images used for training the model based on this document.
 
 
 ## Installation
----
 
 ### 1. Clone the code
 
@@ -93,7 +92,6 @@ setting azure paths of where the data can be located and the flags to enable or 
 
 
 ## Pipelines
----
 
 Pipelines can be started as follows from your local installation:
 
@@ -113,7 +111,6 @@ More information about the pipelines can be found on our [Azure DevOps Wiki](htt
 
 
 ## Monitoring
----
 
 We monitor the health of the pipelines in the BaaS workbook which can be found in [portal](https://portal.azure.com/#@amsterdam.nl/resource/subscriptions/5e762a44-83c7-4972-b0cb-939aa7845c90/resourceGroups/rg-blur-ont-weu-esy-01/providers/microsoft.insights/workbooks/9b284c8e-c5ca-45fb-9194-65f56c6e5066/overview).
 The [`dashboard`](dashboard) folder contains the workbook in gallery template (.workbook) and ARM template (.json).
