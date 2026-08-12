@@ -5,22 +5,25 @@ from typing import List, Tuple
 IMG_FORMATS = "jpeg", "jpg"
 
 
-def count_corrupted_images_per_folder(
+def count_images_per_folder(
     input_folder: str,
 ) -> Tuple[defaultdict[str, defaultdict[str, int]], defaultdict[str, List[str]]]:
     """
-    Count the number of corrupted images in each folder within the input container.
+    Count the number of (corrupted) images in each folder within the input folder.
 
     Parameters
     ----------
-    input_container : str
-        The path to the input container directory.
+    input_folder : str
+        The path to the input folder.
 
     Returns
     -------
-    defaultdict
-        A nested defaultdict where the keys are folder paths and the values are dictionaries
-        with counts of total, good, empty, and corrupted images.
+    defaultdict, defaultdict
+        1) A nested defaultdict where the keys are folder paths and the values
+           are dictionaries with counts of total, good, empty, and corrupted
+           images.
+        2) A defaultdict where the keys are "empty" and "corrupted" and the
+           values are the list of file names for each type.
     """
     image_counts: defaultdict[str, defaultdict[str, int]] = defaultdict(
         lambda: defaultdict(int)

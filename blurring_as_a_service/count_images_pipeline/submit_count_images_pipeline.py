@@ -18,13 +18,13 @@ azureLoggingConfigurer.setup_baas_logging()
 
 from aml_interface.aml_interface import AMLInterface  # noqa: E402
 
-from blurring_as_a_service.check_corrupted_images.components.count_corrupted_images import (  # noqa: E402
-    count_corrupted_images,
+from blurring_as_a_service.count_images_pipeline.components.count_images import (  # noqa: E402
+    count_images,
 )
 
 
 @pipeline()
-def check_corrupted_images_pipeline():
+def count_images_pipeline():
     aml_interface = AMLInterface()
 
     input_datastore_fullpath = aml_interface.get_datastore_full_path(
@@ -39,7 +39,7 @@ def check_corrupted_images_pipeline():
         description="Input folder",
     )
 
-    count_corrupted_images(input_folder=input_folder)
+    count_images(input_folder=input_folder)
 
     return {}
 
@@ -47,7 +47,7 @@ def check_corrupted_images_pipeline():
 def main():
     aml_interface = AMLInterface()
     aml_interface.submit_pipeline_experiment(
-        pipeline_function=check_corrupted_images_pipeline,
+        pipeline_function=count_images_pipeline,
         experiment_name=settings["aml_experiment_details"]["experiment_name"],
         default_compute=settings["aml_experiment_details"]["compute_name"],
         show_log=False,

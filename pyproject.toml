@@ -43,7 +43,7 @@ cu128 = [
 create_azure_env = "blurring_as_a_service.create_aml_environment.create_azure_env:main"
 run_pre_inference_pipeline = "blurring_as_a_service.pre_inference_pipeline.submit_pre_inference_pipeline:main"
 run_inference_pipeline = "blurring_as_a_service.inference_pipeline.submit_inference_pipeline:main"
-run_check_corrupted_images_pipeline = "blurring_as_a_service.check_corrupted_images.submit_check_corrupted_images_pipeline:main"
+run_count_images_pipeline = "blurring_as_a_service.count_images_pipeline.submit_count_images_pipeline:main"
 
 [tool.setuptools.packages.find]
 include=["blurring_as_a_service", "tests"]
