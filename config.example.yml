@@ -24,6 +24,11 @@ metadata_pipeline:
     - CONVERT_AZURE_COCO_TO_YOLO
     - CONVERT_AZURE_COCO_TO_COCO
 
+count_images_pipeline:
+  inputs: 
+    datastore: "inference_test"
+    input_rel_path: "datasets/kavel10_kempkes_geo360_sampled_panos_test" 
+
 pre_inference_pipeline:
   inputs: 
     datastore: "inference_test"
@@ -80,7 +85,7 @@ logging:
   own_packages: ["__main__", "blurring_as_a_service", "cvtoolkit",
                  "aml_interface", "evaluate_with_cvt_metrics", "validate_model",
                  "evaluate_with_coco", "detect_and_blur_sensitive_data",
-                 "inference_pipeline" "move_files", "split_workload",
+                 "inference_pipeline", "move_files", "split_workload",
                  "workload_splitter", "smart_sampling", "api_endpoint",
                  "count_images"]
   basic_config:

@@ -41,6 +41,15 @@ class MetadataPipelineSpec(SettingsSpecModel):
             )
 
 
+class CountImagesPipelineInputs(SettingsSpecModel):
+    datastore: str
+    input_rel_path: str
+
+
+class CountImagesPipelineSpec(SettingsSpecModel):
+    inputs: CountImagesPipelineInputs
+
+
 class PreInferencePipelineInputs(SettingsSpecModel):
     datastore: str
     input_rel_path: str
@@ -90,6 +99,7 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     customer: str
     aml_experiment_details: AMLExperimentDetailsSpec
     metadata_pipeline: MetadataPipelineSpec = None
+    count_images_pipeline: CountImagesPipelineSpec = None
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: BaaSInferencePipelineSpec = None
     sampling_parameters: SmartSamplingPipelineSpec = None

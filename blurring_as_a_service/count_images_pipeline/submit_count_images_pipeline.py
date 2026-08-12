@@ -28,13 +28,13 @@ def count_images_pipeline():
     aml_interface = AMLInterface()
 
     input_datastore_fullpath = aml_interface.get_datastore_full_path(
-        settings["pre_inference_pipeline"]["inputs"]["datastore"]
+        settings["count_images_pipeline"]["inputs"]["datastore"]
     )
     input_folder = Input(
         type=AssetTypes.URI_FOLDER,
         path=os.path.join(
             input_datastore_fullpath,
-            settings["pre_inference_pipeline"]["inputs"]["input_rel_path"],
+            settings["count_images_pipeline"]["inputs"]["input_rel_path"],
         ),
         description="Input folder",
     )
