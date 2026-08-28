@@ -8,7 +8,6 @@ from datetime import datetime
 from typing import List, Optional, Set
 
 from azure.ai.ml.constants import AssetTypes
-from azureml.core import Run
 from mldesigner import Input, Output, command_component
 from sqlalchemy.exc import SQLAlchemyError
 
@@ -47,7 +46,7 @@ from blurring_as_a_service.inference_pipeline.source.db_utils import (  # noqa: 
 )
 
 aml_experiment_settings = settings["aml_experiment_details"]
-run_id = Run.get_context().id
+run_id = os.getenv("AZUREML_RUN_ID")
 
 
 @command_component(
