@@ -1,28 +1,37 @@
 import os
 from collections import defaultdict
+from typing import List, Tuple
 
 IMG_FORMATS = "jpeg", "jpg"
 
 
-def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
+def count_images_per_folder(
+    input_folder: str,
+) -> Tuple[defaultdict[str, defaultdict[str, int]], defaultdict[str, List[str]]]:
     """
-    Count the number of corrupted images in each folder within the input container.
+    Count the number of (corrupted) images in each folder within the input folder.
 
     Parameters
     ----------
-    input_container : str
-        The path to the input container directory.
+    input_folder : str
+        The path to the input folder.
 
     Returns
     -------
-    defaultdict
-        A nested defaultdict where the keys are folder paths and the values are dictionaries
-        with counts of total, good, empty, and corrupted images.
+    defaultdict, defaultdict
+        1) A nested defaultdict where the keys are folder paths and the values
+           are dictionaries with counts of total, good, empty, and corrupted
+           images.
+        2) A defaultdict where the keys are "empty" and "corrupted" and the
+           values are the list of file names for each type.
     """
     image_counts: defaultdict[str, defaultdict[str, int]] = defaultdict(
         lambda: defaultdict(int)
     )
-    for root, _, files in os.walk(input_container):
+    image_names: defaultdict[str, List[str]] = defaultdict(list)
+
+    for root, _, files in os.walk(input_folder):
+        rel_root = f"input_folder/{os.path.relpath(root, input_folder)}"
         total_images = good_images = empty_images = corrupted_images = 0
         for file in files:
             if file.lower().endswith(IMG_FORMATS):
@@ -32,19 +41,21 @@ def count_corrupted_images_per_folder(input_container: str) -> defaultdict:
                     good_images += 1
                 elif validation_code == 1:
                     empty_images += 1
+                    image_names["empty"].append(os.path.join(rel_root, file))
                 elif validation_code == 2:
                     corrupted_images += 1
+                    image_names["corrupted"].append(os.path.join(rel_root, file))
 
         if total_images > 0:
-            image_counts[root]["total_images"] += total_images
+            image_counts[rel_root]["total"] += total_images
         if good_images > 0:
-            image_counts[root]["good_images"] += good_images
+            image_counts[rel_root]["good"] += good_images
         if empty_images > 0:
-            image_counts[root]["empty_images"] += empty_images
+            image_counts[rel_root]["empty"] += empty_images
         if corrupted_images > 0:
-            image_counts[root]["corrupted_images"] += corrupted_images
+            image_counts[rel_root]["corrupted"] += corrupted_images
 
-    return image_counts
+    return image_counts, image_names
 
 
 def check_jpgs(filename: str) -> int:

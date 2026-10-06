@@ -1,10 +1,9 @@
+import logging
 import os
 import sys
-import logging
 
 from azure.ai.ml.constants import AssetTypes
-from mldesigner import Output, command_component
-
+from mldesigner import Input, command_component
 
 sys.path.append("../../..")
 from aml_interface.azure_logging import AzureLoggingConfigurer  # noqa: E402
@@ -23,22 +22,30 @@ settings = BlurringAsAServiceSettings.get_settings()
 azureLoggingConfigurer = AzureLoggingConfigurer(settings["logging"], __name__)
 azureLoggingConfigurer.setup_baas_logging()
 
-from blurring_as_a_service.check_corrupted_images.source.count_corrupted_images_per_folder import count_corrupted_images_per_folder  # noqa: E402
+logger = logging.getLogger(__name__)
 
+from blurring_as_a_service.count_images_pipeline.source.count_images_per_folder import (  # noqa: E402
+    count_images_per_folder,
+)
 
 aml_experiment_settings = settings["aml_experiment_details"]
 
 
 @command_component(
-    name="count_corrupted_images",
-    display_name="Count corrupted images in input_structured folder",
+    name="count_images",
+    display_name="Count (corrupted) images in input folder",
     environment=f"azureml:{aml_experiment_settings['env_name']}:{aml_experiment_settings['env_version']}",
     code="../../../",
     is_deterministic=False,
 )
-def count_corrupted_images(
-    input_structured_container: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+def count_images(
+    input_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
-    image_counts = count_corrupted_images_per_folder(input_structured_container)
+    image_counts, image_names = count_images_per_folder(input_folder)
     for folder, count in image_counts.items():
-        logging.info(f"{folder}: {count} images")
+        count_str = ", ".join([f"{key}: {value}" for key, value in count.items()])
+        logger.info(f"Image counts for {folder}: {count_str}")
+    for key, file_list in image_names.items():
+        key_str = key.upper()
+        for file in file_list:
+            logger.info(f"{key_str}: {file}")

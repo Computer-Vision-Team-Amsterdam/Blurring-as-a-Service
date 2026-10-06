@@ -59,7 +59,7 @@ run_id = os.getenv("AZUREML_RUN_ID")
 def detect_and_blur_sensitive_data(
     images_folder: Input(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     model: Input(type=AssetTypes.URI_FILE),  # type: ignore # noqa: F821
-    batches_files_path: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
+    batch_files_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
     output_folder: Output(type=AssetTypes.URI_FOLDER),  # type: ignore # noqa: F821
 ):
     """
@@ -71,7 +71,7 @@ def detect_and_blur_sensitive_data(
         Path of the mounted folder containing the images.
     model:
         Model weights for inference
-    batches_files_path:
+    batch_files_folder:
          Path to folder with multiple text files.
          One text file contains multiple rows.
          Each row is a relative path to {customer_name}_input_structured/inference_queue
@@ -86,8 +86,8 @@ def detect_and_blur_sensitive_data(
     """
     start_time = get_current_time()
     logger = logging.getLogger("detect_and_blur_sensitive_data")
-    if not os.path.exists(batches_files_path):
-        raise FileNotFoundError(f"The folder '{batches_files_path}' does not exist.")
+    if not os.path.exists(batch_files_folder):
+        raise FileNotFoundError(f"The folder '{batch_files_folder}' does not exist.")
 
     output_rel_path = settings["inference_pipeline"]["outputs"]["output_rel_path"]
     if output_rel_path:
@@ -98,11 +98,11 @@ def detect_and_blur_sensitive_data(
     db_connector.create_connection()
 
     while True:
-        next_batch_file = get_next_batch_file(batches_files_path, logger)
+        next_batch_file = get_next_batch_file(batch_files_folder, logger)
         if next_batch_file is None:
             break
 
-        file_path = os.path.join(batches_files_path, next_batch_file)
+        file_path = os.path.join(batch_files_folder, next_batch_file)
         if os.path.isfile(file_path):
             try:
                 logger.info(f"Creating inference step: {file_path}")

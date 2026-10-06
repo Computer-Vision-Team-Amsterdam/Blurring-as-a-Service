@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "blurring_as_a_service"
-version = "2.2.1"
+version = "2.2.2"
 description = "Blurring of people and license plates in images."
 authors = [
     {name = "Daan Bloembergen", email = "d.bloembergen@amsterdam.nl"},
@@ -42,6 +42,12 @@ cu126 = [
   "torchvision>=0.26.0",
 ]
 
+[project.scripts]
+create_azure_env = "blurring_as_a_service.create_aml_environment.create_azure_env:main"
+run_pre_inference_pipeline = "blurring_as_a_service.pre_inference_pipeline.submit_pre_inference_pipeline:main"
+run_inference_pipeline = "blurring_as_a_service.inference_pipeline.submit_inference_pipeline:main"
+run_count_images_pipeline = "blurring_as_a_service.count_images_pipeline.submit_count_images_pipeline:main"
+
 [tool.uv]
 conflicts = [
   [
@@ -49,6 +55,7 @@ conflicts = [
     { extra = "cu126" },
   ],
 ]
+package = true
 prerelease = "allow"
 
 [tool.uv.sources]
@@ -75,7 +82,7 @@ url = "https://download.pytorch.org/whl/cu126"
 explicit = true
 
 [tool.setuptools.packages.find]
-include=["blurring_as_a_service", "blurring_as_a_service.*"]
+include=["blurring_as_a_service", "blurring_as_a_service.*", "tests"]
 
 [tool.isort]
 profile = "black"

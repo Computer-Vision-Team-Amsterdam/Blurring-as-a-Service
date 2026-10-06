@@ -41,16 +41,30 @@ class MetadataPipelineSpec(SettingsSpecModel):
             )
 
 
+class CountImagesPipelineInputs(SettingsSpecModel):
+    datastore: str
+    input_rel_path: str
+
+
+class CountImagesPipelineSpec(SettingsSpecModel):
+    inputs: CountImagesPipelineInputs
+
+
 class PreInferencePipelineInputs(SettingsSpecModel):
-    number_of_batches: int
+    datastore: str
+    input_rel_path: str
     exclude_list_file: str = "None"
 
 
+class PreInferencePipelineOutputs(SettingsSpecModel):
+    datastore: str
+    inference_queue_rel_path: str = "inference_queue"
+
+
 class PreInferencePipelineSpec(SettingsSpecModel):
-    datastore_input: str
-    datastore_input_path: str
-    datastore_output: str
     inputs: PreInferencePipelineInputs
+    outputs: PreInferencePipelineOutputs
+    number_of_batches: int = 1
 
 
 class DatabaseCredentialsSpec(SettingsSpecModel):
@@ -85,6 +99,7 @@ class BlurringAsAServiceSettingsSpec(SettingsSpecModel):
     customer: str
     aml_experiment_details: AMLExperimentDetailsSpec
     metadata_pipeline: MetadataPipelineSpec = None
+    count_images_pipeline: CountImagesPipelineSpec = None
     pre_inference_pipeline: PreInferencePipelineSpec = None
     inference_pipeline: BaaSInferencePipelineSpec = None
     sampling_parameters: SmartSamplingPipelineSpec = None

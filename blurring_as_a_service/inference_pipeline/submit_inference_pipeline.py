@@ -24,30 +24,43 @@ from blurring_as_a_service.inference_pipeline.components.detect_and_blur_sensiti
 
 @pipeline()
 def inference_pipeline():
-    images_folder_path = aml_interface.get_datastore_full_path(
-        settings["inference_pipeline"]["inputs"]["datastore_path"]
+    input_datastore_fullpath = aml_interface.get_datastore_full_path(
+        settings["inference_pipeline"]["inputs"]["datastore"]
     )
     images_folder = Input(
         type=AssetTypes.URI_FOLDER,
-        path=images_folder_path,
+        path=input_datastore_fullpath,
         description="Data to be blurred",
+    )
+
+    model_string = (
+        "azureml:"
+        f"{settings['inference_pipeline']['inputs']['model_name']}:"
+        f"{settings['inference_pipeline']['inputs']['model_version']}"
     )
     model_input = Input(
         type=AssetTypes.CUSTOM_MODEL,
-        path=f"azureml:{settings['inference_pipeline']['inputs']['model_name']}:{settings['inference_pipeline']['inputs']['model_version']}",
+        path=model_string,
         description="Model weights for evaluation",
     )
+
     detect_and_blur_sensitive_data_step = detect_and_blur_sensitive_data(
         images_folder=images_folder,
         model=model_input,
     )
-    detect_and_blur_sensitive_data_step.outputs.batches_files_path = Output(
+
+    batch_files_folder = os.path.join(
+        input_datastore_fullpath,
+        settings["inference_pipeline"]["inputs"]["inference_queue_rel_path"],
+    )
+    detect_and_blur_sensitive_data_step.outputs.batch_files_folder = Output(
         type="uri_folder",
         mode="rw_mount",
-        path=os.path.join(images_folder_path, "inference_queue"),
+        path=batch_files_folder,
     )
+
     output_datastore_fullpath = aml_interface.get_datastore_full_path(
-        settings["inference_pipeline"]["outputs"]["datastore_path"]
+        settings["inference_pipeline"]["outputs"]["datastore"]
     )
     detect_and_blur_sensitive_data_step.outputs.output_folder = Output(
         type="uri_folder", mode="rw_mount", path=output_datastore_fullpath

@@ -14,16 +14,18 @@ from blurring_as_a_service.pre_inference_pipeline.source.image_paths import (  #
 class WorkloadSplitter:
     @staticmethod
     def create_batches(
-        data_folder: str,
-        datastore_input_path: str,
+        input_data_folder: str,
+        input_rel_path: str,
         number_of_batches: int,
         output_folder: str,
         execution_time: str,
         exclude_file: Optional[str] = None,
     ) -> None:
         """
-        Starting from a data folder, iterates over all subfolders and equally groups all jpg files into number_of_batches
-        batches. These groups are stored into multiple txt files where each line is a file including the relative path.
+        Starting from a data folder, iterates over all subfolders and equally
+        groups all jpg files into number_of_batches batches. These groups are
+        stored into multiple txt files where each line is a file including the
+        relative path.
 
         Examples
         --------
@@ -40,23 +42,27 @@ class WorkloadSplitter:
 
         Parameters
         ----------
-        data_folder : str
-            Root folder containing the images.
+        input_data_folder : str
+            Root folder containing the data.
+        input_rel_path: str
+            Relative path on the root folder where to find the input images.
         number_of_batches : int
             Number of files to distribute the data.
         output_folder : str
             Where to store the output files.
         execution_time: str
-            Datetime containing when the job was executed. Used to prefix the files name.
+            Datetime containing when the job was executed. Used to prefix the
+            files name.
         exclude_file : Optional[str]
-            CSV file containing a column `filename` with names of files to skip.
+            CSV file path on the input_data_folder containing a column
+            `filename` with names of files to skip.
         """
-        image_paths = get_image_paths(os.path.join(data_folder, datastore_input_path))
+        image_paths = get_image_paths(os.path.join(input_data_folder, input_rel_path))
 
         logger.info(f"Number of input files found: {len(image_paths)}")
 
         if (exclude_file is not None) and (exclude_file != "None"):
-            with open(os.path.join(data_folder, exclude_file), "r") as csv_file:
+            with open(os.path.join(input_data_folder, exclude_file), "r") as csv_file:
                 reader = csv.reader(csv_file)
                 _ = next(reader)
                 exclude_list = {row[0] for row in reader}
@@ -76,7 +82,8 @@ class WorkloadSplitter:
                 math.ceil(len(image_paths) / 50) if len(image_paths) > 50 else 1
             )
             logger.warning(
-                f"Number of batches is greater than the number of images. Setting number_of_batches to {number_of_batches}."
+                "Number of batches is greater than the number of images. "
+                f"Setting number_of_batches to {number_of_batches}."
             )
 
         images_per_batch = math.ceil(len(image_paths) / number_of_batches)
@@ -91,7 +98,5 @@ class WorkloadSplitter:
             with open(batch_file_path, "w") as batch_file:
                 for j in range(start_index, end_index):
                     image_path = image_paths[j][1]
-                    batch_file.write(
-                        os.path.join(datastore_input_path, image_path) + "\n"
-                    )
+                    batch_file.write(os.path.join(input_rel_path, image_path) + "\n")
             logger.info(f"Batch {i} written to {batch_file_path}")

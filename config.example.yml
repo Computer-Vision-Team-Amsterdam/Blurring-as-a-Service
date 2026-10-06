@@ -24,13 +24,20 @@ metadata_pipeline:
     - CONVERT_AZURE_COCO_TO_YOLO
     - CONVERT_AZURE_COCO_TO_COCO
 
+count_images_pipeline:
+  inputs: 
+    datastore: "inference_test"
+    input_rel_path: "datasets/kavel10_kempkes_geo360_sampled_panos_test" 
+
 pre_inference_pipeline:
-  datastore_input: "inference_test"
-  datastore_input_path: "datasets/kavel10_kempkes_geo360_sampled_panos_test"
-  datastore_output: "inference_test"
-  inputs:
-    number_of_batches: 1
-    exclude_list_file: "files_not_to_process.csv"  # column of file names with header "file"; omit or use "None" for no exclude list
+  inputs: 
+    datastore: "inference_test"
+    input_rel_path: "datasets/kavel10_kempkes_geo360_sampled_panos_test"
+    exclude_list_file: "files_not_to_process.csv"  # Column of file names with header "file"; use "None" for no exclude list
+  outputs:
+    datastore: "inference_test"
+    inference_queue_rel_path: "inference_queue"  # Where to store batch files
+  number_of_batches: 1
 
 inference_pipeline:
   model_params:
@@ -38,12 +45,12 @@ inference_pipeline:
     img_size: 2048
     conf: 0.01
   inputs:
-    datastore_path: "inference_test"
-    inference_data_rel_path: "."
+    datastore: "inference_test"
+    inference_queue_rel_path: "inference_queue"  # Output of pre-inference pipeline
     model_name: "dataoffice_model"
     model_version: "2"
   outputs:
-    datastore_path: "inference_test"  # empty string "" means same as input datastore
+    datastore: "inference_test"
     output_rel_path: "inference/baas_test"
     detections_subfolder: ""
     labels_subfolder: ""
@@ -75,9 +82,12 @@ api_endpoint:
 
 logging:
   loglevel_own: INFO  # override loglevel for packages defined in `own_packages`
-  own_packages: ["__main__", "blurring_as_a_service", "yolov5", "cvtoolkit", "aml_interface",
-                 "evaluate_with_cvt_metrics", "validate_model", "evaluate_with_coco", "detect_and_blur_sensitive_data",
-                 "move_files", "split_workload", "smart_sampling", "api_endpoint"]
+  own_packages: ["__main__", "blurring_as_a_service", "cvtoolkit",
+                 "aml_interface", "evaluate_with_cvt_metrics", "validate_model",
+                 "evaluate_with_coco", "detect_and_blur_sensitive_data",
+                 "inference_pipeline", "move_files", "split_workload",
+                 "workload_splitter", "smart_sampling", "api_endpoint",
+                 "count_images"]
   basic_config:
     # log config as arguments to `logging.basicConfig`
     level: INFO

@@ -181,6 +181,7 @@ poetry.lock
 /weights
 /yolov5/runs
 /draw-YOLO-box
+/dashboard
 *.jpg
 *.DS_Store
 *.md
