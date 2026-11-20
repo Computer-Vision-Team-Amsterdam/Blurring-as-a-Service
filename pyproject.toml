@@ -57,6 +57,24 @@ conflicts = [
 ]
 package = true
 prerelease = "allow"
+dependency-metadata = [
+    { name = "yolo_model_development_kit", version = "v1.4.7", requires-dist = [
+      "aml_interface",
+      "azure-ai-ml>=1.20",
+      "azure-storage-blob>=12.23",
+      "cvtoolkit",
+      "matplotlib>=3.9.0",
+      "mldesigner>=0.1.0b16",
+      "numpy>=1.24.2",
+      "opencv-python>=4.6.0",
+      "pandas>=2.0",
+      "pycocotools>=2.0.8",
+      "pydantic>=1.8.2",
+      "sahi>=0.11.20",
+      "ultralytics>=8.3.0",
+      "wandb>=0.18.0",
+    ] },
+]
 
 [tool.uv.sources]
 aml_interface = { git = "https://github.com/Computer-Vision-Team-Amsterdam/AML-Interface.git", tag = "v1.1.5" }
