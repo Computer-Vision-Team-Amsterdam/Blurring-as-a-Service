@@ -2,12 +2,14 @@ from aml_interface.aml_interface import AMLInterface
 
 from blurring_as_a_service.settings.settings import BlurringAsAServiceSettings
 
+BlurringAsAServiceSettings.set_from_yaml("config.yml")
+settings = BlurringAsAServiceSettings.get_settings()
+
 
 def main():
     """
     This file creates an AML environment.
     """
-    settings = BlurringAsAServiceSettings.get_settings()
     aml_interface = AMLInterface()
     aml_interface.create_aml_environment(
         env_name=settings["aml_experiment_details"]["env_name"],
@@ -18,5 +20,4 @@ def main():
 
 
 if __name__ == "__main__":
-    BlurringAsAServiceSettings.set_from_yaml("config.yml")
     main()
