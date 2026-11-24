@@ -1,7 +1,7 @@
 customer: dataoffice
 
 aml_experiment_details:
-experiment_name: "baas_dataoffice"
+  experiment_name: "baas_dataoffice"
   compute_name: gpu-inference-cluster
   env_name: baas-environment
   env_version: 1  # Replace with the latest version
